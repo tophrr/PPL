@@ -1,5 +1,14 @@
 import { vi } from 'vitest';
 
+type MockFunction = (...args: readonly unknown[]) => unknown;
+
+interface MockUser {
+  id: string;
+  name: string;
+  email: string;
+  createdAt: string;
+}
+
 /**
  * Common test utilities and helper functions
  * Use these across all test files to keep tests DRY
@@ -24,16 +33,16 @@ export const waitFor = async (
 /**
  * Create a mock function with a default implementation
  */
-export const createMockFn = <T extends (...args: any[]) => any>(
+export const createMockFn = <T extends MockFunction>(
   implementation?: T
 ) => {
-  return vi.fn(implementation);
+  return implementation ? vi.fn(implementation) : vi.fn();
 };
 
 /**
  * Create a mock async function
  */
-export const createMockAsyncFn = <T = any>(
+export const createMockAsyncFn = <T>(
   resolvedValue?: T
 ) => {
   return vi.fn().mockResolvedValue(resolvedValue);
@@ -43,7 +52,7 @@ export const createMockAsyncFn = <T = any>(
  * Create a mock fetch response
  */
 export const createMockFetchResponse = (
-  data: any,
+  data: unknown,
   options: ResponseInit = {}
 ) => {
   return Promise.resolve(
@@ -63,15 +72,18 @@ export const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve
 /**
  * Generate mock data for testing
  */
-export const generateMockUser = (overrides = {}) => ({
-  id: Math.random().toString(36).substr(2, 9),
+export const generateMockUser = (overrides: Partial<MockUser> = {}): MockUser => ({
+  id: Math.random().toString(36).slice(2, 11),
   name: 'Test User',
   email: 'test@example.com',
   createdAt: new Date().toISOString(),
   ...overrides,
 });
 
-export const generateMockUsers = (count: number, overrides = {}) => {
+export const generateMockUsers = (
+  count: number,
+  overrides: Partial<MockUser> = {}
+): MockUser[] => {
   return Array.from({ length: count }, (_, i) =>
     generateMockUser({ id: `user-${i}`, ...overrides })
   );

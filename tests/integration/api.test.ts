@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
 
+interface UserPayload {
+  email?: string;
+  name?: string;
+}
+
 /**
  * Integration Tests - API Route Handlers
  * Test API endpoints work correctly with different inputs
@@ -17,7 +22,7 @@ class ApiHandler {
     return null;
   }
 
-  handlePostRequest(path: string, data: any) {
+  handlePostRequest(path: string, data: UserPayload) {
     if (path === '/api/users') {
       if (!data.email) {
         return { error: 'Email is required' };

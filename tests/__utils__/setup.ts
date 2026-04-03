@@ -1,5 +1,8 @@
-import { expect, afterAll, afterEach, beforeAll, vi } from 'vitest';
+import React, { type ComponentPropsWithoutRef } from 'react';
+import { afterAll, afterEach, beforeAll, vi } from 'vitest';
 import { server } from './mocks/server';
+
+(globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
 // Enable API mocking before all tests
 beforeAll(() => server.listen());
@@ -26,5 +29,6 @@ vi.mock('next/navigation', () => ({
 
 // Mock Next.js Image component
 vi.mock('next/image', () => ({
-  default: (props: any) => <img {...props} />,
+  default: (props: ComponentPropsWithoutRef<'img'>) =>
+    React.createElement('img', props),
 }));

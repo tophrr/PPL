@@ -1,4 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+import React, { useLayoutEffect } from 'react';
+import { act } from 'react';
+import { createRoot, type Root } from 'react-dom/client';
 
 /**
  * Unit Tests - Custom React Hooks
@@ -20,18 +23,38 @@ const useCounter = (initialValue = 0) => {
 
 describe('useCounter Hook', () => {
   it('should initialize with the correct value', () => {
-    // Note: Direct hook testing requires @testing-library/react
-    // For now, we're testing the logic structure
-    expect(useCounter).toBeDefined();
+    const hook = renderHook(() => useCounter(5));
+    expect(hook.current.count).toBe(5);
+    hook.unmount();
   });
 
   it('should export required methods', () => {
-    // Verify the hook structure
-    const mockHook = useCounter();
-    expect(mockHook).toHaveProperty('count');
-    expect(mockHook).toHaveProperty('increment');
-    expect(mockHook).toHaveProperty('decrement');
-    expect(mockHook).toHaveProperty('reset');
+    const hook = renderHook(() => useCounter());
+    expect(hook.current).toHaveProperty('count');
+    expect(hook.current).toHaveProperty('increment');
+    expect(hook.current).toHaveProperty('decrement');
+    expect(hook.current).toHaveProperty('reset');
+    hook.unmount();
+  });
+
+  it('should update state through increment, decrement, and reset', () => {
+    const hook = renderHook(() => useCounter(2));
+
+    act(() => {
+      hook.current.increment();
+    });
+    expect(hook.current.count).toBe(3);
+
+    act(() => {
+      hook.current.decrement();
+    });
+    expect(hook.current.count).toBe(2);
+
+    act(() => {
+      hook.current.reset();
+    });
+    expect(hook.current.count).toBe(2);
+    hook.unmount();
   });
 });
 
@@ -47,3 +70,37 @@ describe('Async Operations', () => {
     await expect(asyncFn()).rejects.toThrow('Failed');
   });
 });
+
+function renderHook<T>(useHook: () => T) {
+  const container = document.createElement('div');
+  document.body.appendChild(container);
+  let root: Root | undefined;
+  let currentValue!: T;
+
+  function HookHarness() {
+    const value = useHook();
+
+    useLayoutEffect(() => {
+      currentValue = value;
+    }, [value]);
+
+    return null;
+  }
+
+  act(() => {
+    root = createRoot(container);
+    root.render(React.createElement(HookHarness));
+  });
+
+  return {
+    get current() {
+      return currentValue;
+    },
+    unmount() {
+      act(() => {
+        root?.unmount();
+      });
+      container.remove();
+    },
+  };
+}

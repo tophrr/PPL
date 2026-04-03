@@ -1,5 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import React from 'react';
+import { act } from 'react';
+import { createRoot, type Root } from 'react-dom/client';
 
 /**
  * Component Tests - React Components
@@ -72,7 +74,20 @@ describe('Button Component', () => {
 function render(component: React.ReactElement) {
   const container = document.createElement('div');
   document.body.appendChild(container);
-  
-  // For testing purposes, we render the JSX structure
-  return { container };
+  let root: Root | undefined;
+
+  act(() => {
+    root = createRoot(container);
+    root.render(component);
+  });
+
+  return {
+    container,
+    unmount: () => {
+      act(() => {
+        root?.unmount();
+      });
+      container.remove();
+    },
+  };
 }

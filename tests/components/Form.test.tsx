@@ -1,12 +1,19 @@
 import { describe, it, expect, vi } from 'vitest';
 import React, { useState } from 'react';
+import { act } from 'react';
+import { createRoot, type Root } from 'react-dom/client';
 
 /**
  * Component Tests - Form Component
  * Test form handling, validation, and submission
  */
 
-const Form = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
+interface FormData {
+  email: string;
+  password: string;
+}
+
+const Form = ({ onSubmit }: { onSubmit: (data: FormData) => void }) => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -90,8 +97,7 @@ describe('Form Component', () => {
     const { container } = render(<Form onSubmit={mockOnSubmit} />);
 
     const emailInput = container.querySelector('input[name="email"]') as HTMLInputElement;
-    emailInput.value = 'test@example.com';
-    emailInput.dispatchEvent(new Event('change', { bubbles: true }));
+    setInputValue(emailInput, 'test@example.com');
 
     expect(emailInput.value).toBe('test@example.com');
   });
@@ -100,8 +106,10 @@ describe('Form Component', () => {
     const mockOnSubmit = vi.fn();
     const { container } = render(<Form onSubmit={mockOnSubmit} />);
 
-    const button = container.querySelector('button') as HTMLButtonElement;
-    button.click();
+    const form = container.querySelector('form') as HTMLFormElement;
+    act(() => {
+      form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    });
 
     const errorMessages = container.querySelectorAll('.error');
     expect(errorMessages.length).toBeGreaterThan(0);
@@ -114,12 +122,13 @@ describe('Form Component', () => {
 
     const emailInput = container.querySelector('input[name="email"]') as HTMLInputElement;
     const passwordInput = container.querySelector('input[name="password"]') as HTMLInputElement;
-    
-    emailInput.value = 'test@example.com';
-    passwordInput.value = 'password123';
+    setInputValue(emailInput, 'test@example.com');
+    setInputValue(passwordInput, 'password123');
 
-    const button = container.querySelector('button') as HTMLButtonElement;
-    button.click();
+    const form = container.querySelector('form') as HTMLFormElement;
+    act(() => {
+      form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    });
 
     expect(mockOnSubmit).toHaveBeenCalled();
   });
@@ -130,15 +139,15 @@ describe('Form Component', () => {
 
     const emailInput = container.querySelector('input[name="email"]') as HTMLInputElement;
     const passwordInput = container.querySelector('input[name="password"]') as HTMLInputElement;
-    
-    emailInput.value = 'invalid-email';
-    passwordInput.value = 'password123';
+    setInputValue(emailInput, 'invalid-email');
+    setInputValue(passwordInput, 'password123');
 
-    const button = container.querySelector('button') as HTMLButtonElement;
-    button.click();
+    const form = container.querySelector('form') as HTMLFormElement;
+    act(() => {
+      form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    });
 
-    const errorMessages = container.querySelectorAll('.error');
-    expect(errorMessages.length).toBeGreaterThan(0);
+    expect(container.textContent).toContain('Email is invalid');
     expect(mockOnSubmit).not.toHaveBeenCalled();
   });
 });
@@ -147,5 +156,33 @@ describe('Form Component', () => {
 function render(component: React.ReactElement) {
   const container = document.createElement('div');
   document.body.appendChild(container);
-  return { container };
+  let root: Root | undefined;
+
+  act(() => {
+    root = createRoot(container);
+    root.render(component);
+  });
+
+  return {
+    container,
+    unmount: () => {
+      act(() => {
+        root?.unmount();
+      });
+      container.remove();
+    },
+  };
+}
+
+function setInputValue(input: HTMLInputElement, value: string) {
+  const setter = Object.getOwnPropertyDescriptor(
+    HTMLInputElement.prototype,
+    'value'
+  )?.set;
+
+  act(() => {
+    setter?.call(input, value);
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  });
 }

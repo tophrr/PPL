@@ -1,5 +1,4 @@
 import React, { ReactElement } from 'react';
-import { render as vitestRender } from 'vitest';
 
 /**
  * Custom render function for testing React components

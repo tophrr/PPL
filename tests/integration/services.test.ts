@@ -1,5 +1,15 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { mockApiResponses } from '../../__fixtures__/api-responses';
+
+interface User {
+  id: number | string;
+  name: string;
+  email: string;
+}
+
+interface UserInput {
+  name: string;
+  email: string;
+}
 
 /**
  * Integration Tests - API Routes and Services
@@ -9,20 +19,20 @@ import { mockApiResponses } from '../../__fixtures__/api-responses';
 
 // Mock service class (you would import your actual service)
 class UserService {
-  baseUrl = '/api';
+  baseUrl = 'http://localhost/api';
 
-  async getUsers() {
+  async getUsers(): Promise<User[]> {
     const response = await fetch(`${this.baseUrl}/users`);
     return response.json();
   }
 
-  async getUserById(id: string) {
+  async getUserById(id: string): Promise<User> {
     const response = await fetch(`${this.baseUrl}/users/${id}`);
     if (!response.ok) throw new Error('User not found');
     return response.json();
   }
 
-  async createUser(userData: any) {
+  async createUser(userData: UserInput): Promise<User> {
     const response = await fetch(`${this.baseUrl}/users`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -32,7 +42,7 @@ class UserService {
     return response.json();
   }
 
-  async updateUser(id: string, userData: any) {
+  async updateUser(id: string, userData: Partial<UserInput>): Promise<User> {
     const response = await fetch(`${this.baseUrl}/users/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -60,7 +70,6 @@ describe('UserService', () => {
 
   describe('getUsers', () => {
     it('should fetch all users successfully', async () => {
-      // MSW will intercept this and return mock data
       const users = await service.getUsers();
       expect(Array.isArray(users)).toBe(true);
       expect(users.length).toBeGreaterThan(0);
@@ -69,36 +78,46 @@ describe('UserService', () => {
 
   describe('getUserById', () => {
     it('should fetch a user by ID', async () => {
-      // Note: This would require additional MSW handlers
-      expect(service.getUserById).toBeDefined();
+      const user = await service.getUserById('1');
+      expect(user).toMatchObject({
+        id: 1,
+        name: 'John Doe',
+      });
     });
 
     it('should throw error when user not found', async () => {
-      // This tests error handling
-      expect(async () => {
-        // Mock the response to be not ok
-        await service.getUserById('nonexistent');
-      }).toBeDefined();
+      await expect(service.getUserById('nonexistent')).rejects.toThrow('User not found');
     });
   });
 
   describe('createUser', () => {
     it('should create a new user', async () => {
-      const newUser = { name: 'Test User', email: 'test@example.com' };
-      // Requires additional MSW handler configuration
-      expect(service.createUser).toBeDefined();
+      const createdUser = await service.createUser({
+        name: 'Test User',
+        email: 'test@example.com',
+      });
+      expect(createdUser).toMatchObject({
+        id: 3,
+        name: 'Test User',
+        email: 'test@example.com',
+      });
     });
   });
 
   describe('updateUser', () => {
     it('should update an existing user', async () => {
-      expect(service.updateUser).toBeDefined();
+      const updatedUser = await service.updateUser('1', { name: 'John Updated' });
+      expect(updatedUser).toMatchObject({
+        id: '1',
+        name: 'John Updated',
+      });
     });
   });
 
   describe('deleteUser', () => {
     it('should delete a user', async () => {
-      expect(service.deleteUser).toBeDefined();
+      const response = await service.deleteUser('1');
+      expect(response).toEqual({ success: true });
     });
   });
 });
