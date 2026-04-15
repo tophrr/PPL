@@ -1,14 +1,24 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const appUrl =
+  process.env.PLAYWRIGHT_BASE_URL ??
+  process.env.NEXT_PUBLIC_APP_URL ??
+  'http://127.0.0.1:3000';
+
 export default defineConfig({
   testDir: './tests/e2e',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: 'html',
+  reporter: process.env.CI
+    ? [
+        ['github'],
+        ['html', { open: 'never' }],
+      ]
+    : 'html',
   use: {
-    baseURL: 'http://localhost:3000',
+    baseURL: appUrl,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
@@ -29,8 +39,8 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:3000',
+    command: 'npx next dev --hostname 127.0.0.1 --port 3000',
+    url: appUrl,
     reuseExistingServer: !process.env.CI,
   },
 });

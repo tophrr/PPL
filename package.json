@@ -23,18 +23,19 @@
     "react-dom": "19.2.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^4",
+    "@vitest/coverage-v8": "^1.6.1",
     "@vitest/ui": "^1",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "jsdom": "^23",
     "msw": "^1",
     "playwright": "^1",
-    "@playwright/test": "^1",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^1"
