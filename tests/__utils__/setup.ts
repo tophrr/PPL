@@ -1,17 +1,12 @@
-import { expect, afterAll, afterEach, beforeAll, vi } from 'vitest';
-import { server } from './mocks/server';
+import { afterAll, afterEach, beforeAll, vi } from "vitest";
+import { createElement } from "react";
+import { server } from "./mocks/server";
 
-// Enable API mocking before all tests
 beforeAll(() => server.listen());
-
-// Reset any request handlers that we may add during tests
 afterEach(() => server.resetHandlers());
-
-// Disable API mocking after all tests
 afterAll(() => server.close());
 
-// Mock Next.js router
-vi.mock('next/navigation', () => ({
+vi.mock("next/navigation", () => ({
   useRouter: () => ({
     push: vi.fn(),
     replace: vi.fn(),
@@ -21,10 +16,9 @@ vi.mock('next/navigation', () => ({
     prefetch: vi.fn(),
   }),
   useSearchParams: () => new URLSearchParams(),
-  usePathname: () => '/',
+  usePathname: () => "/",
 }));
 
-// Mock Next.js Image component
-vi.mock('next/image', () => ({
-  default: (props: any) => <img {...props} />,
+vi.mock("next/image", () => ({
+  default: (props: Record<string, unknown>) => createElement("img", props),
 }));

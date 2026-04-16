@@ -1,5 +1,4 @@
-import React, { ReactElement } from 'react';
-import { render as vitestRender } from 'vitest';
+import type { ReactElement } from "react";
 
 /**
  * Custom render function for testing React components
@@ -12,63 +11,69 @@ interface CustomRenderOptions {
 
 const customRender = (
   ui: ReactElement,
-  options?: CustomRenderOptions
+  options?: CustomRenderOptions,
 ) => {
-  const container = options?.container || document.createElement('div');
-  
-  // Render component into container
-  const root = React.createElement(React.Fragment, null, ui);
-  
+  const container = options?.container || document.createElement("div");
+
   return {
     container,
-    render: () => root,
+    render: () => ui,
   };
 };
 
-// Utility functions for DOM queries
 export const screen = {
   getByText: (text: string | RegExp): HTMLElement => {
-    const xpath = `//*[contains(text(), '${typeof text === 'string' ? text : text.source}')]`;
+    const queryText = typeof text === "string" ? text : text.source;
+    const xpath = `//*[contains(text(), '${queryText}')]`;
     const result = document.evaluate(
       xpath,
       document,
       null,
       XPathResult.FIRST_ORDERED_NODE_TYPE,
-      null
+      null,
     );
+
     if (!result.singleNodeValue) {
       throw new Error(`Element with text "${text}" not found`);
     }
+
     return result.singleNodeValue as HTMLElement;
   },
 
   getByRole: (role: string, options?: { name?: string | RegExp }): HTMLElement => {
     const elements = document.querySelectorAll(`[role="${role}"]`);
+
     if (options?.name) {
-      const nameStr = typeof options.name === 'string' ? options.name : options.name.source;
-      for (const el of elements) {
-        if (el.textContent?.includes(nameStr)) {
-          return el as HTMLElement;
+      const nameText = typeof options.name === "string" ? options.name : options.name.source;
+
+      for (const element of elements) {
+        if (element.textContent?.includes(nameText)) {
+          return element as HTMLElement;
         }
       }
     }
+
     if (elements.length === 0) {
       throw new Error(`Element with role "${role}" not found`);
     }
+
     return elements[0] as HTMLElement;
   },
 
   getByLabel: (label: string | RegExp): HTMLInputElement => {
-    const labels = document.querySelectorAll('label');
-    const labelStr = typeof label === 'string' ? label : label.source;
-    for (const l of labels) {
-      if (l.textContent?.includes(labelStr)) {
-        const id = l.getAttribute('for');
+    const labels = document.querySelectorAll("label");
+    const labelText = typeof label === "string" ? label : label.source;
+
+    for (const currentLabel of labels) {
+      if (currentLabel.textContent?.includes(labelText)) {
+        const id = currentLabel.getAttribute("for");
+
         if (id) {
           return document.getElementById(id) as HTMLInputElement;
         }
       }
     }
+
     throw new Error(`Input with label "${label}" not found`);
   },
 
@@ -87,4 +92,3 @@ export const screen = {
 };
 
 export { customRender as render };
-

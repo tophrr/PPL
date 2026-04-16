@@ -55,8 +55,8 @@ export const calendarColumns = [
     count: "3",
     tone: "draft" as StatusTone,
     cards: [
-      { title: "Spring Collection Launch - Instagram Carousel", brand: "Fashion Co.", meta: "Mar 15 · Sarah", platform: "IG" },
-      { title: "Weekly dashboard recap", brand: "Agency Pro", meta: "Mar 16 · Emma", platform: "LN" },
+      { title: "Spring Collection Launch - Instagram Carousel", brand: "Fashion Co.", meta: "Mar 15 | Sarah", platform: "IG" },
+      { title: "Weekly dashboard recap", brand: "Agency Pro", meta: "Mar 16 | Emma", platform: "LN" },
     ],
   },
   {
@@ -64,8 +64,8 @@ export const calendarColumns = [
     count: "3",
     tone: "review" as StatusTone,
     cards: [
-      { title: "Customer Success Story Video", brand: "Agency Pro", meta: "Mar 13 · Emma", platform: "YT" },
-      { title: "Product feature article", brand: "Tech Labs", meta: "Mar 18 · Riko", platform: "FB" },
+      { title: "Customer Success Story Video", brand: "Agency Pro", meta: "Mar 13 | Emma", platform: "YT" },
+      { title: "Product feature article", brand: "Tech Labs", meta: "Mar 18 | Riko", platform: "FB" },
     ],
   },
   {
@@ -73,8 +73,8 @@ export const calendarColumns = [
     count: "2",
     tone: "approved" as StatusTone,
     cards: [
-      { title: "Monthly Newsletter: Industry Trends", brand: "Fashion Co.", meta: "Mar 11 · David", platform: "EM" },
-      { title: "Launch reminder story sequence", brand: "Kopi Sela", meta: "Mar 19 · Nia", platform: "IG" },
+      { title: "Monthly Newsletter: Industry Trends", brand: "Fashion Co.", meta: "Mar 11 | David", platform: "EM" },
+      { title: "Launch reminder story sequence", brand: "Kopi Sela", meta: "Mar 19 | Nia", platform: "IG" },
     ],
   },
 ];

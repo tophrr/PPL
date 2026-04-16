@@ -131,22 +131,155 @@ export function ApprovalAnalyticsPageDesign() {
 
 export function LoginPageDesign() {
   return (
-    <div className="premium-background flex min-h-screen items-center justify-center px-4 py-8 md:px-6">
-      <div className="mx-auto w-full max-w-[540px]">
-        <GlassPanel className="p-7 md:p-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--purple-strong)]">Secure Access</p>
-          <h2 className="mt-3 text-4xl font-semibold tracking-tight text-[var(--slate-900)]">Sign in to Kitalaku.in</h2>
-          <p className="mt-2 text-base text-[var(--slate-500)]">Lanjutkan pekerjaan tim dari dashboard terpusat.</p>
-          <div className="mt-6 space-y-3">
-            <div className="rounded-xl border border-[var(--slate-150)] bg-white/80 px-4 py-4 text-sm text-[var(--slate-400)]">Email address</div>
-            <div className="rounded-xl border border-[var(--slate-150)] bg-white/80 px-4 py-4 text-sm text-[var(--slate-400)]">Password</div>
-            <div className="rounded-xl border border-[var(--slate-150)] bg-white/80 px-4 py-4 text-sm text-[var(--slate-400)]">Role: Admin/Manager/Creator/Client</div>
+    <div className="premium-background relative min-h-screen overflow-hidden px-4 py-8 md:px-6">
+      <div className="absolute inset-x-0 top-0 h-72 bg-[radial-gradient(circle_at_top,rgba(139,92,246,0.12),transparent_60%)]" />
+
+      <div className="relative mx-auto flex min-h-screen max-w-[1180px] items-center">
+        <div className="grid w-full gap-6 lg:grid-cols-[0.92fr_1.08fr]">
+          <section className="relative hidden overflow-hidden rounded-[32px] bg-[#111111] p-8 text-white shadow-[var(--shadow-elevated)] lg:flex lg:flex-col lg:justify-between">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.42),transparent_38%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(245,158,11,0.2),transparent_34%)]" />
+
+            <div className="relative z-10">
+              <Link href="/" className="text-sm font-semibold uppercase tracking-[0.18em] text-white/70">
+                Kitalaku.in
+              </Link>
+              <p className="mt-8 text-xs font-semibold uppercase tracking-[0.2em] text-[#f3d27c]">Secure Workspace Access</p>
+              <h1 className="mt-3 text-5xl font-semibold tracking-tight leading-[1.04]">
+                Simplified sign in with the same premium feel.
+              </h1>
+              <p className="mt-5 max-w-xl text-base leading-8 text-white/78">
+                Access planner, scheduler, approvals, and analytics from one clean gateway designed to keep your team moving.
+              </p>
+            </div>
+
+            <div className="relative z-10 grid gap-3 sm:grid-cols-3">
+              {[
+                ["4 Modules", "Planner, schedule, approval, analytics"],
+                ["Role Based", "Admin, manager, creator, and client"],
+                ["Persistent", "Secure session between workflow steps"],
+              ].map(([title, desc]) => (
+                <div key={title} className="rounded-2xl border border-white/12 bg-white/8 p-4 backdrop-blur-sm">
+                  <p className="text-lg font-semibold">{title}</p>
+                  <p className="mt-2 text-sm leading-6 text-white/70">{desc}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <div className="mx-auto w-full max-w-[620px]">
+            <div className="mb-4 flex flex-wrap gap-2 lg:hidden">
+              {["Role-based access", "Persistent session", "Premium workspace"].map((pill) => (
+                <span key={pill} className="rounded-full border border-[rgba(219,227,238,0.88)] bg-white/80 px-3 py-1.5 text-xs font-semibold text-[var(--slate-600)]">
+                  {pill}
+                </span>
+              ))}
+            </div>
+
+            <GlassPanel className="relative overflow-hidden p-7 md:p-8">
+              <div className="absolute right-0 top-0 h-36 w-36 bg-[radial-gradient(circle,rgba(139,92,246,0.14),transparent_68%)]" />
+
+              <div className="relative z-10">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--purple-strong)]">Secure Access</p>
+                <h2 className="mt-3 text-4xl font-semibold tracking-tight text-[var(--slate-900)]">Sign in to Kitalaku.in</h2>
+                <p className="mt-3 max-w-xl text-base leading-7 text-[var(--slate-500)]">
+                  Satu form yang lebih ringkas, lebih jelas, dan langsung mengarahkan user ke pekerjaan utamanya.
+                </p>
+
+                <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                  {[
+                    ["Protected", "Secure workspace"],
+                    ["Fast access", "Persistent session"],
+                    ["Team ready", "Role-aware entry"],
+                  ].map(([title, desc]) => (
+                    <div key={title} className="rounded-2xl border border-[rgba(219,227,238,0.88)] bg-white/72 px-4 py-3">
+                      <p className="text-sm font-semibold text-[var(--slate-900)]">{title}</p>
+                      <p className="mt-1 text-xs leading-5 text-[var(--slate-500)]">{desc}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <form className="mt-8 space-y-4">
+                  <div>
+                    <label htmlFor="email" className="text-sm font-medium text-[var(--slate-700)]">
+                      Work email
+                    </label>
+                    <input
+                      id="email"
+                      type="email"
+                      defaultValue="admin@kitalaku.in"
+                      className="mt-2 w-full rounded-2xl border border-[var(--slate-150)] bg-white/82 px-4 py-3.5 text-sm text-[var(--slate-700)] outline-none ring-0 placeholder:text-[var(--slate-400)] focus:border-[var(--purple-border)] focus:shadow-[0_0_0_4px_rgba(139,92,246,0.1)]"
+                    />
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label htmlFor="password" className="text-sm font-medium text-[var(--slate-700)]">
+                        Password
+                      </label>
+                      <input
+                        id="password"
+                        type="password"
+                        placeholder="Enter your password"
+                        className="mt-2 w-full rounded-2xl border border-[var(--slate-150)] bg-white/82 px-4 py-3.5 text-sm text-[var(--slate-700)] outline-none placeholder:text-[var(--slate-400)] focus:border-[var(--purple-border)] focus:shadow-[0_0_0_4px_rgba(139,92,246,0.1)]"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="role" className="text-sm font-medium text-[var(--slate-700)]">
+                        Role
+                      </label>
+                      <select
+                        id="role"
+                        defaultValue="Admin"
+                        className="mt-2 w-full rounded-2xl border border-[var(--slate-150)] bg-white/82 px-4 py-3.5 text-sm text-[var(--slate-700)] outline-none focus:border-[var(--purple-border)] focus:shadow-[0_0_0_4px_rgba(139,92,246,0.1)]"
+                      >
+                        <option>Admin</option>
+                        <option>Manager</option>
+                        <option>Creator</option>
+                        <option>Client</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-3 text-sm text-[var(--slate-500)] sm:flex-row sm:items-center sm:justify-between">
+                    <label className="flex items-center gap-2">
+                      <input type="checkbox" defaultChecked className="h-4 w-4 rounded border-[var(--slate-150)] accent-[var(--purple)]" />
+                      <span>Keep me signed in</span>
+                    </label>
+                    <Link href="/" className="font-semibold text-[var(--purple-strong)]">
+                      Back to landing page
+                    </Link>
+                  </div>
+                </form>
+
+                <button
+                  type="button"
+                  className="mt-6 w-full rounded-2xl bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] px-5 py-4 text-base font-semibold text-white shadow-[var(--shadow-soft)]"
+                >
+                  Secure Sign In
+                </button>
+
+                <div className="mt-4 rounded-2xl border border-[rgba(16,185,129,0.2)] bg-[rgba(16,185,129,0.08)] px-4 py-3 text-sm leading-6 text-[var(--emerald-strong)]">
+                  Session akan tetap aktif saat user berpindah dari planner ke scheduler atau approval.
+                </div>
+
+                <div className="mt-5 flex flex-col gap-3 rounded-2xl border border-[rgba(219,227,238,0.88)] bg-white/70 p-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-sm font-semibold text-[var(--slate-900)]">Need a quick UI preview?</p>
+                    <p className="mt-1 text-sm text-[var(--slate-500)]">Open the dashboard directly to review the new information hierarchy.</p>
+                  </div>
+                  <Link
+                    href="/dashboard"
+                    className="inline-flex items-center justify-center rounded-xl border border-[rgba(219,227,238,0.88)] bg-white px-4 py-2.5 text-sm font-semibold text-[var(--slate-700)]"
+                  >
+                    Open Dashboard
+                  </Link>
+                </div>
+              </div>
+            </GlassPanel>
           </div>
-          <button className="mt-5 w-full rounded-xl bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] px-5 py-4 text-base font-semibold text-white shadow-[var(--shadow-soft)]">Sign In</button>
-          <div className="mt-4 rounded-xl border border-[rgba(16,185,129,0.2)] bg-[rgba(16,185,129,0.08)] px-4 py-3 text-sm text-[var(--emerald-strong)]">
-            Session akan dipertahankan agar tidak perlu login ulang saat berpindah modul.
-          </div>
-        </GlassPanel>
+        </div>
       </div>
     </div>
   );

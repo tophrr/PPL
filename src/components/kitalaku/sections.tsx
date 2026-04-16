@@ -1,27 +1,142 @@
-import { activities, analyticsSummary, approvalStats, calendarColumns, captionDrafts, contentStatus, dashboardMetrics, plannerTopics, platformPerformance } from "./data";
-import { IconAnalytics, IconCopy, IconThumb, IconWand } from "./icons";
+import Link from "next/link";
+import {
+  activities,
+  analyticsSummary,
+  approvalStats,
+  calendarColumns,
+  captionDrafts,
+  contentStatus,
+  dashboardMetrics,
+  plannerTopics,
+  platformPerformance,
+} from "./data";
+import { IconAnalytics, IconCalendar, IconCopy, IconGrid, IconThumb, IconWand } from "./icons";
 import { cn, GlassPanel, toneDot, toneSurface } from "./primitives";
 
 export function DashboardSection() {
+  const totalItems = contentStatus.reduce((sum, item) => sum + Number(item.value), 0);
+
+  const quickActions = [
+    {
+      href: "/dashboard/planner",
+      title: "Open Planner",
+      detail: "Generate a new content direction for the next campaign.",
+      icon: <IconWand />,
+    },
+    {
+      href: "/dashboard/scheduler",
+      title: "Review Schedule",
+      detail: "Check this week's publishing queue and move blockers faster.",
+      icon: <IconCalendar />,
+    },
+    {
+      href: "/dashboard/approval-analytics",
+      title: "Track Performance",
+      detail: "See approvals and engagement without switching context.",
+      icon: <IconAnalytics />,
+    },
+  ];
+
+  const focusItems = [
+    {
+      title: "Finalize review queue",
+      detail: "8 pieces are waiting for feedback before 16:00.",
+      href: "/dashboard/approval-analytics",
+      tone: "review",
+    },
+    {
+      title: "Prepare tomorrow's schedule",
+      detail: "3 drafts are ready to be moved into the calendar.",
+      href: "/dashboard/scheduler",
+      tone: "draft",
+    },
+    {
+      title: "Generate fresh campaign ideas",
+      detail: "AI planner still has enough credits for another sprint.",
+      href: "/dashboard/planner",
+      tone: "approved",
+    },
+  ] as const;
+
   return (
-    <div className="space-y-5">
-      <GlassPanel className="relative overflow-hidden border-[rgba(124,58,237,0.2)] p-6">
-        <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-[radial-gradient(circle,rgba(139,92,246,0.24),transparent_68%)]" />
-        <div className="absolute -left-20 -bottom-20 h-52 w-52 rounded-full bg-[radial-gradient(circle,rgba(16,185,129,0.18),transparent_68%)]" />
-        <div className="relative z-10 flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
-          <div>
+    <div className="space-y-6">
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.15fr)_340px]">
+        <GlassPanel className="relative overflow-hidden border-[rgba(124,58,237,0.18)] p-6 md:p-7">
+          <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-[radial-gradient(circle,rgba(139,92,246,0.24),transparent_68%)]" />
+          <div className="absolute -left-20 -bottom-20 h-52 w-52 rounded-full bg-[radial-gradient(circle,rgba(16,185,129,0.18),transparent_68%)]" />
+
+          <div className="relative z-10">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--purple-strong)]">Command Center</p>
-            <h1 className="mt-2 text-4xl font-semibold tracking-tight text-[var(--slate-900)]">Welcome back, John!</h1>
-            <p className="mt-2 text-sm text-[var(--slate-500)]">Monitor campaign health, generate drafts, and move items to approval faster.</p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {["SLA 96%", "12 Pending Review", "420 AI Credits Used"].map((pill) => (
-                <span key={pill} className="rounded-full border border-[var(--slate-150)] bg-white/85 px-3 py-1 text-xs font-medium text-[var(--slate-600)]">
+            <h1 className="mt-3 max-w-3xl text-4xl font-semibold tracking-tight text-[var(--slate-900)] md:text-5xl">
+              A calmer workspace for planning, reviewing, and publishing.
+            </h1>
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--slate-500)] md:text-base">
+              The dashboard now puts the next decision first, trims secondary noise, and keeps your most important actions within one screen.
+            </p>
+
+            <div className="mt-5 flex flex-wrap gap-2">
+              {["SLA 96%", "8 items waiting review", "24 approved this month"].map((pill) => (
+                <span
+                  key={pill}
+                  className="rounded-full border border-[rgba(219,227,238,0.88)] bg-white/82 px-3 py-1.5 text-xs font-medium text-[var(--slate-600)]"
+                >
                   {pill}
                 </span>
               ))}
             </div>
+
+            <div className="mt-6 grid gap-3 md:grid-cols-3">
+              {quickActions.map((action) => (
+                <Link
+                  key={action.title}
+                  href={action.href}
+                  className="rounded-2xl border border-[rgba(255,255,255,0.78)] bg-white/74 p-4 shadow-[0_12px_24px_rgba(30,41,59,0.05)]"
+                >
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[rgba(124,58,237,0.1)] text-[var(--purple-strong)]">
+                    {action.icon}
+                  </div>
+                  <p className="mt-4 text-base font-semibold text-[var(--slate-900)]">{action.title}</p>
+                  <p className="mt-2 text-sm leading-6 text-[var(--slate-500)]">{action.detail}</p>
+                </Link>
+              ))}
+            </div>
           </div>
-          <div className="w-full rounded-2xl border border-[rgba(255,255,255,0.85)] bg-white/80 p-4 xl:w-[360px]">
+        </GlassPanel>
+
+        <GlassPanel className="p-5">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--amber-strong)]">Today Focus</p>
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[var(--slate-900)]">Three priorities</h2>
+            </div>
+            <span className="rounded-full bg-[var(--slate-100)] px-3 py-1 text-xs font-semibold text-[var(--slate-500)]">16 Apr</span>
+          </div>
+
+          <div className="mt-5 space-y-3">
+            {focusItems.map((item, index) => (
+              <div key={item.title} className="rounded-2xl border border-[rgba(219,227,238,0.88)] bg-white/76 p-4">
+                <div className="flex items-start gap-3">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--slate-100)] text-sm font-semibold text-[var(--slate-700)]">
+                    {index + 1}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-sm font-semibold text-[var(--slate-900)]">{item.title}</p>
+                      <span className={cn("rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em]", toneSurface(item.tone))}>
+                        {item.tone}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-sm leading-6 text-[var(--slate-500)]">{item.detail}</p>
+                    <Link href={item.href} className="mt-3 inline-flex text-xs font-semibold text-[var(--purple-strong)]">
+                      Open module
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-5 rounded-2xl border border-[rgba(219,227,238,0.88)] bg-[linear-gradient(135deg,rgba(255,255,255,0.82),rgba(241,245,249,0.95))] p-4">
             <div className="flex items-center justify-between text-sm">
               <span className="font-medium text-[var(--slate-700)]">Weekly engagement trend</span>
               <span className="font-semibold text-[var(--emerald-strong)]">+24%</span>
@@ -33,33 +148,64 @@ export function DashboardSection() {
                 </div>
               ))}
             </div>
+            <p className="mt-3 text-xs leading-5 text-[var(--slate-500)]">Best growth came from posts that passed review before noon.</p>
           </div>
-        </div>
-      </GlassPanel>
+        </GlassPanel>
+      </div>
 
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h2 className="text-2xl font-semibold tracking-tight text-[var(--slate-900)]">Performance Snapshot</h2>
           <p className="mt-1 text-sm text-[var(--slate-500)]">Real-time metrics across planner, scheduler, and approvals.</p>
         </div>
-        <button className="inline-flex items-center justify-center gap-2 rounded-xl bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] px-5 py-3 text-sm font-semibold text-white shadow-[var(--shadow-soft)]">
-          <IconWand />
-          <span>Create AI Draft</span>
-        </button>
+
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/dashboard/approval-analytics"
+            className="inline-flex items-center justify-center rounded-xl border border-[rgba(219,227,238,0.88)] bg-white/80 px-5 py-3 text-sm font-semibold text-[var(--slate-700)]"
+          >
+            View Approvals
+          </Link>
+          <Link
+            href="/dashboard/planner"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] px-5 py-3 text-sm font-semibold text-white shadow-[var(--shadow-soft)]"
+          >
+            <IconWand />
+            <span>Create AI Draft</span>
+          </Link>
+        </div>
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {dashboardMetrics.map((metric) => (
           <GlassPanel key={metric.label} className="p-5">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-sm text-[var(--slate-500)]">{metric.label}</p>
-                <p className="mt-2 text-4xl font-semibold tracking-tight text-[var(--slate-900)]">{metric.value}</p>
-                <p className={cn("mt-2 text-xs font-medium", metric.tone === "green" ? "text-[var(--emerald-strong)]" : metric.tone === "amber" ? "text-[var(--amber-strong)]" : "text-[var(--slate-500)]")}>
+                <p className="mt-3 text-4xl font-semibold tracking-tight text-[var(--slate-900)]">{metric.value}</p>
+                <p
+                  className={cn(
+                    "mt-3 inline-flex rounded-full px-3 py-1 text-xs font-semibold",
+                    metric.tone === "green"
+                      ? "bg-[var(--emerald-soft)] text-[var(--emerald-strong)]"
+                      : metric.tone === "amber"
+                        ? "bg-[var(--amber-soft)] text-[var(--amber-strong)]"
+                        : "bg-[var(--purple-soft)] text-[var(--purple-strong)]",
+                  )}
+                >
                   {metric.note}
                 </p>
               </div>
-              <div className={cn("rounded-xl p-2", metric.tone === "green" ? "bg-[var(--emerald-soft)] text-[var(--emerald-strong)]" : metric.tone === "amber" ? "bg-[var(--amber-soft)] text-[var(--amber-strong)]" : "bg-[var(--purple-soft)] text-[var(--purple-strong)]")}>
+              <div
+                className={cn(
+                  "rounded-2xl p-3",
+                  metric.tone === "green"
+                    ? "bg-[var(--emerald-soft)] text-[var(--emerald-strong)]"
+                    : metric.tone === "amber"
+                      ? "bg-[var(--amber-soft)] text-[var(--amber-strong)]"
+                      : "bg-[var(--purple-soft)] text-[var(--purple-strong)]",
+                )}
+              >
                 <IconAnalytics />
               </div>
             </div>
@@ -67,33 +213,79 @@ export function DashboardSection() {
         ))}
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[320px_minmax(0,1fr)]">
+      <div className="grid gap-4 xl:grid-cols-[340px_minmax(0,1fr)]">
         <GlassPanel className="p-5">
-          <h2 className="text-lg font-semibold text-[var(--slate-900)]">Content Status</h2>
-          <div className="mt-5 space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-semibold text-[var(--slate-900)]">Workflow Status</h2>
+              <p className="mt-1 text-sm text-[var(--slate-500)]">{totalItems} active items across the current production cycle.</p>
+            </div>
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[rgba(124,58,237,0.1)] text-[var(--purple-strong)]">
+              <IconGrid />
+            </div>
+          </div>
+
+          <div className="mt-5 space-y-4">
             {contentStatus.map((item) => (
-              <div key={item.label} className="flex items-center justify-between rounded-xl bg-white/70 px-4 py-4">
-                <div className="flex items-center gap-3">
-                  <span className={cn("h-2.5 w-2.5 rounded-full", toneDot(item.tone))} />
-                  <span className="text-sm font-medium text-[var(--slate-700)]">{item.label}</span>
+              <div key={item.label} className="rounded-2xl border border-[rgba(219,227,238,0.88)] bg-white/74 px-4 py-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className={cn("h-2.5 w-2.5 rounded-full", toneDot(item.tone))} />
+                    <span className="text-sm font-medium text-[var(--slate-700)]">{item.label}</span>
+                  </div>
+                  <span className="text-2xl font-semibold text-[var(--slate-900)]">{item.value}</span>
                 </div>
-                <span className="text-2xl font-semibold text-[var(--slate-900)]">{item.value}</span>
+                <div className="mt-3 h-2 rounded-full bg-[var(--slate-100)]">
+                  <div
+                    className={cn(
+                      "h-2 rounded-full",
+                      item.tone === "approved"
+                        ? "bg-[linear-gradient(90deg,#34d399,#10b981)]"
+                        : item.tone === "review"
+                          ? "bg-[linear-gradient(90deg,#c4b5fd,#8b5cf6)]"
+                          : "bg-[linear-gradient(90deg,#fcd34d,#f59e0b)]",
+                    )}
+                    style={{ width: `${(Number(item.value) / totalItems) * 100}%` }}
+                  />
+                </div>
               </div>
             ))}
+          </div>
+
+          <div className="mt-5 rounded-2xl border border-[rgba(245,158,11,0.18)] bg-[rgba(245,158,11,0.08)] p-4 text-sm leading-6 text-[var(--amber-strong)]">
+            Human-in-the-loop approval remains active so AI drafts always get a final manual review.
           </div>
         </GlassPanel>
 
         <GlassPanel className="p-5">
-          <h2 className="text-lg font-semibold text-[var(--slate-900)]">Recent Activity</h2>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-[var(--slate-900)]">Recent Activity</h2>
+              <p className="mt-1 text-sm text-[var(--slate-500)]">Latest motion across drafts, approvals, and publishing.</p>
+            </div>
+            <Link
+              href="/dashboard/scheduler"
+              className="inline-flex w-fit rounded-xl border border-[rgba(219,227,238,0.88)] bg-white/80 px-4 py-2.5 text-sm font-semibold text-[var(--slate-700)]"
+            >
+              Open Scheduler
+            </Link>
+          </div>
+
           <div className="mt-5 space-y-3">
             {activities.map((item) => (
-              <div key={item.title} className="rounded-xl bg-white/70 px-4 py-4">
+              <div key={item.title} className="rounded-2xl border border-[rgba(219,227,238,0.88)] bg-white/74 px-4 py-4">
                 <div className="flex items-start gap-3">
                   <span className={cn("mt-1.5 h-2.5 w-2.5 rounded-full", item.color)} />
-                  <div>
-                    <p className="text-sm font-medium text-[var(--slate-800)]">{item.title}</p>
-                    <p className="mt-1 text-sm text-[var(--slate-500)]">{item.detail}</p>
-                    <p className="mt-1 text-xs text-[var(--slate-400)]">{item.time}</p>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-[var(--slate-800)]">{item.title}</p>
+                        <p className="mt-1 text-sm leading-6 text-[var(--slate-500)]">{item.detail}</p>
+                      </div>
+                      <span className="rounded-full bg-[var(--slate-100)] px-3 py-1 text-[11px] font-semibold text-[var(--slate-500)]">
+                        {item.time}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -50,9 +50,11 @@ body {
   color: var(--foreground);
   font-family: var(--font-inter), "Helvetica Neue", Arial, sans-serif;
   background-image:
-    radial-gradient(circle at top left, rgba(139, 92, 246, 0.1), transparent 35%),
-    radial-gradient(circle at top right, rgba(16, 185, 129, 0.08), transparent 28%),
-    linear-gradient(180deg, #f8fafc 0%, #f1f5f9 55%, #eef2ff 100%);
+    radial-gradient(circle at 10% 12%, rgba(139, 92, 246, 0.12), transparent 26%),
+    radial-gradient(circle at 88% 2%, rgba(16, 185, 129, 0.08), transparent 24%),
+    radial-gradient(circle at 52% 100%, rgba(245, 158, 11, 0.06), transparent 34%),
+    linear-gradient(180deg, #f8fafc 0%, #f1f5f9 52%, #eef2ff 100%);
+  background-attachment: fixed;
   min-height: 100vh;
 }
 
@@ -72,14 +74,17 @@ h3 {
 
 .premium-glass {
   background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.66)),
-    radial-gradient(circle at top right, rgba(139, 92, 246, 0.08), transparent 45%);
-  backdrop-filter: blur(12px);
+    linear-gradient(155deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.72)),
+    radial-gradient(circle at top right, rgba(139, 92, 246, 0.1), transparent 42%),
+    radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.08), transparent 36%);
+  backdrop-filter: blur(18px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
 }
 
 a,
 button,
-input {
+input,
+select {
   transition:
     color 180ms ease,
     background-color 180ms ease,
