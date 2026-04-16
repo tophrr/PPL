@@ -1,26 +1,99 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f1f5f9;
+  --foreground: #1e293b;
+  --surface: rgba(255, 255, 255, 0.92);
+  --purple: #8b5cf6;
+  --purple-strong: #7c3aed;
+  --purple-soft: #efe7ff;
+  --purple-surface: #f7f2ff;
+  --purple-border: #c4b5fd;
+  --emerald: #10b981;
+  --emerald-strong: #15803d;
+  --emerald-soft: #dcfce7;
+  --amber: #f59e0b;
+  --amber-strong: #b45309;
+  --amber-soft: #fef3c7;
+  --slate-50: #f8fafc;
+  --slate-100: #f1f5f9;
+  --slate-150: #e2e8f0;
+  --slate-200: #dbe3ee;
+  --slate-500: #64748b;
+  --slate-600: #475569;
+  --slate-700: #334155;
+  --slate-800: #243041;
+  --slate-900: #1e293b;
+  --shadow-soft: 0 18px 45px rgba(30, 41, 59, 0.08);
+  --shadow-elevated: 0 24px 60px rgba(124, 58, 237, 0.14);
+  --shadow-card: 0 10px 24px rgba(30, 41, 59, 0.08);
+  --radius-card: 1rem;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
+  --font-mono: "Cascadia Code";
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), "Helvetica Neue", Arial, sans-serif;
+  background-image:
+    radial-gradient(circle at top left, rgba(139, 92, 246, 0.1), transparent 35%),
+    radial-gradient(circle at top right, rgba(16, 185, 129, 0.08), transparent 28%),
+    linear-gradient(180deg, #f8fafc 0%, #f1f5f9 55%, #eef2ff 100%);
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-lora), Georgia, serif;
+}
+
+.premium-background {
+  background-image:
+    radial-gradient(circle at 12% 8%, rgba(139, 92, 246, 0.14), transparent 30%),
+    radial-gradient(circle at 88% 14%, rgba(16, 185, 129, 0.1), transparent 28%),
+    radial-gradient(circle at 52% 100%, rgba(245, 158, 11, 0.08), transparent 34%),
+    linear-gradient(180deg, #f8fafc 0%, #f1f5f9 52%, #eef2ff 100%);
+}
+
+.premium-glass {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.66)),
+    radial-gradient(circle at top right, rgba(139, 92, 246, 0.08), transparent 45%);
+  backdrop-filter: blur(12px);
+}
+
+a,
+button,
+input {
+  transition:
+    color 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+button:hover,
+a:hover {
+  transform: translateY(-1px);
+}
+
+::selection {
+  background: rgba(139, 92, 246, 0.18);
+  color: var(--slate-900);
 }
