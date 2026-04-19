@@ -6,4 +6,5 @@ export {
   PlannerPageDesign,
   SchedulerPageDesign,
   SimplePlaceholderPage,
+  SubscriptionPageDesign,
 } from "./kitalaku/pages";

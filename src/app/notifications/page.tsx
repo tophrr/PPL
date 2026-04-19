@@ -1,10 +1,5 @@
-import { SimplePlaceholderPage } from "@/src/components/kitalaku-ui";
+import { redirect } from "next/navigation";
 
 export default function NotificationsPage() {
-  return (
-    <SimplePlaceholderPage
-      title="Notifications Center"
-      description="Pantau notifikasi approval, status generate AI, dan perubahan jadwal agar tim selalu sinkron secara real-time."
-    />
-  );
+  redirect("/dashboard");
 }

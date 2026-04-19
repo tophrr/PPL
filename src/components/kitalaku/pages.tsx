@@ -1,16 +1,17 @@
 import Link from "next/link";
-import { AppShell, GlassPanel } from "./primitives";
-import { ApprovalAnalyticsSection, CalendarSection, DashboardSection, PlannerSection } from "./sections";
+import { AppShell } from "./app-shell";
+import { GlassPanel } from "./primitives";
+import { ApprovalAnalyticsSection, CalendarSection, DashboardSection, PlannerSection, SubscriptionSection } from "./sections";
 
 function LandingNav() {
   return (
     <header className="mx-auto flex w-full max-w-[1200px] items-center justify-between rounded-2xl border border-[rgba(255,255,255,0.7)] bg-[rgba(255,255,255,0.72)] px-5 py-4 backdrop-blur-xl">
-      <p className="text-xl font-semibold tracking-tight text-[var(--slate-900)]">Kitalaku.in</p>
+      <p className="font-display text-2xl leading-[0.95] text-[var(--slate-900)]">Kitalaku.in</p>
       <div className="flex items-center gap-2">
         <Link href="/login" className="rounded-lg border border-[var(--slate-150)] bg-white/80 px-4 py-2 text-sm font-semibold text-[var(--slate-700)]">
           Login
         </Link>
-        <Link href="/dashboard" className="rounded-lg bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] px-4 py-2 text-sm font-semibold text-white">
+        <Link href="/dashboard" className="rounded-lg bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] px-4 py-2 text-sm font-semibold text-[var(--slate-900)]">
           Open Dashboard
         </Link>
       </div>
@@ -21,42 +22,43 @@ function LandingNav() {
 function LandingHero() {
   return (
     <div className="grid gap-6 xl:grid-cols-[1.12fr_0.88fr]">
-      <section className="relative overflow-hidden rounded-3xl bg-[#111111] p-8 text-white shadow-[var(--shadow-elevated)]">
+      <section className="relative overflow-hidden rounded-[36px] bg-[#17172b] p-8 text-[var(--slate-900)] shadow-[var(--shadow-premium)] md:p-10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.45),transparent_38%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(245,158,11,0.22),transparent_34%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(245,158,11,0.18),transparent_34%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.02),transparent_52%)]" />
         <div className="relative z-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#f3d27c]">AI CONTENT WORKSPACE</p>
-          <h1 className="mt-3 text-5xl font-semibold tracking-tight leading-[1.04] md:text-6xl">
-            Kelola konten lebih cepat, rapi, dan tetap sesuai brand.
+          <p className="text-xs font-semibold uppercase tracking-[0.34em] text-[var(--slate-700)]">AI CONTENT WORKSPACE</p>
+          <h1 className="font-display mt-4 max-w-4xl text-5xl leading-[0.98] text-[var(--slate-900)] md:text-7xl">
+            Workflow konten yang terasa tenang, tajam, dan siap dipakai tim harian.
           </h1>
-          <p className="mt-6 max-w-2xl text-lg text-white/78">
-            Dari ide konten sampai approval klien, semua alur kerja ada di satu dashboard yang terhubung.
+          <p className="mt-7 max-w-2xl text-lg leading-8 text-[var(--slate-700)]">
+            Kitalaku.in merangkum brief, drafting, approval, dan analytics ke dalam satu ruang kerja yang bersih, premium, dan tetap praktis untuk agensi maupun brand in-house.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/login" className="rounded-xl bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] px-6 py-3 text-sm font-semibold text-white">
-              Masuk ke Workspace
+            <Link href="/login" className="rounded-xl bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] px-6 py-3 text-sm font-semibold text-[var(--slate-900)]">
+              Masuk ke workspace
             </Link>
-            <Link href="/dashboard" className="rounded-xl border border-white/25 bg-white/10 px-6 py-3 text-sm font-semibold text-white">
-              Lihat Dashboard
+            <Link href="/dashboard" className="rounded-xl border border-white/25 bg-white/10 px-6 py-3 text-sm font-semibold text-[var(--slate-900)]">
+              Jelajahi dashboard
             </Link>
           </div>
         </div>
       </section>
 
       <GlassPanel className="p-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--amber-strong)]">Quick Access</p>
-        <h2 className="mt-3 text-4xl font-semibold tracking-tight text-[var(--slate-900)]">Masuk dan lanjutkan pekerjaan tim.</h2>
-        <p className="mt-3 text-base text-[var(--slate-500)]">Akses role-based untuk Admin, Manager, Creator, dan Client.</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--slate-700)]">Quick Access</p>
+        <h2 className="font-display mt-4 text-4xl leading-[1.02] text-[var(--slate-900)]">Masuk dan lanjutkan sprint tanpa kehilangan konteks kerja.</h2>
+        <p className="mt-4 text-base leading-7 text-[var(--slate-500)]">Akses role-based untuk Admin, Manager, Creator, dan Client dengan session yang tetap stabil di seluruh modul.</p>
         <div className="mt-7 space-y-3">
           <div className="rounded-xl border border-[var(--slate-150)] bg-white/90 px-4 py-4 text-[var(--slate-400)]">admin@kitalaku.in</div>
           <div className="rounded-xl border border-[var(--slate-150)] bg-white/90 px-4 py-4 text-[var(--slate-400)]">Masukkan password</div>
           <div className="flex items-center justify-between rounded-xl border border-[var(--slate-150)] bg-white/90 px-4 py-4">
-            <span className="text-sm text-[var(--slate-600)]">Admin session detected</span>
+            <span className="text-sm text-[var(--slate-600)]">Admin workspace terdeteksi</span>
             <span className="rounded-full bg-[rgba(16,185,129,0.14)] px-3 py-1 text-xs font-semibold text-[var(--emerald-strong)]">Persistent Session</span>
           </div>
         </div>
         <Link href="/login" className="mt-5 block rounded-xl bg-[linear-gradient(135deg,#f59e0b,#d28a19)] px-5 py-4 text-center text-lg font-semibold text-[#1e293b]">
-          Masuk ke Dashboard
+          Buka control room
         </Link>
       </GlassPanel>
     </div>
@@ -77,7 +79,7 @@ export function LandingPageDesign() {
             ["Analytics", "Pantau reach, engagement, dan performa platform."],
           ].map(([title, desc]) => (
             <GlassPanel key={title} className="p-5">
-              <p className="text-lg font-semibold text-[var(--slate-900)]">{title}</p>
+              <p className="font-display text-2xl leading-[1] text-[var(--slate-900)]">{title}</p>
               <p className="mt-2 text-sm leading-7 text-[var(--slate-600)]">{desc}</p>
             </GlassPanel>
           ))}
@@ -85,10 +87,10 @@ export function LandingPageDesign() {
 
         <GlassPanel className="flex flex-col items-center justify-between gap-4 p-6 text-center md:flex-row md:text-left">
           <div>
-            <p className="text-2xl font-semibold tracking-tight text-[var(--slate-900)]">Mulai kerja dari satu workspace yang terintegrasi.</p>
+            <p className="font-display text-3xl leading-[0.98] text-[var(--slate-900)]">Mulai kerja dari satu workspace yang terintegrasi.</p>
             <p className="mt-1 text-sm text-[var(--slate-500)]">Login untuk membuka planner, scheduler, approval, dan analytics.</p>
           </div>
-          <Link href="/login" className="rounded-xl bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] px-6 py-3 text-sm font-semibold text-white">
+          <Link href="/login" className="rounded-xl bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] px-6 py-3 text-sm font-semibold text-[var(--slate-900)]">
             Go to Login
           </Link>
         </GlassPanel>
@@ -129,6 +131,14 @@ export function ApprovalAnalyticsPageDesign() {
   );
 }
 
+export function SubscriptionPageDesign() {
+  return (
+    <AppShell active="Subscription">
+      <SubscriptionSection />
+    </AppShell>
+  );
+}
+
 export function LoginPageDesign() {
   return (
     <div className="premium-background relative min-h-screen overflow-hidden px-4 py-8 md:px-6">
@@ -136,20 +146,20 @@ export function LoginPageDesign() {
 
       <div className="relative mx-auto flex min-h-screen max-w-[1180px] items-center">
         <div className="grid w-full gap-6 lg:grid-cols-[0.92fr_1.08fr]">
-          <section className="relative hidden overflow-hidden rounded-[32px] bg-[#111111] p-8 text-white shadow-[var(--shadow-elevated)] lg:flex lg:flex-col lg:justify-between">
+          <section className="relative hidden overflow-hidden rounded-[32px] bg-[#111111] p-8 text-[var(--slate-900)] shadow-[var(--shadow-elevated)] lg:flex lg:flex-col lg:justify-between">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.42),transparent_38%)]" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(245,158,11,0.2),transparent_34%)]" />
 
             <div className="relative z-10">
-              <Link href="/" className="text-sm font-semibold uppercase tracking-[0.18em] text-white/70">
+              <Link href="/" className="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--slate-700)]">
                 Kitalaku.in
               </Link>
-              <p className="mt-8 text-xs font-semibold uppercase tracking-[0.2em] text-[#f3d27c]">Secure Workspace Access</p>
-              <h1 className="mt-3 text-5xl font-semibold tracking-tight leading-[1.04]">
-                Simplified sign in with the same premium feel.
+              <p className="mt-8 text-xs font-semibold uppercase tracking-[0.24em] text-[var(--slate-700)]">Secure Workspace Access</p>
+              <h1 className="font-display mt-4 text-5xl leading-[0.98] text-[var(--slate-900)]">
+                Masuk ke workspace yang terasa rapi sejak layar pertama.
               </h1>
-              <p className="mt-5 max-w-xl text-base leading-8 text-white/78">
-                Access planner, scheduler, approvals, and analytics from one clean gateway designed to keep your team moving.
+              <p className="mt-5 max-w-xl text-base leading-8 text-[var(--slate-700)]">
+                Planner, scheduler, approval, dan analytics dibuka dari satu gerbang yang lebih tenang, lebih eksklusif, dan tetap jelas untuk semua peran.
               </p>
             </div>
 
@@ -161,7 +171,7 @@ export function LoginPageDesign() {
               ].map(([title, desc]) => (
                 <div key={title} className="rounded-2xl border border-white/12 bg-white/8 p-4 backdrop-blur-sm">
                   <p className="text-lg font-semibold">{title}</p>
-                  <p className="mt-2 text-sm leading-6 text-white/70">{desc}</p>
+                  <p className="mt-2 text-sm leading-6 text-[var(--slate-700)]">{desc}</p>
                 </div>
               ))}
             </div>
@@ -180,10 +190,10 @@ export function LoginPageDesign() {
               <div className="absolute right-0 top-0 h-36 w-36 bg-[radial-gradient(circle,rgba(139,92,246,0.14),transparent_68%)]" />
 
               <div className="relative z-10">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--purple-strong)]">Secure Access</p>
-                <h2 className="mt-3 text-4xl font-semibold tracking-tight text-[var(--slate-900)]">Sign in to Kitalaku.in</h2>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--slate-700)]">Secure Access</p>
+                <h2 className="font-display mt-4 text-5xl leading-[1] text-[var(--slate-900)]">Sign in to Kitalaku.in</h2>
                 <p className="mt-3 max-w-xl text-base leading-7 text-[var(--slate-500)]">
-                  Satu form yang lebih ringkas, lebih jelas, dan langsung mengarahkan user ke pekerjaan utamanya.
+                  Satu form yang lebih ringkas, lebih dewasa, dan langsung mengarahkan pengguna ke pekerjaan prioritas mereka.
                 </p>
 
                 <div className="mt-6 grid gap-3 sm:grid-cols-3">
@@ -247,7 +257,7 @@ export function LoginPageDesign() {
                       <input type="checkbox" defaultChecked className="h-4 w-4 rounded border-[var(--slate-150)] accent-[var(--purple)]" />
                       <span>Keep me signed in</span>
                     </label>
-                    <Link href="/" className="font-semibold text-[var(--purple-strong)]">
+                    <Link href="/" className="font-semibold text-[var(--slate-900)]">
                       Back to landing page
                     </Link>
                   </div>
@@ -255,7 +265,7 @@ export function LoginPageDesign() {
 
                 <button
                   type="button"
-                  className="mt-6 w-full rounded-2xl bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] px-5 py-4 text-base font-semibold text-white shadow-[var(--shadow-soft)]"
+                  className="mt-6 w-full rounded-2xl bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] px-5 py-4 text-base font-semibold text-[var(--slate-900)] shadow-[var(--shadow-soft)]"
                 >
                   Secure Sign In
                 </button>
@@ -286,16 +296,18 @@ export function LoginPageDesign() {
 }
 
 export function SimplePlaceholderPage({
+  active,
   title,
   description,
 }: {
+  active: string;
   title: string;
   description: string;
 }) {
   return (
-    <AppShell active="Dashboard">
+    <AppShell active={active}>
       <GlassPanel className="p-8">
-        <p className="text-sm font-semibold uppercase tracking-[0.25em] text-[var(--purple-strong)]">Supporting page</p>
+        <p className="text-sm font-semibold uppercase tracking-[0.25em] text-[var(--slate-700)]">Supporting page</p>
         <h1 className="mt-3 text-4xl font-semibold tracking-tight text-[var(--slate-900)]">{title}</h1>
         <p className="mt-4 max-w-3xl text-base leading-8 text-[var(--slate-600)]">{description}</p>
       </GlassPanel>

@@ -5,6 +5,7 @@ export const sideNav = [
   { label: "AI Planner", href: "/dashboard/planner" },
   { label: "Scheduler", href: "/dashboard/scheduler" },
   { label: "Approval & Analytics", href: "/dashboard/approval-analytics" },
+  { label: "Subscription", href: "/dashboard/subscription" },
 ];
 
 export const dashboardMetrics = [
@@ -21,31 +22,31 @@ export const contentStatus = [
 ];
 
 export const activities = [
-  { title: "New draft created", detail: "Social Media Post - Spring Campaign", time: "2 hours ago", color: "bg-[var(--amber)]" },
-  { title: "Content approved", detail: "Blog Post - Marketing Tips", time: "5 hours ago", color: "bg-[var(--emerald)]" },
-  { title: "Review requested", detail: "Email Newsletter - March Edition", time: "1 day ago", color: "bg-[var(--purple)]" },
-  { title: "AI draft generated", detail: "Instagram Caption - Product Launch", time: "2 days ago", color: "bg-[var(--amber)]" },
+  { title: "Draft selesai dipoles", detail: "Caption launch serum hydration untuk Lumiere Skin masuk ke review lane.", time: "12 minutes ago", color: "bg-[var(--amber)]" },
+  { title: "Klien menyetujui konten", detail: "Newsletter mingguan Bumi Properti disetujui tanpa revisi tambahan.", time: "48 minutes ago", color: "bg-[var(--emerald)]" },
+  { title: "Manager meminta refinement", detail: "Carousel edukasi pajak UMKM butuh CTA yang lebih tegas di slide akhir.", time: "2 hours ago", color: "bg-[var(--purple)]" },
+  { title: "AI planner menghasilkan batch baru", detail: "Tiga angle campaign Ramadan untuk Kopi Sela siap dipilih tim kreatif.", time: "Yesterday", color: "bg-[var(--amber)]" },
 ];
 
 export const plannerTopics = [
-  { title: "AI in Content Marketing", tag: "Marketing", score: "95%", lift: "+127%" },
-  { title: "Sustainable Business Practices", tag: "Business", score: "88%", lift: "+89%" },
-  { title: "Remote Work Culture", tag: "HR", score: "82%", lift: "+72%" },
-  { title: "Social Media Trends 2026", tag: "Social Media", score: "90%", lift: "+65%" },
+  { title: "Ritual malam premium untuk kulit dehidrasi", tag: "Beauty", score: "95%", lift: "+127%" },
+  { title: "Behind the scenes roasting batch Ramadan", tag: "F&B", score: "88%", lift: "+89%" },
+  { title: "Checklist rumah pertama untuk pasangan muda", tag: "Property", score: "82%", lift: "+72%" },
+  { title: "Micro-storytelling untuk Reels edukatif 2026", tag: "Social Media", score: "90%", lift: "+65%" },
 ];
 
 export const captionDrafts = [
   {
     platform: "Instagram",
-    tone: "Professional & Engaging",
-    body: "Transform your content strategy with AI-powered insights! Discover how smart automation can help you create engaging posts in minutes, not hours.",
-    tags: ["#ContentMarketing", "#AITools", "#DigitalMarketing", "#SocialMediaTips"],
+    tone: "Refined & Warm",
+    body: "Kulit kusam tidak selalu butuh langkah rumit. Kadang yang dibutuhkan hanya serum dengan hidrasi yang terasa ringan, cepat menyerap, dan cukup lembut dipakai setiap malam. Lumiere Night Dew dirancang untuk rutinitas yang simple, tapi tetap terasa premium saat menyentuh kulit.",
+    tags: ["#NightRepair", "#HydrationRitual", "#LumiereSkin", "#SkincareMinimalist"],
   },
   {
     platform: "LinkedIn",
-    tone: "Professional & Authoritative",
-    body: "In today's fast-paced digital landscape, content creators need every advantage. Our AI-driven platform helps teams streamline workflow and maintain consistent brand quality.",
-    tags: ["#B2B", "#ContentStrategy", "#MarketingAutomation"],
+    tone: "Editorial & Bold",
+    body: "Agensi yang ingin tumbuh tidak bisa lagi bergantung pada alur kerja konten yang tersebar di banyak tools. Ketika planner, approval, dan analytics berada dalam satu workspace, keputusan editorial jadi lebih cepat, lebih terukur, dan lebih mudah dijaga kualitasnya untuk setiap brand yang ditangani.",
+    tags: ["#AgencyOperations", "#ContentSystem", "#MarketingWorkflow"],
   },
 ];
 
@@ -55,8 +56,8 @@ export const calendarColumns = [
     count: "3",
     tone: "draft" as StatusTone,
     cards: [
-      { title: "Spring Collection Launch - Instagram Carousel", brand: "Fashion Co.", meta: "Mar 15 | Sarah", platform: "IG" },
-      { title: "Weekly dashboard recap", brand: "Agency Pro", meta: "Mar 16 | Emma", platform: "LN" },
+      { title: "Teaser carousel koleksi Raya untuk Svarna Studio", brand: "Svarna Studio", meta: "Apr 18 | Sarah", platform: "IG" },
+      { title: "Recap insight mingguan untuk retainer Klio", brand: "Klio Agency", meta: "Apr 19 | Emma", platform: "LN" },
     ],
   },
   {
@@ -64,8 +65,8 @@ export const calendarColumns = [
     count: "3",
     tone: "review" as StatusTone,
     cards: [
-      { title: "Customer Success Story Video", brand: "Agency Pro", meta: "Mar 13 | Emma", platform: "YT" },
-      { title: "Product feature article", brand: "Tech Labs", meta: "Mar 18 | Riko", platform: "FB" },
+      { title: "Video testimonial founder untuk Rivora Living", brand: "Rivora Living", meta: "Apr 20 | Emma", platform: "YT" },
+      { title: "Artikel soft launch fitur baru untuk Clario", brand: "Clario Tech", meta: "Apr 21 | Riko", platform: "FB" },
     ],
   },
   {
@@ -73,8 +74,8 @@ export const calendarColumns = [
     count: "2",
     tone: "approved" as StatusTone,
     cards: [
-      { title: "Monthly Newsletter: Industry Trends", brand: "Fashion Co.", meta: "Mar 11 | David", platform: "EM" },
-      { title: "Launch reminder story sequence", brand: "Kopi Sela", meta: "Mar 19 | Nia", platform: "IG" },
+      { title: "Newsletter market outlook kuartal dua", brand: "Bumi Properti", meta: "Apr 16 | David", platform: "EM" },
+      { title: "Story reminder flash sale sore ini", brand: "Kopi Sela", meta: "Apr 17 | Nia", platform: "IG" },
     ],
   },
 ];
