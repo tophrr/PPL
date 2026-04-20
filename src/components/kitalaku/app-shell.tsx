@@ -157,7 +157,7 @@ export function AppShell({
             <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--slate-700)]">Workspace Overview</p>
-                <p className="font-display mt-3 text-4xl leading-[0.98] text-[var(--slate-900)]">{active}</p>
+                <p className="font-display mt-3 text-3xl leading-[1.04] text-[var(--slate-900)]">{active}</p>
                 <p className="mt-1 max-w-2xl text-sm leading-6 text-[var(--slate-500)]">{activeDescription}</p>
               </div>
 

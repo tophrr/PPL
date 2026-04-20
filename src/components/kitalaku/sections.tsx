@@ -68,7 +68,7 @@ export function DashboardSection() {
 
           <div className="relative z-10">
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--slate-700)]">COMMAND CENTER</p>
-            <h1 className="font-display mt-4 max-w-4xl text-5xl leading-[0.98] text-[var(--slate-900)] md:text-6xl">
+            <h1 className="font-display mt-4 max-w-4xl text-4xl leading-[1.04] text-[var(--slate-900)] md:text-5xl">
               Semua keputusan konten penting, sekarang terasa lebih jernih.
             </h1>
             <p className="mt-5 max-w-2xl text-sm leading-8 text-[var(--slate-700)] md:text-base">
