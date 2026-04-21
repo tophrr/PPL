@@ -18,6 +18,8 @@ const useCounter = (initialValue = 0) => {
   return { count, increment, decrement, reset };
 };
 
+import { renderHook, act } from '@testing-library/react';
+
 describe('useCounter Hook', () => {
   it('should initialize with the correct value', () => {
     // Note: Direct hook testing requires @testing-library/react
@@ -27,11 +29,11 @@ describe('useCounter Hook', () => {
 
   it('should export required methods', () => {
     // Verify the hook structure
-    const mockHook = useCounter();
-    expect(mockHook).toHaveProperty('count');
-    expect(mockHook).toHaveProperty('increment');
-    expect(mockHook).toHaveProperty('decrement');
-    expect(mockHook).toHaveProperty('reset');
+    const { result } = renderHook(() => useCounter());
+    expect(result.current).toHaveProperty('count');
+    expect(result.current).toHaveProperty('increment');
+    expect(result.current).toHaveProperty('decrement');
+    expect(result.current).toHaveProperty('reset');
   });
 });
 

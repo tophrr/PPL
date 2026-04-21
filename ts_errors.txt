@@ -1,0 +1,17 @@
+.next/types/validator.ts(42,39): error TS2307: Cannot find module '../../app/page.js' or its corresponding type declarations.
+.next/types/validator.ts(57,39): error TS2307: Cannot find module '../../app/layout.js' or its corresponding type declarations.
+tests/__utils__/mocks/handlers.ts(1,10): error TS2305: Module '"msw"' has no exported member 'rest'.
+tests/__utils__/mocks/handlers.ts(9,27): error TS7006: Parameter '_req' implicitly has an 'any' type.
+tests/__utils__/mocks/handlers.ts(9,33): error TS7006: Parameter 'res' implicitly has an 'any' type.
+tests/__utils__/mocks/handlers.ts(9,38): error TS7006: Parameter 'ctx' implicitly has an 'any' type.
+tests/__utils__/mocks/handlers.ts(18,34): error TS7006: Parameter 'req' implicitly has an 'any' type.
+tests/__utils__/mocks/handlers.ts(18,39): error TS7006: Parameter 'res' implicitly has an 'any' type.
+tests/__utils__/mocks/handlers.ts(18,44): error TS7006: Parameter 'ctx' implicitly has an 'any' type.
+tests/__utils__/mocks/handlers.ts(27,28): error TS7006: Parameter '_req' implicitly has an 'any' type.
+tests/__utils__/mocks/handlers.ts(27,34): error TS7006: Parameter 'res' implicitly has an 'any' type.
+tests/__utils__/mocks/handlers.ts(27,39): error TS7006: Parameter 'ctx' implicitly has an 'any' type.
+tests/integration/api.test.ts(41,3): error TS2304: Cannot find name 'beforeEach'.
+tests/integration/services.test.ts(2,34): error TS2307: Cannot find module '../../__fixtures__/api-responses' or its corresponding type declarations.
+vitest.config.ts(12,7): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Type '"c8"' is not assignable to type '"istanbul" | "v8" | "custom" | undefined'.
