@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter, Lora } from "next/font/google";
 import "./globals.css";
 
+import ConvexClientProvider from "./ConvexClientProvider";
+
 export const metadata: Metadata = {
   title: "Kitalaku.in",
   description: "AI-based content management dashboard for planning, scheduling, approval, and analytics.",
@@ -25,7 +27,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="id">
       <body className={`${inter.variable} ${lora.variable}`}>
-        <main>{children}</main>
+        <ConvexClientProvider>
+          <main>{children}</main>
+        </ConvexClientProvider>
       </body>
     </html>
   );
