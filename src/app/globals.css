@@ -31,13 +31,7 @@
   --shadow-card: 0 10px 24px rgba(30, 41, 59, 0.08);
   --shadow-premium: 0 28px 90px rgba(23, 23, 45, 0.18);
   --radius-card: 1rem;
-  --font-display:
-    "Iowan Old Style",
-    "Palatino Linotype",
-    "Book Antiqua",
-    "Times New Roman",
-    Georgia,
-    serif;
+  --font-display: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
 }
 
 @theme inline {
