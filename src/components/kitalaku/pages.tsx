@@ -22,9 +22,9 @@ function LandingNav() {
 function LandingHero() {
   return (
     <div className="grid gap-6 xl:grid-cols-[1.12fr_0.88fr]">
-      <section className="relative overflow-hidden rounded-[36px] bg-[] p-8 text-[var(--slate-900)] shadow-[var(--shadow-premium)] md:p-10">
+      <section className="relative overflow-hidden rounded-[36px] bg-[#FFFFFF] p-8 text-[var(--slate-900)] shadow-[var(--shadow-premium)] md:p-10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.45),transparent_38%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(245,158,11,0.18),transparent_34%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_npbottom_right,rgba(245,158,11,0.18),transparent_34%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.02),transparent_52%)]" />
         <div className="relative z-10">
           <p className="text-xs font-semibold uppercase tracking-[0.34em] text-[var(--slate-700)]">AI CONTENT WORKSPACE</p>
@@ -146,7 +146,7 @@ export function LoginPageDesign() {
 
       <div className="relative mx-auto flex min-h-screen max-w-[1180px] items-center">
         <div className="grid w-full gap-6 lg:grid-cols-[0.92fr_1.08fr]">
-          <section className="relative hidden overflow-hidden rounded-[32px] bg-[#111111] p-8 text-[var(--slate-900)] shadow-[var(--shadow-elevated)] lg:flex lg:flex-col lg:justify-between">
+          <section className="relative hidden overflow-hidden rounded-[32px] bg-[#FFFFFF] p-8 text-[var(--slate-900)] shadow-[var(--shadow-elevated)] lg:flex lg:flex-col lg:justify-between">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.42),transparent_38%)]" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(245,158,11,0.2),transparent_34%)]" />
 
