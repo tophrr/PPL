@@ -5,6 +5,9 @@ import nextTs from "eslint-config-next/typescript";
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
+  // Add TypeScript recommended rules and Prettier integration
+  "plugin:@typescript-eslint/recommended",
+  "plugin:prettier/recommended",
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:
