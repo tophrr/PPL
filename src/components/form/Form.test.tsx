@@ -152,7 +152,7 @@ function render(node?: React.ReactNode) {
   document.body.appendChild(container);
   if (node !== undefined) {
     const root = createRoot(container);
-    root.render(node as any);
+    root.render(node);
   }
   return { container };
 }
