@@ -69,10 +69,8 @@ describe('Button Component', () => {
 });
 
 // Simple render helper for this test
-function render(component: React.ReactElement) {
+function render() {
   const container = document.createElement('div');
   document.body.appendChild(container);
-
-  // For testing purposes, we render the JSX structure
   return { container };
 }

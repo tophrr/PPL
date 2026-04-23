@@ -6,7 +6,9 @@ import React, { useState } from 'react';
  * Test form handling, validation, and submission
  */
 
-const Form = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
+type FormData = { email: string; password: string };
+
+const Form = ({ onSubmit }: { onSubmit: (data: FormData) => void }) => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -144,7 +146,7 @@ describe('Form Component', () => {
 });
 
 // Simple render helper
-function render(component: React.ReactElement) {
+function render() {
   const container = document.createElement('div');
   document.body.appendChild(container);
   return { container };
