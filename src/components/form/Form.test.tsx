@@ -114,7 +114,7 @@ describe('Form Component', () => {
 
     const emailInput = container.querySelector('input[name="email"]') as HTMLInputElement;
     const passwordInput = container.querySelector('input[name="password"]') as HTMLInputElement;
-    
+
     emailInput.value = 'test@example.com';
     passwordInput.value = 'password123';
 
@@ -130,7 +130,7 @@ describe('Form Component', () => {
 
     const emailInput = container.querySelector('input[name="email"]') as HTMLInputElement;
     const passwordInput = container.querySelector('input[name="password"]') as HTMLInputElement;
-    
+
     emailInput.value = 'invalid-email';
     passwordInput.value = 'password123';
 

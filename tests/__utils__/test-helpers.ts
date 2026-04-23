@@ -8,10 +8,7 @@ import { vi } from 'vitest';
 /**
  * Wait for a condition to be true
  */
-export const waitFor = async (
-  condition: () => boolean,
-  timeout = 1000
-): Promise<void> => {
+export const waitFor = async (condition: () => boolean, timeout = 1000): Promise<void> => {
   const startTime = Date.now();
   while (!condition()) {
     if (Date.now() - startTime > timeout) {
@@ -24,34 +21,27 @@ export const waitFor = async (
 /**
  * Create a mock function with a default implementation
  */
-export const createMockFn = <T extends (...args: any[]) => any>(
-  implementation?: T
-) => {
+export const createMockFn = <T extends (...args: any[]) => any>(implementation?: T) => {
   return vi.fn(implementation);
 };
 
 /**
  * Create a mock async function
  */
-export const createMockAsyncFn = <T = any>(
-  resolvedValue?: T
-) => {
+export const createMockAsyncFn = <T = any>(resolvedValue?: T) => {
   return vi.fn().mockResolvedValue(resolvedValue);
 };
 
 /**
  * Create a mock fetch response
  */
-export const createMockFetchResponse = (
-  data: any,
-  options: ResponseInit = {}
-) => {
+export const createMockFetchResponse = (data: any, options: ResponseInit = {}) => {
   return Promise.resolve(
     new Response(JSON.stringify(data), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
       ...options,
-    })
+    }),
   );
 };
 
@@ -73,6 +63,6 @@ export const generateMockUser = (overrides = {}) => ({
 
 export const generateMockUsers = (count: number, overrides = {}) => {
   return Array.from({ length: count }, (_, i) =>
-    generateMockUser({ id: `user-${i}`, ...overrides })
+    generateMockUser({ id: `user-${i}`, ...overrides }),
   );
 };

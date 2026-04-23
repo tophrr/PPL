@@ -60,7 +60,7 @@ describe('Button Component', () => {
     const { container } = render(
       <Button disabled onClick={handleClick}>
         Disabled
-      </Button>
+      </Button>,
     );
     const button = container.querySelector('button') as HTMLButtonElement;
     button.click?.();
@@ -72,7 +72,7 @@ describe('Button Component', () => {
 function render(component: React.ReactElement) {
   const container = document.createElement('div');
   document.body.appendChild(container);
-  
+
   // For testing purposes, we render the JSX structure
   return { container };
 }
