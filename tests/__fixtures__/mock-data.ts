@@ -9,11 +9,7 @@ export const mockTimestamps = {
 };
 
 export const mockIds = {
-  valid: [
-    'clh1a2b3c4d5e6f7g8h9i0j1',
-    'clh2a2b3c4d5e6f7g8h9i0j2',
-    'clh3a2b3c4d5e6f7g8h9i0j3',
-  ],
+  valid: ['clh1a2b3c4d5e6f7g8h9i0j1', 'clh2a2b3c4d5e6f7g8h9i0j2', 'clh3a2b3c4d5e6f7g8h9i0j3'],
   invalid: ['invalid-id', '123', ''],
 };
 

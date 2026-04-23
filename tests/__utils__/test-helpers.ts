@@ -1,40 +1,47 @@
-import { vi } from "vitest";
+import { vi } from 'vitest';
 
-export const waitFor = async (
-  condition: () => boolean,
-  timeout = 1000,
-): Promise<void> => {
+/**
+ * Common test utilities and helper functions
+ * Use these across all test files to keep tests DRY
+ */
+
+/**
+ * Wait for a condition to be true
+ */
+export const waitFor = async (condition: () => boolean, timeout = 1000): Promise<void> => {
   const startTime = Date.now();
 
   while (!condition()) {
     if (Date.now() - startTime > timeout) {
-      throw new Error("Timeout waiting for condition");
+      throw new Error('Timeout waiting for condition');
     }
 
     await new Promise((resolve) => setTimeout(resolve, 50));
   }
 };
 
-export const createMockFn = <T extends (...args: any[]) => any>(
-  implementation?: T,
-) => {
-  return implementation ? vi.fn(implementation) : vi.fn();
+/**
+ * Create a mock function with a default implementation
+ */
+export const createMockFn = <T extends (...args: any[]) => any>(implementation?: T) => {
+  return vi.fn(implementation);
 };
 
-export const createMockAsyncFn = <T = any>(
-  resolvedValue?: T,
-) => {
+/**
+ * Create a mock async function
+ */
+export const createMockAsyncFn = <T = any>(resolvedValue?: T) => {
   return vi.fn().mockResolvedValue(resolvedValue);
 };
 
-export const createMockFetchResponse = (
-  data: any,
-  options: ResponseInit = {},
-) => {
+/**
+ * Create a mock fetch response
+ */
+export const createMockFetchResponse = (data: any, options: ResponseInit = {}) => {
   return Promise.resolve(
     new Response(JSON.stringify(data), {
       status: 200,
-      headers: { "Content-Type": "application/json" },
+      headers: { 'Content-Type': 'application/json' },
       ...options,
     }),
   );
@@ -44,8 +51,8 @@ export const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve
 
 export const generateMockUser = (overrides = {}) => ({
   id: Math.random().toString(36).slice(2, 11),
-  name: "Test User",
-  email: "test@example.com",
+  name: 'Test User',
+  email: 'test@example.com',
   createdAt: new Date().toISOString(),
   ...overrides,
 });

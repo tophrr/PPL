@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+    "prepare": "husky install",
+    "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\" --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "eslint \"src/**/*.{js,jsx,ts,tsx}\" --fix --ext .js,.jsx,.ts,.tsx",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
     "test": "vitest",
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
@@ -23,18 +28,31 @@
     "react-dom": "19.2.3"
   },
   "devDependencies": {
+    "@next/eslint-plugin-next": "^16.2.4",
     "@playwright/test": "^1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@typescript-eslint/eslint-plugin": "^8",
+    "@typescript-eslint/parser": "^8",
     "@vitejs/plugin-react": "^4",
     "@vitest/ui": "^4.0.18",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "eslint-config-prettier": "^9",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-prettier": "^5",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.5.0",
     "jsdom": "^23",
     "msw": "^2.12.10",
     "playwright": "^1",
+    "prettier": "^3",
+    "husky": "^8.0.0",
+    "lint-staged": "^14.0.0",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.0.18"
@@ -46,5 +64,14 @@
   "trustedDependencies": [
     "sharp",
     "unrs-resolver"
-  ]
+  ],
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,css,md}": [
+      "prettier --write"
+    ]
+  }
 }

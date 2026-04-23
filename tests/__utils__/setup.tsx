@@ -1,12 +1,12 @@
-import { afterAll, afterEach, beforeAll, vi } from "vitest";
-import { createElement } from "react";
-import { server } from "./mocks/server";
+import { afterAll, afterEach, beforeAll, vi } from 'vitest';
+import { createElement } from 'react';
+import { server } from './mocks/server';
 
 beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
-vi.mock("next/navigation", () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: vi.fn(),
     replace: vi.fn(),
@@ -16,9 +16,9 @@ vi.mock("next/navigation", () => ({
     prefetch: vi.fn(),
   }),
   useSearchParams: () => new URLSearchParams(),
-  usePathname: () => "/",
+  usePathname: () => '/',
 }));
 
-vi.mock("next/image", () => ({
-  default: (props: Record<string, unknown>) => createElement("img", props),
+vi.mock('next/image', () => ({
+  default: (props: Record<string, unknown>) => createElement('img', props),
 }));

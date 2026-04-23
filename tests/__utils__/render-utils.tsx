@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import React, { ReactElement } from 'react';
 
 /**
  * Custom render function for testing React components
@@ -9,11 +9,11 @@ interface CustomRenderOptions {
   container?: HTMLElement;
 }
 
-const customRender = (
-  ui: ReactElement,
-  options?: CustomRenderOptions,
-) => {
-  const container = options?.container || document.createElement("div");
+const customRender = (ui: ReactElement, options?: CustomRenderOptions) => {
+  const container = options?.container || document.createElement('div');
+
+  // Render component into container
+  const root = React.createElement(React.Fragment, null, ui);
 
   return {
     container,
@@ -23,7 +23,7 @@ const customRender = (
 
 export const screen = {
   getByText: (text: string | RegExp): HTMLElement => {
-    const queryText = typeof text === "string" ? text : text.source;
+    const queryText = typeof text === 'string' ? text : text.source;
     const xpath = `//*[contains(text(), '${queryText}')]`;
     const result = document.evaluate(
       xpath,
@@ -44,7 +44,7 @@ export const screen = {
     const elements = document.querySelectorAll(`[role="${role}"]`);
 
     if (options?.name) {
-      const nameText = typeof options.name === "string" ? options.name : options.name.source;
+      const nameText = typeof options.name === 'string' ? options.name : options.name.source;
 
       for (const element of elements) {
         if (element.textContent?.includes(nameText)) {
@@ -61,12 +61,12 @@ export const screen = {
   },
 
   getByLabel: (label: string | RegExp): HTMLInputElement => {
-    const labels = document.querySelectorAll("label");
-    const labelText = typeof label === "string" ? label : label.source;
+    const labels = document.querySelectorAll('label');
+    const labelText = typeof label === 'string' ? label : label.source;
 
     for (const currentLabel of labels) {
       if (currentLabel.textContent?.includes(labelText)) {
-        const id = currentLabel.getAttribute("for");
+        const id = currentLabel.getAttribute('for');
 
         if (id) {
           return document.getElementById(id) as HTMLInputElement;

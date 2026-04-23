@@ -1,4 +1,4 @@
-import { SimplePlaceholderPage } from "@/src/components/kitalaku-ui";
+import { SimplePlaceholderPage } from '@/src/components/kitalaku-ui';
 
 export default function SettingsPage() {
   return (

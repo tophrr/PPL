@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { mockApiResponses } from '../../__fixtures__/api-responses';
+import { mockApiResponses } from '../__fixtures__/api-responses';
 
 /**
  * Integration Tests - API Routes and Services
