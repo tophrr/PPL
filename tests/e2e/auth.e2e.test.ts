@@ -19,9 +19,7 @@ test.describe('Authentication Flow', () => {
     await expect(page.getByRole('button', { name: /sign in/i })).toBeVisible();
   });
 
-  test('should show validation errors on invalid credentials', async ({
-    page,
-  }) => {
+  test('should show validation errors on invalid credentials', async ({ page }) => {
     // Try to submit without entering credentials
     await page.getByRole('button', { name: /sign in/i }).click();
 
@@ -42,9 +40,7 @@ test.describe('Authentication Flow', () => {
     await expect(page.getByText(/invalid email/i)).toBeVisible();
   });
 
-  test('should successfully login with valid credentials', async ({
-    page,
-  }) => {
+  test('should successfully login with valid credentials', async ({ page }) => {
     // Assume a test user exists with these credentials
     await page.getByLabel(/email/i).fill('test@example.com');
     await page.getByLabel(/password/i).fill('password123');

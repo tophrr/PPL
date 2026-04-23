@@ -1,12 +1,15 @@
 import { describe, it, expect, vi } from 'vitest';
 import React, { useState } from 'react';
+import { createRoot } from 'react-dom/client';
 
 /**
  * Component Tests - Form Component
  * Test form handling, validation, and submission
  */
 
-const Form = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
+type FormData = { email: string; password: string };
+
+const Form = ({ onSubmit }: { onSubmit: (data: FormData) => void }) => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -114,7 +117,7 @@ describe('Form Component', () => {
 
     const emailInput = container.querySelector('input[name="email"]') as HTMLInputElement;
     const passwordInput = container.querySelector('input[name="password"]') as HTMLInputElement;
-    
+
     emailInput.value = 'test@example.com';
     passwordInput.value = 'password123';
 
@@ -130,7 +133,7 @@ describe('Form Component', () => {
 
     const emailInput = container.querySelector('input[name="email"]') as HTMLInputElement;
     const passwordInput = container.querySelector('input[name="password"]') as HTMLInputElement;
-    
+
     emailInput.value = 'invalid-email';
     passwordInput.value = 'password123';
 
@@ -144,8 +147,12 @@ describe('Form Component', () => {
 });
 
 // Simple render helper
-function render(component: React.ReactElement) {
+function render(node?: React.ReactNode) {
   const container = document.createElement('div');
   document.body.appendChild(container);
+  if (node !== undefined) {
+    const root = createRoot(container);
+    root.render(node);
+  }
   return { container };
 }

@@ -9,15 +9,12 @@ interface CustomRenderOptions {
   container?: HTMLElement;
 }
 
-const customRender = (
-  ui: ReactElement,
-  options?: CustomRenderOptions
-) => {
+const customRender = (ui: ReactElement, options?: CustomRenderOptions) => {
   const container = options?.container || document.createElement('div');
-  
+
   // Render component into container
   const root = React.createElement(React.Fragment, null, ui);
-  
+
   return {
     container,
     render: () => root,
@@ -33,7 +30,7 @@ export const screen = {
       document,
       null,
       XPathResult.FIRST_ORDERED_NODE_TYPE,
-      null
+      null,
     );
     if (!result.singleNodeValue) {
       throw new Error(`Element with text "${text}" not found`);
@@ -86,4 +83,3 @@ export const screen = {
 };
 
 export { customRender as render };
-

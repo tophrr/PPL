@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   const body = await request.json();
@@ -6,18 +6,18 @@ export async function POST(request: Request) {
   const { email, password } = body;
 
   // contoh validasi sederhana
-  if (email === "admin@gmail.com" && password === "123456") {
+  if (email === 'admin@gmail.com' && password === '123456') {
     return NextResponse.json({
       success: true,
-      message: "Login successful",
+      message: 'Login successful',
     });
   }
 
   return NextResponse.json(
     {
       success: false,
-      message: "Invalid email or password",
+      message: 'Invalid email or password',
     },
-    { status: 401 }
+    { status: 401 },
   );
 }

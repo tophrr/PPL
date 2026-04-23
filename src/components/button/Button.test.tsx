@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import React from 'react';
+import { createRoot } from 'react-dom/client';
 
 /**
  * Component Tests - React Components
@@ -60,7 +61,7 @@ describe('Button Component', () => {
     const { container } = render(
       <Button disabled onClick={handleClick}>
         Disabled
-      </Button>
+      </Button>,
     );
     const button = container.querySelector('button') as HTMLButtonElement;
     button.click?.();
@@ -69,10 +70,12 @@ describe('Button Component', () => {
 });
 
 // Simple render helper for this test
-function render(component: React.ReactElement) {
+function render(node?: React.ReactNode) {
   const container = document.createElement('div');
   document.body.appendChild(container);
-  
-  // For testing purposes, we render the JSX structure
+  if (node !== undefined) {
+    const root = createRoot(container);
+    root.render(node);
+  }
   return { container };
 }
