@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import React from 'react';
+import { createRoot } from 'react-dom/client';
 
 /**
  * Component Tests - React Components
@@ -69,8 +70,12 @@ describe('Button Component', () => {
 });
 
 // Simple render helper for this test
-function render() {
+function render(node?: React.ReactNode) {
   const container = document.createElement('div');
   document.body.appendChild(container);
+  if (node !== undefined) {
+    const root = createRoot(container);
+    root.render(node as any);
+  }
   return { container };
 }
