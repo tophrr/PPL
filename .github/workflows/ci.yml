@@ -1,7 +1,8 @@
 name: CI - Lint, Format, Typecheck
 
 on:
-  push: {}
+  push:
+    branches: [ main ]
   pull_request:
     branches: [main]
 
