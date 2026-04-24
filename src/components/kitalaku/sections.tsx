@@ -1,7 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
-import { useQuery } from 'convex/react';
+import { useQuery, useAction, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import {
   activities,

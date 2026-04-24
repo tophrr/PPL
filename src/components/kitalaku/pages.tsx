@@ -5,9 +5,9 @@ import {
   ApprovalAnalyticsSection,
   CalendarSection,
   DashboardSection,
-  PlannerSection,
   SubscriptionSection,
 } from './sections';
+import { PlannerSection } from './planner-section';
 
 function LandingNav() {
   return (

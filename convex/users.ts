@@ -1,4 +1,4 @@
-import { mutation, query } from './_generated/server';
+import { mutation, query, internalQuery, internalMutation } from './_generated/server';
 import { v } from 'convex/values';
 
 export const createUser = mutation({
@@ -86,5 +86,41 @@ export const getCurrentUser = query({
       .unique();
 
     return user;
+  },
+});
+
+export const checkQuota = internalQuery({
+  args: { tokenIdentifier: v.string() },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query('users')
+      .withIndex('by_token', (q) => q.eq('tokenIdentifier', args.tokenIdentifier))
+      .unique();
+
+    if (!user || !user.agencyId) return true;
+
+    const agency = await ctx.db.get(user.agencyId);
+    if (!agency) return true;
+
+    return agency.tokenQuotaRemaining > 0;
+  },
+});
+
+export const deductQuota = internalMutation({
+  args: { tokenIdentifier: v.string(), amount: v.number() },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query('users')
+      .withIndex('by_token', (q) => q.eq('tokenIdentifier', args.tokenIdentifier))
+      .unique();
+
+    if (!user || !user.agencyId) return;
+
+    const agency = await ctx.db.get(user.agencyId);
+    if (agency && agency.tokenQuotaRemaining >= args.amount) {
+      await ctx.db.patch(user.agencyId, {
+        tokenQuotaRemaining: agency.tokenQuotaRemaining - args.amount,
+      });
+    }
   },
 });

@@ -8,6 +8,11 @@
  * @module
  */
 
+import type * as ai from "../ai.js";
+import type * as brands from "../brands.js";
+import type * as drafts from "../drafts.js";
+import type * as media from "../media.js";
+import type * as projects from "../projects.js";
 import type * as users from "../users.js";
 
 import type {
@@ -17,6 +22,11 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  ai: typeof ai;
+  brands: typeof brands;
+  drafts: typeof drafts;
+  media: typeof media;
+  projects: typeof projects;
   users: typeof users;
 }>;
 
