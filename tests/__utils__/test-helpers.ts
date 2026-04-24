@@ -10,10 +10,12 @@ import { vi } from 'vitest';
  */
 export const waitFor = async (condition: () => boolean, timeout = 1000): Promise<void> => {
   const startTime = Date.now();
+
   while (!condition()) {
     if (Date.now() - startTime > timeout) {
       throw new Error('Timeout waiting for condition');
     }
+
     await new Promise((resolve) => setTimeout(resolve, 50));
   }
 };
@@ -45,16 +47,10 @@ export const createMockFetchResponse = (data: any, options: ResponseInit = {}) =
   );
 };
 
-/**
- * Delay execution for testing async operations
- */
 export const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-/**
- * Generate mock data for testing
- */
 export const generateMockUser = (overrides = {}) => ({
-  id: Math.random().toString(36).substr(2, 9),
+  id: Math.random().toString(36).slice(2, 11),
   name: 'Test User',
   email: 'test@example.com',
   createdAt: new Date().toISOString(),

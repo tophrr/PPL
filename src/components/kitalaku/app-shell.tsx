@@ -1,0 +1,352 @@
+'use client';
+
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { sideNav } from './data';
+import {
+  IconAnalytics,
+  IconBell,
+  IconCalendar,
+  IconCard,
+  IconGrid,
+  IconSearch,
+  IconSettings,
+  IconWand,
+} from './icons';
+import { GlassPanel, cn } from './primitives';
+
+const NOTIFICATION_TRANSITION_MS = 260;
+
+export function AppShell({ active, children }: { active: string; children: React.ReactNode }) {
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [notificationsMounted, setNotificationsMounted] = useState(false);
+
+  const pageDescriptions: Record<string, string> = {
+    Dashboard: 'Monitor priorities, approvals, and performance without leaving the workspace.',
+    'AI Planner': 'Generate strategic content directions, then refine them before review.',
+    Scheduler:
+      'Keep publishing timelines visible so the team can move faster with less back-and-forth.',
+    'Approval & Analytics': 'Track approvals and campaign performance in one decision-ready view.',
+    Subscription:
+      'Track plan limits, billing cycle, and Convex-backed usage status from one place.',
+    Profile: 'Keep account identity and workspace profile details aligned with your brand.',
+    Settings: 'Manage team access, integrations, and workspace preferences from one place.',
+  };
+
+  const activeDescription =
+    pageDescriptions[active] ?? 'Move work forward from one calm workspace.';
+
+  const openNotifications = () => {
+    setNotificationsMounted(true);
+    requestAnimationFrame(() => setNotificationsOpen(true));
+  };
+
+  const closeNotifications = () => {
+    setNotificationsOpen(false);
+  };
+
+  useEffect(() => {
+    if (!notificationsMounted) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') closeNotifications();
+    };
+
+    const previousOverflow = document.body.style.overflow;
+
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [notificationsMounted]);
+
+  useEffect(() => {
+    if (notificationsOpen || !notificationsMounted) return;
+
+    const timeout = window.setTimeout(() => {
+      setNotificationsMounted(false);
+    }, NOTIFICATION_TRANSITION_MS);
+
+    return () => window.clearTimeout(timeout);
+  }, [notificationsOpen, notificationsMounted]);
+
+  return (
+    <div className="min-h-screen md:pl-[292px]">
+      <aside className="hidden rounded-[32px] border border-[rgba(219,227,238,0.88)] bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(255,255,255,0.72))] shadow-[0_24px_48px_rgba(30,41,59,0.14)] backdrop-blur-2xl md:fixed md:bottom-4 md:left-4 md:top-4 md:flex md:w-[260px] md:flex-col md:justify-between md:overflow-y-auto">
+        <div className="px-5 py-5">
+          <GlassPanel className="p-5">
+            <p className="font-display text-3xl leading-[0.95] text-[var(--slate-900)]">
+              Kitalaku.in
+            </p>
+            <p className="mt-1 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--slate-700)]">
+              Creative OS
+            </p>
+            <p className="mt-4 text-sm leading-6 text-[var(--slate-600)]">
+              Planner, scheduler, approval, and analytics in one premium workspace.
+            </p>
+          </GlassPanel>
+
+          <div className="mt-6 px-1">
+            <p className="px-3 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--slate-400)]">
+              Navigation
+            </p>
+          </div>
+
+          <nav className="mt-3 space-y-1">
+            {sideNav.map((item) => {
+              const current = item.label === active;
+              const icon =
+                item.label === 'Dashboard' ? (
+                  <IconGrid />
+                ) : item.label === 'AI Planner' ? (
+                  <IconWand />
+                ) : item.label === 'Scheduler' ? (
+                  <IconCalendar />
+                ) : item.label === 'Subscription' ? (
+                  <IconCard />
+                ) : (
+                  <IconAnalytics />
+                );
+
+              return (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className={cn(
+                    'flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium',
+                    current
+                      ? 'bg-[linear-gradient(135deg,rgba(124,58,237,0.12),rgba(255,255,255,0.88))] text-[var(--slate-900)] ring-1 ring-[rgba(124,58,237,0.16)]'
+                      : 'text-[var(--slate-600)] hover:bg-white/75',
+                  )}
+                >
+                  {icon}
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+
+        <div className="px-5 pb-5">
+          <GlassPanel className="border-[rgba(124,58,237,0.16)] p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-semibold text-[var(--slate-700)]">AI Quota</p>
+                <p className="mt-1 text-xs text-[var(--slate-500)]">420 / 1000 credits used</p>
+              </div>
+              <span className="rounded-full bg-[rgba(16,185,129,0.12)] px-2.5 py-1 text-xs font-semibold text-[var(--emerald-strong)]">
+                Healthy
+              </span>
+            </div>
+            <div className="mt-4 h-2 rounded-full bg-white/85">
+              <div className="h-2 w-[42%] rounded-full bg-[linear-gradient(90deg,#8b5cf6,#7c3aed)]" />
+            </div>
+            <p className="mt-3 text-xs leading-5 text-[var(--slate-500)]">
+              Sufficient credit balance to keep draft generation and review workflows running today.
+            </p>
+          </GlassPanel>
+        </div>
+      </aside>
+
+      <div className="min-w-0">
+        <header className="sticky top-0 z-30 border-b border-[rgba(219,227,238,0.88)] bg-[rgba(248,250,252,0.78)] backdrop-blur-2xl">
+          <div className="mx-auto flex max-w-[1240px] flex-col gap-4 px-4 py-4 md:px-6">
+            <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--slate-700)]">
+                  Workspace Overview
+                </p>
+                <p className="font-display mt-3 text-3xl leading-[1.04] text-[var(--slate-900)]">
+                  {active}
+                </p>
+                <p className="mt-1 max-w-2xl text-sm leading-6 text-[var(--slate-500)]">
+                  {activeDescription}
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <button
+                  type="button"
+                  className="flex w-full items-center gap-3 rounded-2xl border border-[rgba(219,227,238,0.88)] bg-white/82 px-4 py-3 text-left text-[var(--slate-500)] shadow-[0_10px_20px_rgba(30,41,59,0.05)] sm:w-[340px]"
+                >
+                  <IconSearch />
+                  <span className="flex-1 text-sm">Search content, campaigns, or insights...</span>
+                  <span className="rounded-lg bg-[var(--slate-100)] px-2 py-1 text-[10px] font-semibold text-[var(--slate-400)]">
+                    /
+                  </span>
+                </button>
+
+                <div className="flex items-center justify-between gap-3">
+                  <button
+                    type="button"
+                    onClick={openNotifications}
+                    aria-label="Open notifications"
+                    className={cn(
+                      'relative rounded-2xl border bg-white/82 p-3 shadow-[0_10px_20px_rgba(30,41,59,0.05)]',
+                      notificationsMounted
+                        ? 'border-[rgba(124,58,237,0.18)] text-[var(--slate-900)]'
+                        : 'border-[rgba(219,227,238,0.88)] text-[var(--slate-600)]',
+                    )}
+                  >
+                    <IconBell />
+                    <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500" />
+                  </button>
+
+                  <Link
+                    href="/settings"
+                    aria-label="Open settings"
+                    className={cn(
+                      'rounded-2xl border bg-white/82 p-3 shadow-[0_10px_20px_rgba(30,41,59,0.05)]',
+                      active === 'Settings'
+                        ? 'border-[rgba(124,58,237,0.18)] text-[var(--slate-900)]'
+                        : 'border-[rgba(219,227,238,0.88)] text-[var(--slate-600)]',
+                    )}
+                  >
+                    <IconSettings />
+                  </Link>
+
+                  <Link
+                    href="/profile"
+                    className={cn(
+                      'flex items-center gap-3 rounded-2xl border bg-white/82 px-3 py-2.5 shadow-[0_10px_20px_rgba(30,41,59,0.05)]',
+                      active === 'Profile'
+                        ? 'border-[rgba(124,58,237,0.18)] ring-1 ring-[rgba(124,58,237,0.08)]'
+                        : 'border-[rgba(219,227,238,0.88)]',
+                    )}
+                  >
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] text-sm font-semibold text-[var(--slate-900)]">
+                      JD
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-[var(--slate-900)]">John Doe</p>
+                      <p className="text-xs text-[var(--slate-500)]">Admin / KennySoft</p>
+                    </div>
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2 overflow-x-auto pb-1 md:hidden">
+              {sideNav.map((item) => {
+                const current = item.label === active;
+
+                return (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    className={cn(
+                      'whitespace-nowrap rounded-full border px-4 py-2 text-sm font-medium',
+                      current
+                        ? 'border-[rgba(124,58,237,0.16)] bg-[rgba(124,58,237,0.1)] text-[var(--slate-900)]'
+                        : 'border-[rgba(219,227,238,0.88)] bg-white/75 text-[var(--slate-600)]',
+                    )}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </header>
+
+        <main className="bg-[var(--background)] p-4 md:p-6">
+          <div className="mx-auto w-full max-w-[1240px]">{children}</div>
+        </main>
+      </div>
+
+      {notificationsMounted ? (
+        <>
+          <button
+            type="button"
+            aria-label="Close notifications"
+            onClick={closeNotifications}
+            className={cn(
+              'fixed inset-0 z-40 bg-[rgba(15,23,42,0.28)] transition-opacity duration-200 ease-out',
+              notificationsOpen ? 'opacity-100' : 'opacity-0',
+            )}
+          />
+
+          <div className="fixed inset-0 z-50 flex items-stretch justify-end overflow-hidden p-2 md:p-3">
+            <section
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="notification-title"
+              className={cn(
+                'notification-drawer-scroll h-full w-full max-w-[440px] overflow-y-scroll rounded-[28px] border border-[rgba(255,255,255,0.76)] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(255,255,255,0.9))] p-5 shadow-[-18px_0_42px_rgba(15,23,42,0.18)] backdrop-blur-2xl will-change-transform will-change-opacity transition-all duration-300 ease-out',
+                notificationsOpen ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0',
+              )}
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--slate-700)]">
+                    Inbox
+                  </p>
+                  <h2
+                    id="notification-title"
+                    className="mt-1 text-xl font-semibold tracking-tight text-[var(--slate-900)]"
+                  >
+                    Notifications
+                  </h2>
+                </div>
+                <button
+                  type="button"
+                  onClick={closeNotifications}
+                  className="rounded-xl border border-[rgba(219,227,238,0.9)] bg-white/85 px-3 py-1.5 text-xs font-semibold text-[var(--slate-600)]"
+                >
+                  Close
+                </button>
+              </div>
+
+              <div className="mt-4 space-y-3">
+                {[
+                  {
+                    title: 'Approval updated',
+                    detail: 'Blog Post - Marketing Tips changed to Approved.',
+                    time: '5m ago',
+                  },
+                  {
+                    title: 'New review requested',
+                    detail: 'Instagram Carousel - April Promo is waiting for your review.',
+                    time: '18m ago',
+                  },
+                  {
+                    title: 'Schedule adjusted',
+                    detail: 'Weekly newsletter moved to Friday 10:00 AM.',
+                    time: '42m ago',
+                  },
+                  {
+                    title: 'AI draft completed',
+                    detail: '3 caption drafts for Product Launch are ready.',
+                    time: '1h ago',
+                  },
+                ].map((item) => (
+                  <div
+                    key={item.title}
+                    className="rounded-2xl border border-[rgba(219,227,238,0.88)] bg-[var(--surface-strong)] px-4 py-3"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <p className="text-sm font-semibold text-[var(--slate-900)]">
+                          {item.title}
+                        </p>
+                        <p className="mt-1 text-xs leading-5 text-[var(--slate-500)]">
+                          {item.detail}
+                        </p>
+                      </div>
+                      <span className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--slate-400)]">
+                        {item.time}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </div>
+        </>
+      ) : null}
+    </div>
+  );
+}

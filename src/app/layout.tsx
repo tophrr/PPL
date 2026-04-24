@@ -1,30 +1,31 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Inter, Lora } from 'next/font/google';
 import './globals.css';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-});
-
 export const metadata: Metadata = {
-  title: 'PPL App',
-  description: 'Software Engineering Project',
+  title: 'Kitalaku.in',
+  description:
+    'AI-based content management dashboard for planning, scheduling, approval, and analytics.',
 };
 
 type RootLayoutProps = {
   children: React.ReactNode;
 };
 
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+});
+
+const lora = Lora({
+  subsets: ['latin'],
+  variable: '--font-lora',
+});
+
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+    <html lang="id">
+      <body className={`${inter.variable} ${lora.variable} antialiased`}>
         <main>{children}</main>
       </body>
     </html>

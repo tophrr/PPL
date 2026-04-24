@@ -1,12 +1,7 @@
 const { defineConfig } = require('eslint/config');
-const nextVitals = require('eslint-config-next/core-web-vitals');
-const nextTs = require('eslint-config-next/typescript');
+const nextPlugin = require('@next/eslint-plugin-next');
 
 module.exports = defineConfig([
-  // Next.js recommended flat configs
-  ...nextVitals,
-  ...nextTs,
-
   // Project-wide rules and plugin wiring
   {
     files: ['**/*.{js,jsx,ts,tsx}'],
@@ -20,11 +15,14 @@ module.exports = defineConfig([
       },
     },
     plugins: {
+      '@next/next': nextPlugin,
       '@typescript-eslint': require('@typescript-eslint/eslint-plugin'),
       prettier: require('eslint-plugin-prettier'),
     },
     settings: { react: { version: 'detect' } },
     rules: {
+      ...nextPlugin.configs.recommended.rules,
+      ...nextPlugin.configs['core-web-vitals'].rules,
       'prettier/prettier': 'error',
     },
   },

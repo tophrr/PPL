@@ -20,7 +20,6 @@ export const handlers = [
     return HttpResponse.json({ id: 3, ...body }, { status: 201 });
   }),
 
-  // Example: Mock GET /api/health
   http.get('/api/health', () => {
     return HttpResponse.json({ status: 'ok' });
   }),
