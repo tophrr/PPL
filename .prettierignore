@@ -7,3 +7,6 @@ dist
 coverage
 *.log
 /.vercel
+.agents
+.claude
+convex/_generated
