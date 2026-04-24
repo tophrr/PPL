@@ -15,7 +15,7 @@ export const getBrands = query({
       .unique();
 
     if (!user) {
-      throw new Error('User not found');
+      return [];
     }
 
     // Role-based access control

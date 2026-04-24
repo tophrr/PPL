@@ -124,3 +124,56 @@ export const deductQuota = internalMutation({
     }
   },
 });
+
+export const storeUser = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error('Called storeUser without authentication present');
+    }
+
+    const user = await ctx.db
+      .query('users')
+      .withIndex('by_token', (q) => q.eq('tokenIdentifier', identity.tokenIdentifier))
+      .unique();
+
+    if (user !== null) {
+      const updates: any = {};
+
+      if (user.name !== identity.name || user.email !== identity.email) {
+        updates.name = identity.name ?? 'Unknown';
+        updates.email = identity.email ?? '';
+      }
+
+      if (!user.agencyId) {
+        // Auto-create an agency if they don't have one
+        const newAgencyId = await ctx.db.insert('agencies', {
+          name: `${identity.name ?? 'New User'}'s Agency`,
+          tokenQuotaRemaining: 1000,
+        });
+        updates.agencyId = newAgencyId;
+        updates.role = 'Admin';
+      }
+
+      if (Object.keys(updates).length > 0) {
+        await ctx.db.patch(user._id, updates);
+      }
+      return user._id;
+    }
+
+    // Auto-create an agency for the new user
+    const agencyId = await ctx.db.insert('agencies', {
+      name: `${identity.name ?? 'New User'}'s Agency`,
+      tokenQuotaRemaining: 1000,
+    });
+
+    return await ctx.db.insert('users', {
+      tokenIdentifier: identity.tokenIdentifier,
+      name: identity.name ?? 'Unknown',
+      email: identity.email ?? '',
+      role: 'Admin', // Give them Admin role so they can create brands
+      agencyId: agencyId,
+    });
+  },
+});

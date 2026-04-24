@@ -31,9 +31,12 @@ export default function SettingsPage() {
     e.preventDefault();
     if (!newBrandName) return;
     try {
+      if (!currentUser?.agencyId) {
+        throw new Error('You must belong to an agency to create a brand.');
+      }
       await createBrand({
         name: newBrandName,
-        agencyId: currentUser?.agencyId || ('jh78f0d87dfg' as Id<'agencies'>), // Temporary fallback if agencyId isn't strictly set yet
+        agencyId: currentUser.agencyId,
         clientIds: [],
       });
       setNewBrandName('');

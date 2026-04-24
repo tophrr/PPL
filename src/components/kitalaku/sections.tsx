@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useQuery, useAction, useMutation } from 'convex/react';
+import { useQuery, useAction, useMutation, useConvexAuth } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import {
   activities,
@@ -19,6 +19,7 @@ import { IconAnalytics, IconCalendar, IconCopy, IconGrid, IconThumb, IconWand } 
 import { cn, GlassPanel, toneDot, toneSurface } from './primitives';
 
 export function DashboardSection() {
+  const { isAuthenticated } = useConvexAuth();
   const currentUser = useQuery(api.users.getCurrentUser);
   const totalItems = contentStatus.reduce((sum, item) => sum + Number(item.value), 0);
 
@@ -91,7 +92,7 @@ export function DashboardSection() {
                 </span>
               ) : currentUser === null ? (
                 <span className="rounded-full border border-white/12 bg-white/8 px-3 py-1.5 text-xs font-medium text-[var(--slate-900)]">
-                  Not signed in
+                  {isAuthenticated ? 'Syncing profile...' : 'Not signed in'}
                 </span>
               ) : (
                 <span className="rounded-full border border-white/12 bg-white/8 px-3 py-1.5 text-xs font-medium text-[var(--slate-900)]">
