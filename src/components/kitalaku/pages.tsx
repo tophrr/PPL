@@ -183,7 +183,15 @@ export function SubscriptionPageDesign() {
   );
 }
 
-export function LoginPageDesign() {
+export function LoginPageDesign({
+  children,
+  title,
+  subtitle,
+}: {
+  children?: React.ReactNode;
+  title?: string;
+  subtitle?: string;
+}) {
   return (
     <div className="premium-background relative min-h-screen overflow-hidden px-4 py-8 md:px-6">
       <div className="absolute inset-x-0 top-0 h-72 bg-[radial-gradient(circle_at_top,rgba(139,92,246,0.12),transparent_60%)]" />
@@ -250,11 +258,11 @@ export function LoginPageDesign() {
                   Secure Access
                 </p>
                 <h2 className="font-display mt-4 text-5xl leading-[1] text-[var(--slate-900)]">
-                  Sign in to Kitalaku.in
+                  {title || 'Sign in to Kitalaku.in'}
                 </h2>
                 <p className="mt-3 max-w-xl text-base leading-7 text-[var(--slate-500)]">
-                  Satu form yang lebih ringkas, lebih dewasa, dan langsung mengarahkan pengguna ke
-                  pekerjaan prioritas mereka.
+                  {subtitle ||
+                    'Satu form yang lebih ringkas, lebih dewasa, dan langsung mengarahkan pengguna ke pekerjaan prioritas mereka.'}
                 </p>
 
                 <div className="mt-6 grid gap-3 sm:grid-cols-3">
@@ -273,73 +281,7 @@ export function LoginPageDesign() {
                   ))}
                 </div>
 
-                <form className="mt-8 space-y-4">
-                  <div>
-                    <label htmlFor="email" className="text-sm font-medium text-[var(--slate-700)]">
-                      Work email
-                    </label>
-                    <input
-                      id="email"
-                      type="email"
-                      defaultValue="admin@kitalaku.in"
-                      className="mt-2 w-full rounded-2xl border border-[var(--slate-150)] bg-white/82 px-4 py-3.5 text-sm text-[var(--slate-700)] outline-none ring-0 placeholder:text-[var(--slate-400)] focus:border-[var(--purple-border)] focus:shadow-[0_0_0_4px_rgba(139,92,246,0.1)]"
-                    />
-                  </div>
-
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div>
-                      <label
-                        htmlFor="password"
-                        className="text-sm font-medium text-[var(--slate-700)]"
-                      >
-                        Password
-                      </label>
-                      <input
-                        id="password"
-                        type="password"
-                        placeholder="Enter your password"
-                        className="mt-2 w-full rounded-2xl border border-[var(--slate-150)] bg-white/82 px-4 py-3.5 text-sm text-[var(--slate-700)] outline-none placeholder:text-[var(--slate-400)] focus:border-[var(--purple-border)] focus:shadow-[0_0_0_4px_rgba(139,92,246,0.1)]"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="role" className="text-sm font-medium text-[var(--slate-700)]">
-                        Role
-                      </label>
-                      <select
-                        id="role"
-                        defaultValue="Admin"
-                        className="mt-2 w-full rounded-2xl border border-[var(--slate-150)] bg-white/82 px-4 py-3.5 text-sm text-[var(--slate-700)] outline-none focus:border-[var(--purple-border)] focus:shadow-[0_0_0_4px_rgba(139,92,246,0.1)]"
-                      >
-                        <option>Admin</option>
-                        <option>Manager</option>
-                        <option>Creator</option>
-                        <option>Client</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-3 text-sm text-[var(--slate-500)] sm:flex-row sm:items-center sm:justify-between">
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        defaultChecked
-                        className="h-4 w-4 rounded border-[var(--slate-150)] accent-[var(--purple)]"
-                      />
-                      <span>Keep me signed in</span>
-                    </label>
-                    <Link href="/" className="font-semibold text-[var(--slate-900)]">
-                      Back to landing page
-                    </Link>
-                  </div>
-                </form>
-
-                <button
-                  type="button"
-                  className="mt-6 w-full rounded-2xl bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] px-5 py-4 text-base font-semibold text-[var(--slate-900)] shadow-[var(--shadow-soft)]"
-                >
-                  Secure Sign In
-                </button>
+                <div className="mt-8 flex justify-center w-full">{children}</div>
 
                 <div className="mt-4 rounded-2xl border border-[rgba(16,185,129,0.2)] bg-[rgba(16,185,129,0.08)] px-4 py-3 text-sm leading-6 text-[var(--emerald-strong)]">
                   Session akan tetap aktif saat user berpindah dari planner ke scheduler atau
