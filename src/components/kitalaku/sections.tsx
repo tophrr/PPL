@@ -18,7 +18,7 @@ import { IconAnalytics, IconCalendar, IconCopy, IconGrid, IconThumb, IconWand } 
 import { cn, GlassPanel, toneDot, toneSurface } from './primitives';
 
 export function DashboardSection() {
-  const tasks = useQuery(api.tasks.get);
+  const currentUser = useQuery(api.users.getCurrentUser);
   const totalItems = contentStatus.reduce((sum, item) => sum + Number(item.value), 0);
 
   const quickActions = [
@@ -84,13 +84,17 @@ export function DashboardSection() {
             </p>
 
             <div className="mt-5 flex flex-wrap gap-2">
-              {tasks === undefined ? (
+              {currentUser === undefined ? (
                 <span className="rounded-full border border-white/12 bg-white/8 px-3 py-1.5 text-xs font-medium text-[var(--slate-900)] italic animate-pulse">
-                  Connecting to Convex...
+                  Loading User Profile...
+                </span>
+              ) : currentUser === null ? (
+                <span className="rounded-full border border-white/12 bg-white/8 px-3 py-1.5 text-xs font-medium text-[var(--slate-900)]">
+                  Not signed in
                 </span>
               ) : (
                 <span className="rounded-full border border-white/12 bg-white/8 px-3 py-1.5 text-xs font-medium text-[var(--slate-900)]">
-                  {tasks.length} tasks in Convex
+                  Role: {currentUser.role}
                 </span>
               )}
               {['SLA 96%', '8 items waiting review', '24 approved this month'].map((pill) => (
