@@ -29,6 +29,6 @@ module.exports = defineConfig([
 
   // Global ignores
   {
-    ignores: ['.next/**', 'out/**', 'build/**', 'next-env.d.ts'],
+    ignores: ['.next/**', 'out/**', 'build/**', 'next-env.d.ts', 'convex/_generated/**'],
   },
 ]);

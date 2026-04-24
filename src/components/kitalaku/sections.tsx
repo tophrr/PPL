@@ -1,4 +1,8 @@
+'use client';
+
 import Link from 'next/link';
+import { useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 import {
   activities,
   analyticsSummary,
@@ -14,6 +18,7 @@ import { IconAnalytics, IconCalendar, IconCopy, IconGrid, IconThumb, IconWand } 
 import { cn, GlassPanel, toneDot, toneSurface } from './primitives';
 
 export function DashboardSection() {
+  const tasks = useQuery(api.tasks.get);
   const totalItems = contentStatus.reduce((sum, item) => sum + Number(item.value), 0);
 
   const quickActions = [
@@ -79,6 +84,15 @@ export function DashboardSection() {
             </p>
 
             <div className="mt-5 flex flex-wrap gap-2">
+              {tasks === undefined ? (
+                <span className="rounded-full border border-white/12 bg-white/8 px-3 py-1.5 text-xs font-medium text-[var(--slate-900)] italic animate-pulse">
+                  Connecting to Convex...
+                </span>
+              ) : (
+                <span className="rounded-full border border-white/12 bg-white/8 px-3 py-1.5 text-xs font-medium text-[var(--slate-900)]">
+                  {tasks.length} tasks in Convex
+                </span>
+              )}
               {['SLA 96%', '8 items waiting review', '24 approved this month'].map((pill) => (
                 <span
                   key={pill}

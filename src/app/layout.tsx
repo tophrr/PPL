@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter, Lora } from 'next/font/google';
 import './globals.css';
+import { ConvexClientProvider } from '@/src/components/ConvexClientProvider';
 
 export const metadata: Metadata = {
   title: 'Kitalaku.in',
@@ -26,7 +27,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="id">
       <body className={`${inter.variable} ${lora.variable} antialiased`}>
-        <main>{children}</main>
+        <ConvexClientProvider>
+          <main>{children}</main>
+        </ConvexClientProvider>
       </body>
     </html>
   );
