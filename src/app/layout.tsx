@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter, Lora } from 'next/font/google';
 import './globals.css';
 import { ConvexClientProvider } from '@/src/components/ConvexClientProvider';
+import { WorkspaceProvider } from '@/src/components/kitalaku/workspace-context';
 
 export const metadata: Metadata = {
   title: 'Kitalaku.in',
@@ -28,7 +29,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <html lang="id">
       <body className={`${inter.variable} ${lora.variable} antialiased`}>
         <ConvexClientProvider>
-          <main>{children}</main>
+          <WorkspaceProvider>
+            <main>{children}</main>
+          </WorkspaceProvider>
         </ConvexClientProvider>
       </body>
     </html>

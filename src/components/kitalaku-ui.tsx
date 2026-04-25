@@ -4,6 +4,7 @@ export {
   LandingPageDesign,
   LoginPageDesign,
   PlannerPageDesign,
+  ProfilePageDesign,
   SchedulerPageDesign,
   SimplePlaceholderPage,
   SubscriptionPageDesign,

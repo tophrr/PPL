@@ -1,4 +1,4 @@
-import { mutation, query } from './_generated/server';
+import { mutation, query, internalQuery, internalMutation } from './_generated/server';
 import { v } from 'convex/values';
 
 export const createUser = mutation({
@@ -86,5 +86,213 @@ export const getCurrentUser = query({
       .unique();
 
     return user;
+  },
+});
+
+export const checkQuota = internalQuery({
+  args: { tokenIdentifier: v.string() },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query('users')
+      .withIndex('by_token', (q) => q.eq('tokenIdentifier', args.tokenIdentifier))
+      .unique();
+
+    if (!user || !user.agencyId) return true;
+
+    const agency = await ctx.db.get(user.agencyId);
+    if (!agency) return true;
+
+    return agency.tokenQuotaRemaining > 0;
+  },
+});
+
+export const deductQuota = internalMutation({
+  args: { tokenIdentifier: v.string(), amount: v.number() },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query('users')
+      .withIndex('by_token', (q) => q.eq('tokenIdentifier', args.tokenIdentifier))
+      .unique();
+
+    if (!user || !user.agencyId) return;
+
+    const agency = await ctx.db.get(user.agencyId);
+    if (agency && agency.tokenQuotaRemaining >= args.amount) {
+      await ctx.db.patch(user.agencyId, {
+        tokenQuotaRemaining: agency.tokenQuotaRemaining - args.amount,
+      });
+    }
+  },
+});
+
+export const storeUser = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error('Called storeUser without authentication present');
+    }
+
+    let user = await ctx.db
+      .query('users')
+      .withIndex('by_token', (q) => q.eq('tokenIdentifier', identity.tokenIdentifier))
+      .unique();
+
+    // Fallback: Check if they were invited by email
+    if (user === null && identity.email) {
+      user = await ctx.db
+        .query('users')
+        .withIndex('by_email', (q) => q.eq('email', identity.email!))
+        .unique();
+    }
+
+    if (user !== null) {
+      const updates: any = {};
+
+      // If they were invited, they'll have a placeholder tokenIdentifier. Update it.
+      if (user.tokenIdentifier !== identity.tokenIdentifier) {
+        updates.tokenIdentifier = identity.tokenIdentifier;
+      }
+
+      const identityName =
+        identity.name ||
+        (identity.givenName && identity.familyName
+          ? `${identity.givenName} ${identity.familyName}`
+          : identity.givenName || identity.familyName);
+
+      if (identityName && user.name !== identityName) {
+        updates.name = identityName;
+      }
+      if (identity.email && user.email !== identity.email) {
+        updates.email = identity.email;
+      }
+
+      if (!user.agencyId) {
+        // Auto-create an agency if they don't have one
+        const newAgencyId = await ctx.db.insert('agencies', {
+          name: `${identity.name ?? 'New User'}'s Agency`,
+          tokenQuotaRemaining: 1000,
+        });
+        updates.agencyId = newAgencyId;
+        updates.role = 'Admin';
+      }
+
+      if (Object.keys(updates).length > 0) {
+        await ctx.db.patch(user._id, updates);
+      }
+      return user._id;
+    }
+
+    // Auto-create an agency for the new user
+    const agencyId = await ctx.db.insert('agencies', {
+      name: `${identity.name ?? 'New User'}'s Agency`,
+      tokenQuotaRemaining: 1000,
+    });
+
+    const identityName =
+      identity.name ||
+      (identity.givenName && identity.familyName
+        ? `${identity.givenName} ${identity.familyName}`
+        : identity.givenName || identity.familyName);
+
+    return await ctx.db.insert('users', {
+      tokenIdentifier: identity.tokenIdentifier,
+      name: identityName ?? identity.email?.split('@')[0] ?? 'Unknown',
+      email: identity.email ?? '',
+      role: 'Admin', // Give them Admin role so they can create brands
+      agencyId: agencyId,
+    });
+  },
+});
+
+export const getAgencyUsers = query({
+  args: { agencyId: v.id('agencies') },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error('Unauthenticated');
+
+    return await ctx.db
+      .query('users')
+      .withIndex('by_agency', (q) => q.eq('agencyId', args.agencyId))
+      .collect();
+  },
+});
+
+export const updateUserRole = mutation({
+  args: {
+    userId: v.id('users'),
+    role: v.union(
+      v.literal('Admin'),
+      v.literal('Creative Manager'),
+      v.literal('Creator'),
+      v.literal('Client'),
+    ),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error('Unauthenticated');
+
+    const admin = await ctx.db
+      .query('users')
+      .withIndex('by_token', (q) => q.eq('tokenIdentifier', identity.tokenIdentifier))
+      .unique();
+
+    if (!admin || admin.role !== 'Admin') {
+      throw new Error('Only Admins can change roles');
+    }
+
+    await ctx.db.patch(args.userId, { role: args.role });
+  },
+});
+
+export const inviteUserByEmail = mutation({
+  args: {
+    email: v.string(),
+    agencyId: v.id('agencies'),
+    role: v.union(
+      v.literal('Admin'),
+      v.literal('Creative Manager'),
+      v.literal('Creator'),
+      v.literal('Client'),
+    ),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error('Unauthenticated');
+
+    const admin = await ctx.db
+      .query('users')
+      .withIndex('by_token', (q) => q.eq('tokenIdentifier', identity.tokenIdentifier))
+      .unique();
+
+    if (!admin || admin.role !== 'Admin') {
+      throw new Error('Only Admins can invite users');
+    }
+
+    // Check if user already exists
+    const existingUser = await ctx.db
+      .query('users')
+      .withIndex('by_email', (q) => q.eq('email', args.email))
+      .unique();
+
+    if (existingUser) {
+      if (existingUser.agencyId && existingUser.agencyId !== args.agencyId) {
+        throw new Error('User already belongs to another agency');
+      }
+      await ctx.db.patch(existingUser._id, {
+        agencyId: args.agencyId,
+        role: args.role,
+      });
+      return existingUser._id;
+    }
+
+    // Create a placeholder user
+    return await ctx.db.insert('users', {
+      tokenIdentifier: `invited_${args.email}`,
+      email: args.email,
+      name: args.email.split('@')[0],
+      role: args.role,
+      agencyId: args.agencyId,
+    });
   },
 });

@@ -13,7 +13,10 @@ export default defineSchema({
       v.literal('Client'),
     ),
     agencyId: v.optional(v.id('agencies')),
-  }).index('by_token', ['tokenIdentifier']),
+  })
+    .index('by_token', ['tokenIdentifier'])
+    .index('by_agency', ['agencyId'])
+    .index('by_email', ['email']),
 
   agencies: defineTable({
     name: v.string(),
@@ -25,6 +28,8 @@ export default defineSchema({
     agencyId: v.id('agencies'),
     clientIds: v.array(v.id('users')),
     isArchived: v.boolean(),
+    isDeleted: v.boolean(),
+    deletedAt: v.optional(v.number()),
   }).index('by_agency', ['agencyId']),
 
   projects: defineTable({
@@ -32,6 +37,8 @@ export default defineSchema({
     brandId: v.id('brands'),
     description: v.optional(v.string()),
     isArchived: v.boolean(),
+    isDeleted: v.boolean(),
+    deletedAt: v.optional(v.number()),
   }).index('by_brand', ['brandId']),
 
   contentDrafts: defineTable({
@@ -43,6 +50,7 @@ export default defineSchema({
     status: v.union(v.literal('Draft'), v.literal('Review'), v.literal('Approved')),
     revisionNotes: v.optional(v.string()),
     scheduledDate: v.optional(v.number()), // Timestamp
+    platform: v.optional(v.string()),
     isDeleted: v.boolean(),
     deletedAt: v.optional(v.number()),
     mediaAssetIds: v.array(v.id('mediaAssets')),
@@ -55,6 +63,7 @@ export default defineSchema({
     storageId: v.id('_storage'),
     size: v.number(),
     contentType: v.string(),
+    url: v.optional(v.string()),
   }),
 
   collaborativeLocks: defineTable({
@@ -70,4 +79,13 @@ export default defineSchema({
     entityId: v.string(),
     performedBy: v.id('users'),
   }).index('by_entity', ['entityType', 'entityId']),
+
+  notifications: defineTable({
+    userId: v.id('users'),
+    title: v.string(),
+    message: v.string(),
+    link: v.string(),
+    isRead: v.boolean(),
+    createdAt: v.number(),
+  }).index('by_user', ['userId', 'isRead']),
 });
