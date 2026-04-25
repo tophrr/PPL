@@ -20,7 +20,10 @@
     "test:all": "vitest run && playwright test",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest --watch",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "test:jest": "jest",
+    "test:jest:watch": "jest --watch",
+    "test:jest:coverage": "jest --coverage"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.2.5",
@@ -42,7 +45,9 @@
     "@next/eslint-plugin-next": "^16.2.4",
     "@playwright/test": "^1",
     "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
+    "@types/jest": "^30.0.0",
     "@types/lodash.debounce": "^4.0.9",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -61,6 +66,9 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^17.5.0",
     "husky": "^8.0.0",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^30.3.0",
+    "jest-environment-jsdom": "^30.3.0",
     "jsdom": "^23",
     "lint-staged": "^14.0.0",
     "msw": "^2.12.10",
