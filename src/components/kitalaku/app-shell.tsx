@@ -108,37 +108,52 @@ export function AppShell({ active, children }: { active: string; children: React
           </div>
 
           <nav className="mt-3 space-y-1">
-            {sideNav.map((item) => {
-              const current = item.label === active;
-              const icon =
-                item.label === 'Dashboard' ? (
-                  <IconGrid />
-                ) : item.label === 'AI Planner' ? (
-                  <IconWand />
-                ) : item.label === 'Scheduler' ? (
-                  <IconCalendar />
-                ) : item.label === 'Subscription' ? (
-                  <IconCard />
-                ) : (
-                  <IconAnalytics />
-                );
+            {sideNav
+              .filter((item) => {
+                if (!currentUser) return true;
+                if (currentUser.role === 'Client') {
+                  return (
+                    item.label === 'Dashboard' ||
+                    item.label === 'Scheduler' ||
+                    item.label === 'Approval & Analytics'
+                  );
+                }
+                if (currentUser.role === 'Creator') {
+                  return item.label !== 'Subscription';
+                }
+                return true;
+              })
+              .map((item) => {
+                const current = item.label === active;
+                const icon =
+                  item.label === 'Dashboard' ? (
+                    <IconGrid />
+                  ) : item.label === 'AI Planner' ? (
+                    <IconWand />
+                  ) : item.label === 'Scheduler' ? (
+                    <IconCalendar />
+                  ) : item.label === 'Subscription' ? (
+                    <IconCard />
+                  ) : (
+                    <IconAnalytics />
+                  );
 
-              return (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  className={cn(
-                    'flex items-center gap-3 rounded-[14px] px-4 py-3 text-sm transition-all duration-200',
-                    current
-                      ? 'bg-white shadow-[0_2px_12px_rgba(30,41,59,0.05)] text-[var(--purple-strong)] font-semibold'
-                      : 'text-[var(--slate-600)] font-medium hover:bg-white/50 hover:text-[var(--slate-900)]',
-                  )}
-                >
-                  {icon}
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
+                return (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    className={cn(
+                      'flex items-center gap-3 rounded-[14px] px-4 py-3 text-sm transition-all duration-200',
+                      current
+                        ? 'bg-white shadow-[0_2px_12px_rgba(30,41,59,0.05)] text-[var(--purple-strong)] font-semibold'
+                        : 'text-[var(--slate-600)] font-medium hover:bg-white/50 hover:text-[var(--slate-900)]',
+                    )}
+                  >
+                    {icon}
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
           </nav>
         </div>
 
@@ -218,18 +233,20 @@ export function AppShell({ active, children }: { active: string; children: React
                     )}
                   </button>
 
-                  <Link
-                    href="/settings"
-                    aria-label="Open settings"
-                    className={cn(
-                      'flex items-center justify-center rounded-2xl border bg-white/80 p-3 shadow-[0_2px_10px_rgba(30,41,59,0.04)] backdrop-blur-md transition-all duration-200 hover:bg-white hover:shadow-[0_8px_20px_rgba(30,41,59,0.08)]',
-                      active === 'Settings'
-                        ? 'border-[var(--purple-border)] text-[var(--purple-strong)]'
-                        : 'border-transparent text-[var(--slate-600)]',
-                    )}
-                  >
-                    <IconSettings />
-                  </Link>
+                  {(currentUser?.role === 'Admin' || currentUser?.role === 'Creative Manager') && (
+                    <Link
+                      href="/settings"
+                      aria-label="Open settings"
+                      className={cn(
+                        'flex items-center justify-center rounded-2xl border bg-white/80 p-3 shadow-[0_2px_10px_rgba(30,41,59,0.04)] backdrop-blur-md transition-all duration-200 hover:bg-white hover:shadow-[0_8px_20px_rgba(30,41,59,0.08)]',
+                        active === 'Settings'
+                          ? 'border-[var(--purple-border)] text-[var(--purple-strong)]'
+                          : 'border-transparent text-[var(--slate-600)]',
+                      )}
+                    >
+                      <IconSettings />
+                    </Link>
+                  )}
 
                   <Link
                     href="/profile"

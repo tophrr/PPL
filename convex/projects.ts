@@ -7,6 +7,26 @@ export const getProjects = query({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error('Unauthenticated');
 
+    const user = await ctx.db
+      .query('users')
+      .withIndex('by_token', (q) => q.eq('tokenIdentifier', identity.tokenIdentifier))
+      .unique();
+
+    if (!user) throw new Error('User not found');
+
+    const brand = await ctx.db.get(args.brandId);
+    if (!brand) throw new Error('Brand not found');
+
+    // Verify access
+    const isTeam =
+      user.agencyId === brand.agencyId &&
+      (user.role === 'Admin' || user.role === 'Creative Manager' || user.role === 'Creator');
+    const isClient = user.role === 'Client' && brand.clientIds.includes(user._id);
+
+    if (!isTeam && !isClient) {
+      throw new Error('Unauthorized access to this brand');
+    }
+
     return await ctx.db
       .query('projects')
       .withIndex('by_brand', (q) => q.eq('brandId', args.brandId))
@@ -24,6 +44,19 @@ export const createProject = mutation({
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error('Unauthenticated');
+    const user = await ctx.db
+      .query('users')
+      .withIndex('by_token', (q) => q.eq('tokenIdentifier', identity.tokenIdentifier))
+      .unique();
+
+    if (!user) throw new Error('User not found');
+
+    const brand = await ctx.db.get(args.brandId);
+    if (!brand) throw new Error('Brand not found');
+
+    if (user.agencyId !== brand.agencyId || user.role === 'Client') {
+      throw new Error('Unauthorized to create projects for this brand');
+    }
 
     const projectId = await ctx.db.insert('projects', {
       name: args.name,

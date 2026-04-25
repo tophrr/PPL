@@ -21,10 +21,22 @@ export default function SettingsPage() {
   const [newProjectDesc, setNewProjectDesc] = useState('');
   const createProject = useMutation(api.projects.createProject);
 
-  const archiveBrand = useMutation(api.brands.archiveBrand);
-  const softDeleteBrand = useMutation(api.brands.softDeleteBrand);
   const archiveProject = useMutation(api.projects.archiveProject);
   const softDeleteProject = useMutation(api.projects.softDeleteProject);
+
+  // Team Management states
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteRole, setInviteRole] = useState<'Admin' | 'Creative Manager' | 'Creator' | 'Client'>(
+    'Creator',
+  );
+  const inviteUser = useMutation(api.users.inviteUserByEmail);
+  const updateUserRole = useMutation(api.users.updateUserRole);
+
+  const agencyUsers =
+    useQuery(
+      api.users.getAgencyUsers,
+      currentUser?.agencyId ? { agencyId: currentUser.agencyId } : 'skip',
+    ) || [];
 
   const projects =
     useQuery(
@@ -51,18 +63,28 @@ export default function SettingsPage() {
     }
   };
 
-  const handleCreateProject = async (e: React.FormEvent) => {
+  const handleInviteUser = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newProjectName || !selectedBrandForProject) return;
+    if (!inviteEmail || !currentUser?.agencyId) return;
     try {
-      await createProject({
-        name: newProjectName,
-        brandId: selectedBrandForProject as Id<'brands'>,
-        description: newProjectDesc,
+      await inviteUser({
+        email: inviteEmail,
+        agencyId: currentUser.agencyId,
+        role: inviteRole,
       });
-      setNewProjectName('');
-      setNewProjectDesc('');
-      alert('Project created');
+      setInviteEmail('');
+      alert('User added to agency.');
+    } catch (error: any) {
+      alert(error.message);
+    }
+  };
+
+  const handleUpdateRole = async (userId: Id<'users'>, role: string) => {
+    try {
+      await updateUserRole({
+        userId,
+        role: role as 'Admin' | 'Creative Manager' | 'Creator' | 'Client',
+      });
     } catch (error: any) {
       alert(error.message);
     }
@@ -229,6 +251,80 @@ export default function SettingsPage() {
             )}
           </GlassPanel>
         </div>
+
+        {currentUser?.role === 'Admin' && (
+          <GlassPanel className="p-6">
+            <h3 className="text-lg font-semibold text-[var(--slate-900)]">Team Access</h3>
+            <p className="mt-1 text-sm text-[var(--slate-500)]">
+              Invite team members and manage their system roles.
+            </p>
+
+            <form onSubmit={handleInviteUser} className="mt-4 flex flex-wrap items-end gap-4">
+              <div className="flex-1 min-w-[200px]">
+                <label className="text-sm font-medium text-[var(--slate-900)]">Email Address</label>
+                <input
+                  type="email"
+                  value={inviteEmail}
+                  onChange={(e) => setInviteEmail(e.target.value)}
+                  className="mt-2 w-full rounded-2xl border border-[var(--slate-200)] bg-white px-4 py-3 text-sm font-medium text-[var(--slate-700)] outline-none transition-all duration-200 focus:border-[var(--purple-border)]"
+                  placeholder="name@company.com"
+                />
+              </div>
+              <div className="w-[180px]">
+                <label className="text-sm font-medium text-[var(--slate-900)]">Assign Role</label>
+                <select
+                  value={inviteRole}
+                  onChange={(e) => setInviteRole(e.target.value as any)}
+                  className="mt-2 w-full rounded-2xl border border-[var(--slate-200)] bg-white px-4 py-3 text-sm font-medium text-[var(--slate-700)] outline-none transition-all duration-200 focus:border-[var(--purple-border)]"
+                >
+                  <option value="Admin">Admin</option>
+                  <option value="Creative Manager">Creative Manager</option>
+                  <option value="Creator">Creator</option>
+                  <option value="Client">Client</option>
+                </select>
+              </div>
+              <button
+                type="submit"
+                className="h-[48px] rounded-2xl bg-[var(--slate-900)] px-6 text-sm font-semibold text-white shadow-sm transition-all hover:-translate-y-[1px]"
+              >
+                Add Member
+              </button>
+            </form>
+
+            <div className="mt-8 overflow-hidden rounded-2xl border border-[var(--slate-200)]">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-[var(--slate-50)] text-xs font-semibold uppercase tracking-wider text-[var(--slate-500)]">
+                  <tr>
+                    <th className="px-6 py-4">Name</th>
+                    <th className="px-6 py-4">Email</th>
+                    <th className="px-6 py-4">Role</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[var(--slate-200)] bg-white/60">
+                  {agencyUsers.map((user) => (
+                    <tr key={user._id}>
+                      <td className="px-6 py-4 font-medium text-[var(--slate-900)]">{user.name}</td>
+                      <td className="px-6 py-4 text-[var(--slate-600)]">{user.email}</td>
+                      <td className="px-6 py-4">
+                        <select
+                          value={user.role}
+                          disabled={user._id === currentUser._id}
+                          onChange={(e) => handleUpdateRole(user._id, e.target.value)}
+                          className="rounded-lg border border-[var(--slate-200)] bg-transparent px-2 py-1 text-xs font-semibold outline-none focus:border-[var(--purple-border)]"
+                        >
+                          <option value="Admin">Admin</option>
+                          <option value="Creative Manager">Creative Manager</option>
+                          <option value="Creator">Creator</option>
+                          <option value="Client">Client</option>
+                        </select>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </GlassPanel>
+        )}
       </div>
     </AppShell>
   );

@@ -177,3 +177,88 @@ export const storeUser = mutation({
     });
   },
 });
+
+export const getAgencyUsers = query({
+  args: { agencyId: v.id('agencies') },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error('Unauthenticated');
+
+    return await ctx.db
+      .query('users')
+      .withIndex('by_agency', (q) => q.eq('agencyId', args.agencyId))
+      .collect();
+  },
+});
+
+export const updateUserRole = mutation({
+  args: {
+    userId: v.id('users'),
+    role: v.union(
+      v.literal('Admin'),
+      v.literal('Creative Manager'),
+      v.literal('Creator'),
+      v.literal('Client'),
+    ),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error('Unauthenticated');
+
+    const admin = await ctx.db
+      .query('users')
+      .withIndex('by_token', (q) => q.eq('tokenIdentifier', identity.tokenIdentifier))
+      .unique();
+
+    if (!admin || admin.role !== 'Admin') {
+      throw new Error('Only Admins can change roles');
+    }
+
+    await ctx.db.patch(args.userId, { role: args.role });
+  },
+});
+
+export const inviteUserByEmail = mutation({
+  args: {
+    email: v.string(),
+    agencyId: v.id('agencies'),
+    role: v.union(
+      v.literal('Admin'),
+      v.literal('Creative Manager'),
+      v.literal('Creator'),
+      v.literal('Client'),
+    ),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error('Unauthenticated');
+
+    const admin = await ctx.db
+      .query('users')
+      .withIndex('by_token', (q) => q.eq('tokenIdentifier', identity.tokenIdentifier))
+      .unique();
+
+    if (!admin || admin.role !== 'Admin') {
+      throw new Error('Only Admins can invite users');
+    }
+
+    // Check if user already exists
+    const existingUser = await ctx.db
+      .query('users')
+      .filter((q) => q.eq(q.field('email'), args.email))
+      .unique();
+
+    if (existingUser) {
+      if (existingUser.agencyId && existingUser.agencyId !== args.agencyId) {
+        throw new Error('User already belongs to another agency');
+      }
+      await ctx.db.patch(existingUser._id, {
+        agencyId: args.agencyId,
+        role: args.role,
+      });
+      return existingUser._id;
+    }
+
+    throw new Error('User must have logged in once to be invited by email in this version.');
+  },
+});

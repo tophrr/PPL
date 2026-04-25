@@ -21,7 +21,31 @@ export const getDraft = query({
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error('Unauthenticated');
-    return await ctx.db.get(args.draftId);
+
+    const user = await ctx.db
+      .query('users')
+      .withIndex('by_token', (q) => q.eq('tokenIdentifier', identity.tokenIdentifier))
+      .unique();
+
+    if (!user) throw new Error('User not found');
+
+    const draft = await ctx.db.get(args.draftId);
+    if (!draft) return null;
+
+    const brand = await ctx.db.get(draft.brandId);
+    if (!brand) return null;
+
+    // Verify access
+    const isTeam =
+      user.agencyId === brand.agencyId &&
+      (user.role === 'Admin' || user.role === 'Creative Manager' || user.role === 'Creator');
+    const isClient = user.role === 'Client' && brand.clientIds.includes(user._id);
+
+    if (!isTeam && !isClient) {
+      throw new Error('Unauthorized access to this draft');
+    }
+
+    return draft;
   },
 });
 
@@ -159,12 +183,28 @@ export const hardDeleteOldDrafts = internalMutation({
 export const getDashboardStats = query({
   args: { agencyId: v.id('agencies') },
   handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error('Unauthenticated');
+
+    const user = await ctx.db
+      .query('users')
+      .withIndex('by_token', (q) => q.eq('tokenIdentifier', identity.tokenIdentifier))
+      .unique();
+
+    if (!user || (user.role !== 'Client' && user.agencyId !== args.agencyId)) {
+      throw new Error('Unauthorized access to this agency');
+    }
+
     const brands = await ctx.db
       .query('brands')
       .withIndex('by_agency', (q) => q.eq('agencyId', args.agencyId))
       .collect();
 
-    const brandIds = brands.map((b) => b._id);
+    let accessibleBrandIds = brands.map((b) => b._id);
+
+    if (user.role === 'Client') {
+      accessibleBrandIds = brands.filter((b) => b.clientIds.includes(user._id)).map((b) => b._id);
+    }
 
     const drafts = await ctx.db
       .query('contentDrafts')
@@ -172,7 +212,7 @@ export const getDashboardStats = query({
       .collect();
 
     // Filter by brands belonging to this agency
-    const agencyDrafts = drafts.filter((d) => brandIds.includes(d.brandId));
+    const agencyDrafts = drafts.filter((d) => accessibleBrandIds.includes(d.brandId));
 
     const stats = {
       total: agencyDrafts.length,
@@ -188,18 +228,34 @@ export const getDashboardStats = query({
 export const getDraftsByAgency = query({
   args: { agencyId: v.id('agencies') },
   handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error('Unauthenticated');
+
+    const user = await ctx.db
+      .query('users')
+      .withIndex('by_token', (q) => q.eq('tokenIdentifier', identity.tokenIdentifier))
+      .unique();
+
+    if (!user || (user.role !== 'Client' && user.agencyId !== args.agencyId)) {
+      throw new Error('Unauthorized access to this agency');
+    }
+
     const brands = await ctx.db
       .query('brands')
       .withIndex('by_agency', (q) => q.eq('agencyId', args.agencyId))
       .collect();
 
-    const brandIds = brands.map((b) => b._id);
+    let accessibleBrandIds = brands.map((b) => b._id);
+
+    if (user.role === 'Client') {
+      accessibleBrandIds = brands.filter((b) => b.clientIds.includes(user._id)).map((b) => b._id);
+    }
 
     const drafts = await ctx.db
       .query('contentDrafts')
       .filter((q) => q.eq(q.field('isDeleted'), false))
       .collect();
 
-    return drafts.filter((d) => brandIds.includes(d.brandId));
+    return drafts.filter((d) => accessibleBrandIds.includes(d.brandId));
   },
 });

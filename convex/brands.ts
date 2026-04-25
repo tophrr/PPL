@@ -19,7 +19,7 @@ export const getBrands = query({
     }
 
     // Role-based access control
-    if (user.role === 'Admin' || user.role === 'Creative Manager') {
+    if (user.role === 'Admin' || user.role === 'Creative Manager' || user.role === 'Creator') {
       if (!user.agencyId) return [];
       return await ctx.db
         .query('brands')
@@ -69,6 +69,15 @@ export const createBrand = mutation({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error('Unauthenticated');
 
+    const user = await ctx.db
+      .query('users')
+      .withIndex('by_token', (q) => q.eq('tokenIdentifier', identity.tokenIdentifier))
+      .unique();
+
+    if (!user || user.agencyId !== args.agencyId || user.role !== 'Admin') {
+      throw new Error('Only Agency Admins can create brands');
+    }
+
     const brandId = await ctx.db.insert('brands', {
       name: args.name,
       agencyId: args.agencyId,
@@ -100,5 +109,36 @@ export const softDeleteBrand = mutation({
       isDeleted: true,
       deletedAt: Date.now(),
     });
+  },
+});
+
+export const addClientToBrand = mutation({
+  args: { brandId: v.id('brands'), userId: v.id('users') },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error('Unauthenticated');
+
+    const brand = await ctx.db.get(args.brandId);
+    if (!brand) throw new Error('Brand not found');
+
+    const clientIds = [...brand.clientIds];
+    if (!clientIds.includes(args.userId)) {
+      clientIds.push(args.userId);
+      await ctx.db.patch(args.brandId, { clientIds });
+    }
+  },
+});
+
+export const removeClientFromBrand = mutation({
+  args: { brandId: v.id('brands'), userId: v.id('users') },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error('Unauthenticated');
+
+    const brand = await ctx.db.get(args.brandId);
+    if (!brand) throw new Error('Brand not found');
+
+    const clientIds = brand.clientIds.filter((id) => id !== args.userId);
+    await ctx.db.patch(args.brandId, { clientIds });
   },
 });
