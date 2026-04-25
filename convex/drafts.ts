@@ -1,5 +1,5 @@
 import { v } from 'convex/values';
-import { mutation, query } from './_generated/server';
+import { mutation, query, internalMutation } from './_generated/server';
 
 export const getDrafts = query({
   args: { projectId: v.id('projects') },
@@ -63,6 +63,19 @@ export const updateDraftContent = mutation({
   },
 });
 
+export const updateDraftSchedule = mutation({
+  args: {
+    draftId: v.id('contentDrafts'),
+    scheduledDate: v.number(), // timestamp
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error('Unauthenticated');
+
+    await ctx.db.patch(args.draftId, { scheduledDate: args.scheduledDate });
+  },
+});
+
 export const softDeleteDraft = mutation({
   args: { draftId: v.id('contentDrafts') },
   handler: async (ctx, args) => {
@@ -73,5 +86,27 @@ export const softDeleteDraft = mutation({
       isDeleted: true,
       deletedAt: Date.now(),
     });
+  },
+});
+
+export const hardDeleteOldDrafts = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+    const threshold = Date.now() - THIRTY_DAYS_MS;
+
+    const oldDrafts = await ctx.db
+      .query('contentDrafts')
+      .filter((q) => q.eq(q.field('isDeleted'), true))
+      .collect();
+
+    let deletedCount = 0;
+    for (const draft of oldDrafts) {
+      if (draft.deletedAt && draft.deletedAt < threshold) {
+        await ctx.db.delete(draft._id);
+        deletedCount++;
+      }
+    }
+    console.log(`Deleted ${deletedCount} old drafts from trash.`);
   },
 });

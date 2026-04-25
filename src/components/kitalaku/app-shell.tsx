@@ -116,10 +116,10 @@ export function AppShell({ active, children }: { active: string; children: React
                   key={item.label}
                   href={item.href}
                   className={cn(
-                    'flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium',
+                    'flex items-center gap-3 rounded-[14px] px-4 py-3 text-sm transition-all duration-200',
                     current
-                      ? 'bg-[linear-gradient(135deg,rgba(124,58,237,0.12),rgba(255,255,255,0.88))] text-[var(--slate-900)] ring-1 ring-[rgba(124,58,237,0.16)]'
-                      : 'text-[var(--slate-600)] hover:bg-white/75',
+                      ? 'bg-white shadow-[0_2px_12px_rgba(30,41,59,0.05)] text-[var(--purple-strong)] font-semibold'
+                      : 'text-[var(--slate-600)] font-medium hover:bg-white/50 hover:text-[var(--slate-900)]',
                   )}
                 >
                   {icon}
@@ -185,10 +185,10 @@ export function AppShell({ active, children }: { active: string; children: React
                     onClick={openNotifications}
                     aria-label="Open notifications"
                     className={cn(
-                      'relative rounded-2xl border bg-white/82 p-3 shadow-[0_10px_20px_rgba(30,41,59,0.05)]',
+                      'relative flex items-center justify-center rounded-2xl border bg-white/80 p-3 shadow-[0_2px_10px_rgba(30,41,59,0.04)] backdrop-blur-md transition-all duration-200 hover:bg-white hover:shadow-[0_8px_20px_rgba(30,41,59,0.08)]',
                       notificationsMounted
-                        ? 'border-[rgba(124,58,237,0.18)] text-[var(--slate-900)]'
-                        : 'border-[rgba(219,227,238,0.88)] text-[var(--slate-600)]',
+                        ? 'border-[var(--purple-border)] text-[var(--purple-strong)]'
+                        : 'border-transparent text-[var(--slate-600)]',
                     )}
                   >
                     <IconBell />
@@ -199,10 +199,10 @@ export function AppShell({ active, children }: { active: string; children: React
                     href="/settings"
                     aria-label="Open settings"
                     className={cn(
-                      'rounded-2xl border bg-white/82 p-3 shadow-[0_10px_20px_rgba(30,41,59,0.05)]',
+                      'flex items-center justify-center rounded-2xl border bg-white/80 p-3 shadow-[0_2px_10px_rgba(30,41,59,0.04)] backdrop-blur-md transition-all duration-200 hover:bg-white hover:shadow-[0_8px_20px_rgba(30,41,59,0.08)]',
                       active === 'Settings'
-                        ? 'border-[rgba(124,58,237,0.18)] text-[var(--slate-900)]'
-                        : 'border-[rgba(219,227,238,0.88)] text-[var(--slate-600)]',
+                        ? 'border-[var(--purple-border)] text-[var(--purple-strong)]'
+                        : 'border-transparent text-[var(--slate-600)]',
                     )}
                   >
                     <IconSettings />
@@ -211,10 +211,10 @@ export function AppShell({ active, children }: { active: string; children: React
                   <Link
                     href="/profile"
                     className={cn(
-                      'flex items-center gap-3 rounded-2xl border bg-white/82 px-3 py-2.5 shadow-[0_10px_20px_rgba(30,41,59,0.05)]',
+                      'flex items-center gap-3 rounded-2xl border bg-white/80 px-3 py-2.5 shadow-[0_2px_10px_rgba(30,41,59,0.04)] backdrop-blur-md transition-all duration-200 hover:bg-white hover:shadow-[0_8px_20px_rgba(30,41,59,0.08)]',
                       active === 'Profile'
-                        ? 'border-[rgba(124,58,237,0.18)] ring-1 ring-[rgba(124,58,237,0.08)]'
-                        : 'border-[rgba(219,227,238,0.88)]',
+                        ? 'border-[var(--purple-border)] ring-1 ring-[rgba(124,58,237,0.08)]'
+                        : 'border-transparent',
                     )}
                   >
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] text-sm font-semibold text-[var(--slate-900)]">
@@ -240,8 +240,8 @@ export function AppShell({ active, children }: { active: string; children: React
                     className={cn(
                       'whitespace-nowrap rounded-full border px-4 py-2 text-sm font-medium',
                       current
-                        ? 'border-[rgba(124,58,237,0.16)] bg-[rgba(124,58,237,0.1)] text-[var(--slate-900)]'
-                        : 'border-[rgba(219,227,238,0.88)] bg-white/75 text-[var(--slate-600)]',
+                        ? 'border-[var(--purple-border)] bg-white text-[var(--purple-strong)] shadow-sm'
+                        : 'border-transparent bg-white/60 text-[var(--slate-600)] hover:bg-white/90',
                     )}
                   >
                     {item.label}

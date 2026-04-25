@@ -11,11 +11,15 @@ export function RichTextEditor({
   onChange,
   onAutoSave,
   disabled = false,
+  onFocus,
+  onBlur,
 }: {
   value: string;
   onChange: (value: string) => void;
   onAutoSave?: (value: string) => void;
   disabled?: boolean;
+  onFocus?: () => void;
+  onBlur?: () => void;
 }) {
   const debouncedAutoSave = useRef(
     debounce((val: string) => {
@@ -39,6 +43,12 @@ export function RichTextEditor({
       const html = editor.getHTML();
       onChange(html);
       debouncedAutoSave(html);
+    },
+    onFocus: () => {
+      if (onFocus) onFocus();
+    },
+    onBlur: () => {
+      if (onBlur) onBlur();
     },
     editorProps: {
       attributes: {
@@ -67,32 +77,32 @@ export function RichTextEditor({
 
   return (
     <div
-      className={`rounded-xl border border-[var(--slate-150)] bg-white/75 ${disabled ? 'opacity-50 pointer-events-none' : ''}`}
+      className={`overflow-hidden rounded-2xl border border-[var(--slate-200)] bg-white/80 shadow-[0_4px_14px_rgba(30,41,59,0.03)] backdrop-blur-md transition-all duration-200 focus-within:border-[var(--purple-border)] focus-within:shadow-[0_0_0_4px_rgba(139,92,246,0.1)] ${disabled ? 'opacity-50 pointer-events-none' : ''}`}
     >
-      <div className="flex flex-wrap gap-2 border-b border-[var(--slate-150)] p-2 bg-white/50 rounded-t-xl">
+      <div className="flex flex-wrap gap-1.5 border-b border-[var(--slate-150)] bg-white/60 p-2">
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBold().run()}
-          className={`px-2 py-1 rounded text-sm font-medium ${editor.isActive('bold') ? 'bg-[var(--slate-200)]' : 'hover:bg-[var(--slate-100)]'}`}
+          className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors duration-200 ${editor.isActive('bold') ? 'bg-[var(--purple-soft)] text-[var(--purple-strong)]' : 'text-[var(--slate-600)] hover:bg-[var(--slate-100)] hover:text-[var(--slate-900)]'}`}
         >
           Bold
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={`px-2 py-1 rounded text-sm font-medium ${editor.isActive('italic') ? 'bg-[var(--slate-200)]' : 'hover:bg-[var(--slate-100)]'}`}
+          className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors duration-200 ${editor.isActive('italic') ? 'bg-[var(--purple-soft)] text-[var(--purple-strong)]' : 'text-[var(--slate-600)] hover:bg-[var(--slate-100)] hover:text-[var(--slate-900)]'}`}
         >
           Italic
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={`px-2 py-1 rounded text-sm font-medium ${editor.isActive('bulletList') ? 'bg-[var(--slate-200)]' : 'hover:bg-[var(--slate-100)]'}`}
+          className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors duration-200 ${editor.isActive('bulletList') ? 'bg-[var(--purple-soft)] text-[var(--purple-strong)]' : 'text-[var(--slate-600)] hover:bg-[var(--slate-100)] hover:text-[var(--slate-900)]'}`}
         >
           Bullet List
         </button>
       </div>
-      <div className="p-4">
+      <div className="p-5">
         <EditorContent editor={editor} />
       </div>
     </div>

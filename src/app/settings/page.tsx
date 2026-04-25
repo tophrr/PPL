@@ -87,13 +87,13 @@ export default function SettingsPage() {
                   type="text"
                   value={newBrandName}
                   onChange={(e) => setNewBrandName(e.target.value)}
-                  className="mt-2 w-full rounded-xl border border-[var(--slate-200)] px-4 py-2 text-sm outline-none"
+                  className="mt-2 w-full rounded-2xl border border-[var(--slate-200)] bg-white px-4 py-3 text-sm font-medium text-[var(--slate-700)] shadow-[inset_0_1px_0_rgba(255,255,255,0.92)] outline-none transition-all duration-200 focus:border-[var(--purple-border)] focus:shadow-[0_0_0_4px_rgba(139,92,246,0.1)] hover:border-[var(--slate-300)]"
                   placeholder="Acme Corp"
                 />
               </div>
               <button
                 type="submit"
-                className="rounded-xl bg-[var(--slate-900)] px-4 py-2 text-sm text-white"
+                className="rounded-2xl bg-[var(--slate-900)] px-6 py-3 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(30,41,59,0.12)] transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[0_12px_24px_rgba(30,41,59,0.18)]"
               >
                 Create Brand
               </button>
@@ -107,7 +107,7 @@ export default function SettingsPage() {
               {brands.map((b) => (
                 <div
                   key={b._id}
-                  className="rounded-xl border border-[var(--slate-150)] p-3 text-sm flex justify-between"
+                  className="rounded-2xl border border-[var(--slate-200)] bg-white/60 p-4 text-sm flex justify-between items-center shadow-sm"
                 >
                   <span>{b.name}</span>
                   <span className="text-xs text-[var(--slate-500)]">
@@ -128,7 +128,7 @@ export default function SettingsPage() {
                 <select
                   value={selectedBrandForProject}
                   onChange={(e) => setSelectedBrandForProject(e.target.value as Id<'brands'>)}
-                  className="mt-2 w-full rounded-xl border border-[var(--slate-200)] px-4 py-2 text-sm outline-none"
+                  className="mt-2 w-full rounded-2xl border border-[var(--slate-200)] bg-white px-4 py-3 text-sm font-medium text-[var(--slate-700)] shadow-[inset_0_1px_0_rgba(255,255,255,0.92)] outline-none transition-all duration-200 focus:border-[var(--purple-border)] focus:shadow-[0_0_0_4px_rgba(139,92,246,0.1)] hover:border-[var(--slate-300)]"
                 >
                   <option value="">-- Select --</option>
                   {brands.map((b) => (
@@ -146,7 +146,7 @@ export default function SettingsPage() {
                   type="text"
                   value={newProjectName}
                   onChange={(e) => setNewProjectName(e.target.value)}
-                  className="mt-2 w-full rounded-xl border border-[var(--slate-200)] px-4 py-2 text-sm outline-none"
+                  className="mt-2 w-full rounded-2xl border border-[var(--slate-200)] bg-white px-4 py-3 text-sm font-medium text-[var(--slate-700)] shadow-[inset_0_1px_0_rgba(255,255,255,0.92)] outline-none transition-all duration-200 focus:border-[var(--purple-border)] focus:shadow-[0_0_0_4px_rgba(139,92,246,0.1)] hover:border-[var(--slate-300)]"
                   placeholder="Q3 Campaign"
                 />
               </div>
@@ -156,14 +156,14 @@ export default function SettingsPage() {
                   type="text"
                   value={newProjectDesc}
                   onChange={(e) => setNewProjectDesc(e.target.value)}
-                  className="mt-2 w-full rounded-xl border border-[var(--slate-200)] px-4 py-2 text-sm outline-none"
+                  className="mt-2 w-full rounded-2xl border border-[var(--slate-200)] bg-white px-4 py-3 text-sm font-medium text-[var(--slate-700)] shadow-[inset_0_1px_0_rgba(255,255,255,0.92)] outline-none transition-all duration-200 focus:border-[var(--purple-border)] focus:shadow-[0_0_0_4px_rgba(139,92,246,0.1)] hover:border-[var(--slate-300)]"
                   placeholder="Optional description"
                 />
               </div>
               <button
                 type="submit"
                 disabled={!selectedBrandForProject}
-                className="rounded-xl bg-[var(--slate-900)] px-4 py-2 text-sm text-white disabled:opacity-50"
+                className="rounded-2xl bg-[var(--slate-900)] px-6 py-3 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(30,41,59,0.12)] transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[0_12px_24px_rgba(30,41,59,0.18)] disabled:opacity-50 disabled:hover:transform-none disabled:hover:shadow-[0_8px_20px_rgba(30,41,59,0.12)]"
               >
                 Create Project
               </button>
@@ -178,7 +178,7 @@ export default function SettingsPage() {
                 {projects.map((p) => (
                   <div
                     key={p._id}
-                    className="rounded-xl border border-[var(--slate-150)] p-3 text-sm flex justify-between"
+                    className="rounded-2xl border border-[var(--slate-200)] bg-white/60 p-4 text-sm flex justify-between items-center shadow-sm"
                   >
                     <span>{p.name}</span>
                     <span className="text-xs text-[var(--slate-500)]">

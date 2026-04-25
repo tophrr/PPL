@@ -68,21 +68,21 @@ export function DashboardSection() {
   return (
     <div className="space-y-6">
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.15fr)_340px]">
-        <GlassPanel className="relative overflow-hidden border-[rgba(124,58,237,0.18)] bg-[#17172b] p-6 text-[var(--slate-900)] shadow-[var(--shadow-premium)] md:p-8">
-          <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-[radial-gradient(circle,rgba(139,92,246,0.24),transparent_68%)]" />
-          <div className="absolute -left-20 -bottom-20 h-52 w-52 rounded-full bg-[radial-gradient(circle,rgba(16,185,129,0.18),transparent_68%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.03),transparent_48%)]" />
+        <GlassPanel className="relative overflow-hidden border-[rgba(255,255,255,0.8)] bg-white/40 p-6 text-[var(--slate-900)] shadow-[var(--shadow-premium)] md:p-8 backdrop-blur-3xl">
+          <div className="absolute -right-20 -top-20 h-[400px] w-[400px] rounded-full bg-[radial-gradient(circle,rgba(139,92,246,0.12),transparent_70%)] pointer-events-none" />
+          <div className="absolute -left-20 -bottom-20 h-[300px] w-[300px] rounded-full bg-[radial-gradient(circle,rgba(16,185,129,0.08),transparent_70%)] pointer-events-none" />
+          <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.4),rgba(255,255,255,0.05))] pointer-events-none" />
 
           <div className="relative z-10">
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--slate-700)]">
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--purple-strong)]">
               COMMAND CENTER
             </p>
             <h1 className="font-display mt-4 max-w-4xl text-4xl leading-[1.04] text-[var(--slate-900)] md:text-5xl">
-              Semua keputusan konten penting, sekarang terasa lebih jernih.
+              Content decisions made instantly clear.
             </h1>
-            <p className="mt-5 max-w-2xl text-sm leading-8 text-[var(--slate-700)] md:text-base">
-              Dari brief sampai approval akhir, halaman ini dirancang untuk mengurangi gesekan kerja
-              tim dan membuat prioritas editorial lebih cepat terbaca.
+            <p className="mt-5 max-w-2xl text-sm leading-8 text-[var(--slate-600)] md:text-base">
+              From creative brief to final approval, this workspace is designed to eliminate team
+              friction and surface your most important editorial priorities.
             </p>
 
             <div className="mt-5 flex flex-wrap gap-2">
@@ -114,9 +114,9 @@ export function DashboardSection() {
                 <Link
                   key={action.title}
                   href={action.href}
-                  className="rounded-[22px] border border-white/10 bg-white/8 p-4 shadow-[0_12px_24px_rgba(6,6,15,0.12)] backdrop-blur-sm"
+                  className="group rounded-[22px] border border-white/50 bg-white/60 p-4 shadow-[0_4px_14px_rgba(30,41,59,0.03)] backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:bg-white hover:border-[var(--purple-border)] hover:shadow-[0_12px_30px_rgba(124,58,237,0.08)]"
                 >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 text-[var(--slate-900)]">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--slate-100)] text-[var(--slate-700)] transition-colors duration-300 group-hover:bg-[var(--purple-soft)] group-hover:text-[var(--purple-strong)]">
                     {action.icon}
                   </div>
                   <p className="mt-4 text-base font-semibold text-[var(--slate-900)]">
@@ -148,7 +148,7 @@ export function DashboardSection() {
             {focusItems.map((item, index) => (
               <div
                 key={item.title}
-                className="rounded-2xl border border-[rgba(219,227,238,0.88)] bg-white/76 p-4"
+                className="group rounded-2xl border border-[rgba(219,227,238,0.6)] bg-white/60 p-4 transition-all duration-300 hover:-translate-y-[2px] hover:bg-white hover:border-[var(--purple-border)] hover:shadow-[0_8px_20px_rgba(30,41,59,0.04)]"
               >
                 <div className="flex items-start gap-3">
                   <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--slate-100)] text-sm font-semibold text-[var(--slate-700)]">
@@ -179,7 +179,7 @@ export function DashboardSection() {
             ))}
           </div>
 
-          <div className="mt-5 rounded-2xl border border-[rgba(219,227,238,0.88)] bg-[linear-gradient(135deg,rgba(255,255,255,0.82),rgba(241,245,249,0.95))] p-4">
+          <div className="mt-5 rounded-2xl border border-[rgba(219,227,238,0.6)] bg-white/60 p-4 shadow-sm backdrop-blur-md">
             <div className="flex items-center justify-between text-sm">
               <span className="font-medium text-[var(--slate-700)]">Weekly engagement trend</span>
               <span className="font-semibold text-[var(--emerald-strong)]">+24%</span>

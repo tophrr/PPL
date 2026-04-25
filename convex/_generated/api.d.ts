@@ -10,6 +10,8 @@
 
 import type * as ai from "../ai.js";
 import type * as brands from "../brands.js";
+import type * as collaborativeLocks from "../collaborativeLocks.js";
+import type * as crons from "../crons.js";
 import type * as drafts from "../drafts.js";
 import type * as media from "../media.js";
 import type * as projects from "../projects.js";
@@ -24,6 +26,8 @@ import type {
 declare const fullApi: ApiFromModules<{
   ai: typeof ai;
   brands: typeof brands;
+  collaborativeLocks: typeof collaborativeLocks;
+  crons: typeof crons;
   drafts: typeof drafts;
   media: typeof media;
   projects: typeof projects;

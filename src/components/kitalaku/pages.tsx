@@ -8,6 +8,7 @@ import {
   SubscriptionSection,
 } from './sections';
 import { PlannerSection } from './planner-section';
+import { SchedulerSection } from './scheduler-section';
 
 function LandingNav() {
   return (
@@ -162,7 +163,7 @@ export function PlannerPageDesign() {
 export function SchedulerPageDesign() {
   return (
     <AppShell active="Scheduler">
-      <CalendarSection />
+      <SchedulerSection />
     </AppShell>
   );
 }
@@ -262,7 +263,7 @@ export function LoginPageDesign({
                 </h2>
                 <p className="mt-3 max-w-xl text-base leading-7 text-[var(--slate-500)]">
                   {subtitle ||
-                    'Satu form yang lebih ringkas, lebih dewasa, dan langsung mengarahkan pengguna ke pekerjaan prioritas mereka.'}
+                    'A streamlined, secure entry point that connects you directly to your top-priority creative tasks.'}
                 </p>
 
                 <div className="mt-6 grid gap-3 sm:grid-cols-3">
@@ -284,8 +285,8 @@ export function LoginPageDesign({
                 <div className="mt-8 flex justify-center w-full">{children}</div>
 
                 <div className="mt-4 rounded-2xl border border-[rgba(16,185,129,0.2)] bg-[rgba(16,185,129,0.08)] px-4 py-3 text-sm leading-6 text-[var(--emerald-strong)]">
-                  Session akan tetap aktif saat user berpindah dari planner ke scheduler atau
-                  approval.
+                  Your secure session will persist seamlessly as you navigate between the planner,
+                  scheduler, and approvals.
                 </div>
 
                 <div className="mt-5 flex flex-col gap-3 rounded-2xl border border-[rgba(219,227,238,0.88)] bg-white/70 p-4 sm:flex-row sm:items-center sm:justify-between">

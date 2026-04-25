@@ -20,23 +20,22 @@ export const getBrands = query({
 
     // Role-based access control
     if (user.role === 'Admin' || user.role === 'Creative Manager') {
-      // Return all brands for their agency (assuming single agency for now, or fetch by agencyId)
-      // Since we don't strictly bind agencyId yet for all, we return all non-archived for MVP
+      if (!user.agencyId) return [];
       return await ctx.db
         .query('brands')
+        .withIndex('by_agency', (q) => q.eq('agencyId', user.agencyId!))
         .filter((q) => q.eq(q.field('isArchived'), false))
         .collect();
     } else if (user.role === 'Client') {
-      // Clients only see brands they are mapped to
-      return await ctx.db
+      if (!user.agencyId) return [];
+      const agencyBrands = await ctx.db
         .query('brands')
-        .filter((q) =>
-          q.and(
-            q.eq(q.field('isArchived'), false),
-            q.eq(q.field('clientIds'), [user._id]), // Simplified array check, Convex requires more complex check or mapping table for arrays, but wait, clientIds is an array. We can fetch all and filter in JS if it's small, or use a mapping table.
-          ),
-        )
-        .collect(); // NOTE: we will fix the array check if needed
+        .withIndex('by_agency', (q) => q.eq('agencyId', user.agencyId!))
+        .filter((q) => q.eq(q.field('isArchived'), false))
+        .collect();
+
+      // Filter in JS since Convex doesn't support .includes() natively for array fields
+      return agencyBrands.filter((b) => b.clientIds.includes(user._id));
     }
 
     return [];

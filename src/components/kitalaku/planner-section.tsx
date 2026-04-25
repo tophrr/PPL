@@ -22,6 +22,14 @@ export function PlannerSection() {
   const [selectedBrandId, setSelectedBrandId] = useState<Id<'brands'> | ''>('');
   const [selectedProjectId, setSelectedProjectId] = useState<Id<'projects'> | ''>('');
 
+  const currentUser = useQuery(api.users.getCurrentUser);
+  const contentLock = useQuery(
+    api.collaborativeLocks.getLock,
+    draftId ? { documentId: draftId, field: 'content' } : 'skip',
+  );
+  const acquireLock = useMutation(api.collaborativeLocks.acquireLock);
+  const releaseLock = useMutation(api.collaborativeLocks.releaseLock);
+
   const brands = useQuery(api.brands.getBrands) || [];
   const projects =
     useQuery(
@@ -103,6 +111,28 @@ export function PlannerSection() {
     }
   };
 
+  const isLockedByOther = contentLock && currentUser && contentLock.lockedBy !== currentUser._id;
+
+  const handleEditorFocus = async () => {
+    if (draftId && !isLockedByOther) {
+      try {
+        await acquireLock({ documentId: draftId, field: 'content' });
+      } catch (err) {
+        console.error('Failed to acquire lock', err);
+      }
+    }
+  };
+
+  const handleEditorBlur = async () => {
+    if (draftId) {
+      try {
+        await releaseLock({ documentId: draftId, field: 'content' });
+      } catch (err) {
+        console.error('Failed to release lock', err);
+      }
+    }
+  };
+
   return (
     <div id="planner" className="space-y-5">
       <GlassPanel className="relative overflow-hidden border-[rgba(124,58,237,0.14)] bg-[linear-gradient(145deg,rgba(255,255,255,0.96),rgba(245,247,255,0.9))] p-6 text-[var(--slate-900)] shadow-[var(--shadow-premium)] md:p-8">
@@ -156,7 +186,7 @@ export function PlannerSection() {
                   id="planner-platform"
                   value={platform}
                   onChange={(e) => setPlatform(e.target.value)}
-                  className="mt-2 w-full rounded-2xl border border-[var(--slate-200)] bg-white px-4 py-3 text-sm font-medium text-[var(--slate-700)] shadow-[inset_0_1px_0_rgba(255,255,255,0.92)] outline-none focus:border-[var(--purple-border)] focus:shadow-[0_0_0_4px_rgba(139,92,246,0.1)]"
+                  className="mt-2 w-full rounded-2xl border border-[var(--slate-200)] bg-white px-4 py-3 text-sm font-medium text-[var(--slate-700)] shadow-[inset_0_1px_0_rgba(255,255,255,0.92)] outline-none transition-all duration-200 focus:border-[var(--purple-border)] focus:shadow-[0_0_0_4px_rgba(139,92,246,0.1)] hover:border-[var(--slate-300)]"
                 >
                   <option>Instagram</option>
                   <option>LinkedIn</option>
@@ -175,7 +205,7 @@ export function PlannerSection() {
                   id="planner-tone"
                   value={tone}
                   onChange={(e) => setTone(e.target.value)}
-                  className="mt-2 w-full rounded-2xl border border-[var(--slate-200)] bg-white px-4 py-3 text-sm font-medium text-[var(--slate-700)] shadow-[inset_0_1px_0_rgba(255,255,255,0.92)] outline-none focus:border-[var(--purple-border)] focus:shadow-[0_0_0_4px_rgba(139,92,246,0.1)]"
+                  className="mt-2 w-full rounded-2xl border border-[var(--slate-200)] bg-white px-4 py-3 text-sm font-medium text-[var(--slate-700)] shadow-[inset_0_1px_0_rgba(255,255,255,0.92)] outline-none transition-all duration-200 focus:border-[var(--purple-border)] focus:shadow-[0_0_0_4px_rgba(139,92,246,0.1)] hover:border-[var(--slate-300)]"
                 >
                   <option>Refined &amp; Warm</option>
                   <option>Professional &amp; Confident</option>
@@ -196,7 +226,7 @@ export function PlannerSection() {
             <button
               onClick={handleGenerate}
               disabled={isGenerating}
-              className="inline-flex items-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] px-6 py-3 text-sm font-semibold text-[var(--slate-900)] shadow-[0_16px_40px_rgba(124,58,237,0.28)] disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] px-6 py-3 text-sm font-semibold text-white shadow-[0_16px_40px_rgba(124,58,237,0.28)] transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[0_20px_45px_rgba(124,58,237,0.36)] disabled:opacity-50 disabled:hover:transform-none"
             >
               {isGenerating ? (
                 <span className="animate-pulse">Generating...</span>
@@ -209,7 +239,7 @@ export function PlannerSection() {
             </button>
             <button
               onClick={() => setBrief('')}
-              className="rounded-2xl border border-[var(--slate-200)] bg-white/90 px-6 py-3 text-sm font-semibold text-[var(--slate-700)]"
+              className="rounded-2xl border border-[var(--slate-200)] bg-white/90 px-6 py-3 text-sm font-semibold text-[var(--slate-700)] transition-all duration-200 hover:bg-white hover:border-[var(--slate-300)]"
             >
               Reset brief
             </button>
@@ -229,7 +259,7 @@ export function PlannerSection() {
                   setSelectedBrandId(e.target.value as Id<'brands'>);
                   setSelectedProjectId(''); // reset project
                 }}
-                className="mt-2 w-full rounded-xl border border-[var(--slate-200)] bg-white px-4 py-2 text-sm text-[var(--slate-700)] outline-none"
+                className="mt-2 w-full rounded-2xl border border-[var(--slate-200)] bg-white px-4 py-3 text-sm font-medium text-[var(--slate-700)] shadow-[inset_0_1px_0_rgba(255,255,255,0.92)] outline-none transition-all duration-200 focus:border-[var(--purple-border)] focus:shadow-[0_0_0_4px_rgba(139,92,246,0.1)] hover:border-[var(--slate-300)]"
               >
                 <option value="">-- Choose Brand --</option>
                 {brands.map((b) => (
@@ -248,7 +278,7 @@ export function PlannerSection() {
                 <select
                   value={selectedProjectId}
                   onChange={(e) => setSelectedProjectId(e.target.value as Id<'projects'>)}
-                  className="mt-2 w-full rounded-xl border border-[var(--slate-200)] bg-white px-4 py-2 text-sm text-[var(--slate-700)] outline-none"
+                  className="mt-2 w-full rounded-2xl border border-[var(--slate-200)] bg-white px-4 py-3 text-sm font-medium text-[var(--slate-700)] shadow-[inset_0_1px_0_rgba(255,255,255,0.92)] outline-none transition-all duration-200 focus:border-[var(--purple-border)] focus:shadow-[0_0_0_4px_rgba(139,92,246,0.1)] hover:border-[var(--slate-300)]"
                 >
                   <option value="">-- Choose Project --</option>
                   {projects.map((p) => (
@@ -285,12 +315,22 @@ export function PlannerSection() {
               Tone: {tone}
             </div>
           </div>
+
+          {isLockedByOther && (
+            <div className="mt-4 rounded-xl border border-[rgba(239,68,68,0.2)] bg-[rgba(239,68,68,0.08)] p-3 text-sm font-medium text-red-600 flex items-center justify-between">
+              <span>🔒 This content is currently being edited by {contentLock.userName}</span>
+              <span className="text-xs">You cannot edit until they finish.</span>
+            </div>
+          )}
+
           <div className="mt-4">
             <RichTextEditor
               value={generatedText}
               onChange={setGeneratedText}
               onAutoSave={handleAutoSave}
-              disabled={false}
+              disabled={!!isLockedByOther}
+              onFocus={handleEditorFocus}
+              onBlur={handleEditorBlur}
             />
           </div>
           <div className="mt-4 flex items-center justify-between rounded-xl border border-[rgba(245,158,11,0.2)] bg-[rgba(245,158,11,0.08)] p-3 text-xs text-[var(--amber-strong)]">
