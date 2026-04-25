@@ -48,10 +48,7 @@ export function SchedulerSection() {
         },
       });
     }
-
-    // Optional: Cleanup if needed, but Draggable usually attaches to DOM.
-    // If the component unmounts, the ref is gone.
-  }, [selectedProjectId]); // Re-init only when project changes (which clears the backlog)
+  }, [selectedProjectId]);
 
   const scheduledDrafts = drafts.filter((d) => d.scheduledDate !== undefined);
   const unscheduledDrafts = drafts.filter((d) => d.scheduledDate === undefined);
@@ -61,8 +58,8 @@ export function SchedulerSection() {
     title:
       d.content.replace(/<[^>]*>?/gm, '').substring(0, 30) + '...' ||
       d.aiPrompt ||
-      'Untitled Draft',
-    start: d.scheduledDate, // Use raw timestamp, FullCalendar handles it
+      'Draf Tanpa Judul',
+    start: d.scheduledDate,
     allDay: true,
     extendedProps: {
       status: d.status,
@@ -71,7 +68,6 @@ export function SchedulerSection() {
 
   const handleEventDrop = async (info: any) => {
     const draftId = info.event.id as Id<'contentDrafts'>;
-    // FullCalendar gives us a Date object for 'start'
     const newDate = info.event.start.getTime();
 
     try {
@@ -79,7 +75,7 @@ export function SchedulerSection() {
     } catch (error) {
       console.error('Failed to reschedule draft:', error);
       info.revert();
-      alert('Failed to save schedule. Reverting.');
+      alert('Gagal menyimpan jadwal. Mengembalikan posisi.');
     }
   };
 
@@ -89,8 +85,6 @@ export function SchedulerSection() {
 
     try {
       await updateDraftSchedule({ draftId, scheduledDate: newDate });
-      // We remove the temporary event because the Convex subscription will
-      // trigger a re-render with the updated drafts list, creating the "real" event.
       info.event.remove();
     } catch (error) {
       console.error('Failed to schedule draft:', error);
@@ -104,10 +98,10 @@ export function SchedulerSection() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-xl font-semibold text-[var(--slate-900)] flex items-center gap-2">
-              <IconCalendar /> Editorial Scheduler
+              <IconCalendar /> Penjadwal Editorial
             </h2>
             <p className="mt-1 text-sm text-[var(--slate-500)]">
-              Drag drafts from the sidebar into the calendar to set publication dates.
+              Tarik draf dari sidebar ke dalam kalender untuk mengatur tanggal publikasi.
             </p>
           </div>
         </div>
@@ -119,7 +113,7 @@ export function SchedulerSection() {
           <GlassPanel className="p-5 h-fit max-h-[800px] flex flex-col">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-[var(--slate-800)] text-sm uppercase tracking-wider">
-                Unscheduled Drafts
+                Draf Belum Terjadwal
               </h3>
               <span className="bg-[var(--slate-100)] text-[var(--slate-600)] text-[10px] font-bold px-2 py-0.5 rounded-full">
                 {unscheduledDrafts.length}
@@ -129,7 +123,7 @@ export function SchedulerSection() {
             <div ref={backlogRef} className="space-y-3 overflow-y-auto pr-1 custom-scrollbar">
               {unscheduledDrafts.length === 0 ? (
                 <p className="text-xs text-[var(--slate-400)] italic p-4 text-center border-2 border-dashed border-[var(--slate-100)] rounded-xl">
-                  No unscheduled drafts found for this project.
+                  Tidak ada draf belum terjadwal untuk proyek ini.
                 </p>
               ) : (
                 unscheduledDrafts.map((d) => (
@@ -143,7 +137,7 @@ export function SchedulerSection() {
                       <p className="text-xs font-medium text-[var(--slate-800)] line-clamp-2 leading-relaxed">
                         {d.content.replace(/<[^>]*>?/gm, '').substring(0, 80) ||
                           d.aiPrompt ||
-                          'Untitled Draft'}
+                          'Draf Tanpa Judul'}
                       </p>
                       <div className="flex items-center justify-between mt-1">
                         <span className="text-[9px] font-bold uppercase text-[var(--slate-400)]">
@@ -159,7 +153,11 @@ export function SchedulerSection() {
                                 : 'bg-emerald-100 text-emerald-600',
                           )}
                         >
-                          {d.status}
+                          {d.status === 'Draft'
+                            ? 'Draf'
+                            : d.status === 'Review'
+                              ? 'Ditinjau'
+                              : 'Disetujui'}
                         </span>
                       </div>
                     </div>
@@ -224,6 +222,7 @@ export function SchedulerSection() {
               eventDrop={handleEventDrop}
               eventReceive={handleEventReceive}
               height="auto"
+              locale="id"
               headerToolbar={{
                 left: 'prev,next today',
                 center: 'title',
@@ -235,7 +234,7 @@ export function SchedulerSection() {
       ) : (
         <GlassPanel className="p-12 text-center">
           <p className="text-sm font-semibold text-[var(--slate-500)]">
-            Please select a Brand and Project in the sidebar to view the calendar.
+            Silakan pilih Brand dan Proyek di sidebar untuk melihat kalender.
           </p>
         </GlassPanel>
       )}

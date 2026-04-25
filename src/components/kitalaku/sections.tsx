@@ -38,31 +38,35 @@ export function DashboardSection() {
     .slice(0, 3);
 
   const contentStatusReal = [
-    { label: 'Draft', value: stats?.draft.toString() || '0', tone: 'draft' as StatusTone },
-    { label: 'Review', value: stats?.review.toString() || '0', tone: 'review' as StatusTone },
-    { label: 'Approved', value: stats?.approved.toString() || '0', tone: 'approved' as StatusTone },
+    { label: 'Draf', value: stats?.draft.toString() || '0', tone: 'draft' as StatusTone },
+    { label: 'Ditinjau', value: stats?.review.toString() || '0', tone: 'review' as StatusTone },
+    {
+      label: 'Disetujui',
+      value: stats?.approved.toString() || '0',
+      tone: 'approved' as StatusTone,
+    },
   ];
 
   const dashboardMetricsReal = [
     {
-      label: 'Total Content',
+      label: 'Total Konten',
       value: stats?.total.toString() || '0',
-      note: 'All-time production',
+      note: 'Produksi sepanjang waktu',
       tone: 'purple',
     },
     {
-      label: 'Pending Review',
+      label: 'Menunggu Peninjauan',
       value: stats?.review.toString() || '0',
-      note: 'Needs attention',
+      note: 'Butuh perhatian',
       tone: 'amber',
     },
     {
-      label: 'Approved',
+      label: 'Disetujui',
       value: stats?.approved.toString() || '0',
-      note: 'Ready to publish',
+      note: 'Siap dipublikasikan',
       tone: 'green',
     },
-    { label: 'AI Credits', value: 'Balanced', note: 'Healthy quota', tone: 'purple' },
+    { label: 'Kredit AI', value: 'Seimbang', note: 'Kuota sehat', tone: 'purple' },
   ];
 
   const totalItems = stats?.total || 0;
@@ -70,27 +74,27 @@ export function DashboardSection() {
   const quickActions = [
     {
       href: '/dashboard/planner',
-      title: 'Open Planner',
-      detail: 'Generate a new content direction for the next campaign.',
+      title: 'Buka Perencana',
+      detail: 'Buat arahan konten baru untuk kampanye berikutnya.',
       icon: <IconWand />,
     },
     {
       href: '/dashboard/scheduler',
-      title: 'Review Schedule',
-      detail: "Check this week's publishing queue and move blockers faster.",
+      title: 'Tinjau Jadwal',
+      detail: 'Cek antrean publikasi minggu ini dan percepat hambatan.',
       icon: <IconCalendar />,
     },
     {
       href: '/dashboard/approval-analytics',
-      title: 'Track Performance',
-      detail: 'See approvals and engagement without switching context.',
+      title: 'Lacak Performa',
+      detail: 'Lihat persetujuan dan keterlibatan tanpa ganti konteks.',
       icon: <IconAnalytics />,
     },
   ];
 
   const focusItems = latestDrafts.map((d) => ({
     title: d.content.substring(0, 40).replace(/<[^>]*>/g, '') + '...',
-    detail: `Awaiting ${d.status} processing.`,
+    detail: `Menunggu pemrosesan ${d.status === 'Draft' ? 'Draf' : d.status === 'Review' ? 'Peninjauan' : 'Persetujuan'}.`,
     href: `/dashboard/planner?draftId=${d._id}`,
     tone: d.status.toLowerCase() as StatusTone,
   }));
@@ -105,37 +109,44 @@ export function DashboardSection() {
 
           <div className="relative z-10">
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--purple-strong)]">
-              COMMAND CENTER
+              PUSAT KOMANDO
             </p>
             <h1 className="font-display mt-4 max-w-4xl text-4xl leading-[1.04] text-[var(--slate-900)] md:text-5xl">
-              Content decisions made instantly clear.
+              Keputusan konten jadi lebih jelas secara instan.
             </h1>
             <p className="mt-5 max-w-2xl text-sm leading-8 text-[var(--slate-600)] md:text-base">
-              From creative brief to final approval, this workspace is designed to eliminate team
-              friction and surface your most important editorial priorities.
+              Dari arahan kreatif hingga persetujuan akhir, ruang kerja ini dirancang untuk
+              menghilangkan hambatan tim dan memunculkan prioritas editorial terpenting Anda.
             </p>
 
             <div className="mt-5 flex flex-wrap gap-2">
               {currentUser === undefined ? (
                 <span className="rounded-full border border-white/12 bg-white/8 px-3 py-1.5 text-xs font-medium text-[var(--slate-900)] italic animate-pulse">
-                  Loading User Profile...
+                  Memuat Profil...
                 </span>
               ) : currentUser === null ? (
                 <span className="rounded-full border border-white/12 bg-white/8 px-3 py-1.5 text-xs font-medium text-[var(--slate-900)]">
-                  {isAuthenticated ? 'Syncing profile...' : 'Not signed in'}
+                  {isAuthenticated ? 'Sinkronisasi profil...' : 'Belum masuk'}
                 </span>
               ) : (
                 <span className="rounded-full border border-white/12 bg-white/8 px-3 py-1.5 text-xs font-medium text-[var(--slate-900)]">
-                  Role: {currentUser.role}
+                  Peran:{' '}
+                  {currentUser.role === 'Admin'
+                    ? 'Admin'
+                    : currentUser.role === 'Creative Manager'
+                      ? 'Manajer Kreatif'
+                      : currentUser.role === 'Creator'
+                        ? 'Kreator'
+                        : 'Klien'}
                 </span>
               )}
               {stats && (
                 <>
                   <span className="rounded-full border border-white/12 bg-white/8 px-3 py-1.5 text-xs font-medium text-[var(--slate-900)]">
-                    {stats.review} pending review
+                    {stats.review} menunggu ditinjau
                   </span>
                   <span className="rounded-full border border-white/12 bg-white/8 px-3 py-1.5 text-xs font-medium text-[var(--slate-900)]">
-                    {stats.approved} approved
+                    {stats.approved} disetujui
                   </span>
                 </>
               )}
@@ -165,25 +176,25 @@ export function DashboardSection() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--slate-700)]">
-                Today Focus
+                Fokus Hari Ini
               </p>
               <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[var(--slate-900)]">
                 {focusItems.length === 0
-                  ? 'No priorities'
+                  ? 'Tidak ada prioritas'
                   : focusItems.length === 1
-                    ? 'One priority'
-                    : `${focusItems.length} priorities`}
+                    ? 'Satu prioritas'
+                    : `${focusItems.length} prioritas`}
               </h2>
             </div>
             <span className="rounded-full bg-[var(--slate-100)] px-3 py-1 text-xs font-semibold text-[var(--slate-500)]">
-              {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+              {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
             </span>
           </div>
 
           <div className="mt-5 space-y-3">
             {focusItems.length === 0 ? (
               <p className="text-sm text-[var(--slate-400)] italic p-4">
-                No drafts to focus on yet. Open the AI Planner to get started.
+                Belum ada draf untuk difokuskan. Buka Perencana AI untuk memulai.
               </p>
             ) : (
               focusItems.map((item, index) => (
@@ -206,7 +217,11 @@ export function DashboardSection() {
                             toneSurface(item.tone),
                           )}
                         >
-                          {item.tone}
+                          {item.tone === 'draft'
+                            ? 'Draf'
+                            : item.tone === 'review'
+                              ? 'Ditinjau'
+                              : 'Disetujui'}
                         </span>
                       </div>
                       <p className="mt-2 text-sm leading-6 text-[var(--slate-500)]">
@@ -216,7 +231,7 @@ export function DashboardSection() {
                         href={item.href}
                         className="mt-3 inline-flex text-xs font-semibold text-[var(--slate-900)]"
                       >
-                        Open module
+                        Buka modul
                       </Link>
                     </div>
                   </div>
@@ -230,10 +245,10 @@ export function DashboardSection() {
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h2 className="text-2xl font-semibold tracking-tight text-[var(--slate-900)]">
-            Performance Snapshot
+            Ringkasan Performa
           </h2>
           <p className="mt-1 text-sm text-[var(--slate-500)]">
-            Real-time metrics across planner, scheduler, and approvals.
+            Metrik real-time dari perencana, penjadwal, dan persetujuan.
           </p>
         </div>
 
@@ -242,14 +257,14 @@ export function DashboardSection() {
             href="/dashboard/approval-analytics"
             className="inline-flex items-center justify-center rounded-xl border border-[rgba(219,227,238,0.88)] bg-white/80 px-5 py-3 text-sm font-semibold text-[var(--slate-700)]"
           >
-            View Approvals
+            Lihat Persetujuan
           </Link>
           <Link
             href="/dashboard/planner"
             className="inline-flex items-center justify-center gap-2 rounded-xl bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] px-5 py-3 text-sm font-semibold text-[var(--slate-900)] shadow-[var(--shadow-soft)]"
           >
             <IconWand />
-            <span>Create AI Draft</span>
+            <span>Buat Draf AI</span>
           </Link>
         </div>
       </div>
@@ -297,9 +312,9 @@ export function DashboardSection() {
         <GlassPanel className="p-5">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <h2 className="text-lg font-semibold text-[var(--slate-900)]">Workflow Status</h2>
+              <h2 className="text-lg font-semibold text-[var(--slate-900)]">Status Alur Kerja</h2>
               <p className="mt-1 text-sm text-[var(--slate-500)]">
-                {totalItems} active items across the current production cycle.
+                {totalItems} item aktif dalam siklus produksi saat ini.
               </p>
             </div>
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[rgba(124,58,237,0.1)] text-[var(--slate-900)]">
@@ -345,22 +360,24 @@ export function DashboardSection() {
         <GlassPanel className="p-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h2 className="text-lg font-semibold text-[var(--slate-900)]">Recent Activity</h2>
+              <h2 className="text-lg font-semibold text-[var(--slate-900)]">Aktivitas Terbaru</h2>
               <p className="mt-1 text-sm text-[var(--slate-500)]">
-                Latest motion across drafts, approvals, and publishing.
+                Pergerakan terbaru pada draf, persetujuan, dan publikasi.
               </p>
             </div>
             <Link
               href="/dashboard/scheduler"
               className="inline-flex w-fit rounded-xl border border-[rgba(219,227,238,0.88)] bg-white/80 px-4 py-2.5 text-sm font-semibold text-[var(--slate-700)]"
             >
-              Open Scheduler
+              Buka Penjadwal
             </Link>
           </div>
 
           <div className="mt-5 space-y-3">
             {notifications.length === 0 ? (
-              <p className="text-sm text-[var(--slate-400)] italic p-4">No recent activity.</p>
+              <p className="text-sm text-[var(--slate-400)] italic p-4">
+                Tidak ada aktivitas terbaru.
+              </p>
             ) : (
               notifications.slice(0, 4).map((item) => (
                 <div
@@ -400,181 +417,6 @@ export function DashboardSection() {
   );
 }
 
-export function SubscriptionSection() {
-  const currentUser = useQuery(api.users.getCurrentUser);
-  const agency = useQuery(
-    api.agencies.getAgency,
-    currentUser?.agencyId ? { agencyId: currentUser.agencyId } : 'skip',
-  );
-
-  const quota = agency?.tokenQuotaRemaining || 0;
-  const usagePercent = Math.round(((1000 - quota) / 1000) * 100);
-
-  return (
-    <div id="subscription" className="space-y-5">
-      <GlassPanel className="relative overflow-hidden p-6 md:p-7">
-        <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-[radial-gradient(circle,rgba(124,58,237,0.2),transparent_70%)]" />
-        <div className="absolute -left-20 -bottom-16 h-48 w-48 rounded-full bg-[radial-gradient(circle,rgba(16,185,129,0.12),transparent_70%)]" />
-        <div className="relative z-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--slate-700)]">
-            Subscription Center
-          </p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight text-[var(--slate-900)]">
-            Workspace Plan & Billing
-          </h2>
-          <p className="mt-2 max-w-3xl text-sm leading-7 text-[var(--slate-500)]">
-            UI design untuk memantau paket langganan, kuota AI, dan siklus pembayaran. Data siap
-            dihubungkan ke Convex untuk status plan, usage, invoice, dan riwayat upgrade.
-          </p>
-          <div className="mt-5 flex flex-wrap gap-2">
-            {['Convex: subscriptions', 'Convex: usage_events', 'Convex: invoices'].map((item) => (
-              <span
-                key={item}
-                className="rounded-full border border-[rgba(124,58,237,0.15)] bg-[rgba(124,58,237,0.08)] px-3 py-1.5 text-xs font-semibold text-[var(--slate-900)]"
-              >
-                {item}
-              </span>
-            ))}
-          </div>
-        </div>
-      </GlassPanel>
-
-      <div className="grid gap-4 lg:grid-cols-3">
-        <GlassPanel className="p-5 lg:col-span-2">
-          <div className="flex flex-wrap items-start justify-between gap-4 border-b border-[var(--slate-150)] pb-4">
-            <div>
-              <p className="text-sm font-semibold text-[var(--slate-900)]">Current Plan</p>
-              <p className="mt-1 text-3xl font-semibold tracking-tight text-[var(--slate-900)]">
-                Pro Team
-              </p>
-              <p className="mt-2 text-sm text-[var(--slate-500)]">
-                Active until 30 Apr 2026 • Auto-renew enabled
-              </p>
-            </div>
-            <span className="rounded-full bg-[rgba(16,185,129,0.12)] px-3 py-1 text-xs font-semibold text-[var(--emerald-strong)]">
-              Healthy
-            </span>
-          </div>
-
-          <div className="mt-4 grid gap-4 sm:grid-cols-3">
-            {[
-              [
-                'AI Credits',
-                `${quota.toLocaleString()} / 1,000`,
-                `${100 - usagePercent}% remaining`,
-              ],
-              ['Seats', '1 / 5', '4 seats available'],
-              ['Storage', '0 GB / 10 GB', 'Plenty of room'],
-            ].map(([label, value, note]) => (
-              <div
-                key={label}
-                className="rounded-2xl border border-[var(--slate-150)] bg-white/80 p-4"
-              >
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--slate-500)]">
-                  {label}
-                </p>
-                <p className="mt-2 text-2xl font-semibold text-[var(--slate-900)]">{value}</p>
-                <p className="mt-1 text-xs text-[var(--slate-500)]">{note}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-5 rounded-2xl border border-[var(--slate-150)] bg-white/80 p-4">
-            <div className="mb-2 flex items-center justify-between text-sm">
-              <p className="font-semibold text-[var(--slate-800)]">Monthly credit trend</p>
-              <p className="text-[var(--slate-500)]">April cycle</p>
-            </div>
-            <div className="h-2 rounded-full bg-[var(--slate-100)]">
-              <div
-                className="h-2 rounded-full bg-[linear-gradient(90deg,#8b5cf6,#7c3aed)]"
-                style={{ width: `${100 - usagePercent}%` }}
-              />
-            </div>
-            <p className="mt-2 text-xs text-[var(--slate-500)]">
-              {quota > 200
-                ? 'Healthy credit balance for current sprint.'
-                : 'Consider upgrading soon to maintain production speed.'}
-            </p>
-          </div>
-        </GlassPanel>
-
-        <GlassPanel className="p-5">
-          <p className="text-sm font-semibold text-[var(--slate-900)]">Plan Actions</p>
-          <div className="mt-4 space-y-3">
-            <button className="w-full rounded-xl bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] px-4 py-3 text-sm font-semibold text-[var(--slate-900)]">
-              Upgrade Plan
-            </button>
-            <button className="w-full rounded-xl border border-[var(--slate-150)] bg-white/85 px-4 py-3 text-sm font-semibold text-[var(--slate-700)]">
-              Manage Seats
-            </button>
-            <button className="w-full rounded-xl border border-[var(--slate-150)] bg-white/85 px-4 py-3 text-sm font-semibold text-[var(--slate-700)]">
-              Download Last Invoice
-            </button>
-          </div>
-
-          <div className="mt-5 rounded-2xl border border-[rgba(245,158,11,0.2)] bg-[rgba(245,158,11,0.08)] p-4">
-            <p className="text-sm font-semibold text-[var(--amber-strong)]">Renewal Reminder</p>
-            <p className="mt-1 text-xs leading-6 text-[var(--slate-600)]">
-              Subscription renews in 14 days. Convex trigger dapat dipakai untuk kirim notifikasi
-              in-app + email H-7 dan H-1.
-            </p>
-          </div>
-        </GlassPanel>
-      </div>
-
-      <GlassPanel className="p-5">
-        <div className="flex flex-col gap-4 border-b border-[var(--slate-150)] pb-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <p className="text-lg font-semibold text-[var(--slate-900)]">Billing History</p>
-            <p className="mt-1 text-sm text-[var(--slate-500)]">
-              Mock data untuk desain tabel invoice (source nantinya dari Convex query).
-            </p>
-          </div>
-          <button className="rounded-xl border border-[var(--slate-150)] bg-white/85 px-4 py-2.5 text-sm font-semibold text-[var(--slate-700)]">
-            Export CSV
-          </button>
-        </div>
-
-        <div className="mt-4 overflow-x-auto">
-          <table className="min-w-[760px] w-full text-left text-sm">
-            <thead>
-              <tr className="text-xs uppercase tracking-[0.12em] text-[var(--slate-500)]">
-                <th className="px-3 py-2">Invoice</th>
-                <th className="px-3 py-2">Date</th>
-                <th className="px-3 py-2">Amount</th>
-                <th className="px-3 py-2">Status</th>
-                <th className="px-3 py-2">Payment Method</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                ['INV-2026-04', '01 Apr 2026', 'Rp 1.499.000', 'Paid', 'Visa **** 1024'],
-                ['INV-2026-03', '01 Mar 2026', 'Rp 1.499.000', 'Paid', 'Visa **** 1024'],
-                ['INV-2026-02', '01 Feb 2026', 'Rp 1.199.000', 'Paid', 'Bank Transfer'],
-              ].map((row) => (
-                <tr
-                  key={row[0]}
-                  className="border-t border-[var(--slate-150)] text-[var(--slate-700)]"
-                >
-                  <td className="px-3 py-3 font-semibold">{row[0]}</td>
-                  <td className="px-3 py-3">{row[1]}</td>
-                  <td className="px-3 py-3">{row[2]}</td>
-                  <td className="px-3 py-3">
-                    <span className="rounded-full bg-[rgba(16,185,129,0.12)] px-2.5 py-1 text-xs font-semibold text-[var(--emerald-strong)]">
-                      {row[3]}
-                    </span>
-                  </td>
-                  <td className="px-3 py-3">{row[4]}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </GlassPanel>
-    </div>
-  );
-}
-
 export function ApprovalAnalyticsSection() {
   return <AnalyticsDashboard />;
 }
@@ -597,20 +439,18 @@ export function ProfileSection() {
       email: currentUser.email,
       name: name,
     });
-    alert('Profile updated');
+    alert('Profil diperbarui');
   };
 
   return (
     <div className="space-y-6">
       <GlassPanel className="p-8">
-        <h2 className="text-2xl font-semibold text-[var(--slate-900)]">Personal Identity</h2>
-        <p className="mt-1 text-sm text-[var(--slate-500)]">
-          Manage your account details and role.
-        </p>
+        <h2 className="text-2xl font-semibold text-[var(--slate-900)]">Identitas Pribadi</h2>
+        <p className="mt-1 text-sm text-[var(--slate-500)]">Kelola detail akun dan peran Anda.</p>
 
         <form onSubmit={handleUpdate} className="mt-8 max-w-md space-y-6">
           <div>
-            <label className="text-sm font-semibold text-[var(--slate-700)]">Full Name</label>
+            <label className="text-sm font-semibold text-[var(--slate-700)]">Nama Lengkap</label>
             <input
               type="text"
               value={name}
@@ -628,36 +468,42 @@ export function ProfileSection() {
             />
           </div>
           <div>
-            <label className="text-sm font-semibold text-[var(--slate-700)]">Role</label>
+            <label className="text-sm font-semibold text-[var(--slate-700)]">Peran</label>
             <div className="mt-2 inline-flex rounded-full bg-[var(--purple-soft)] px-4 py-2 text-sm font-semibold text-[var(--slate-900)]">
-              {currentUser?.role}
+              {currentUser?.role === 'Admin'
+                ? 'Admin'
+                : currentUser?.role === 'Creative Manager'
+                  ? 'Manajer Kreatif'
+                  : currentUser?.role === 'Creator'
+                    ? 'Kreator'
+                    : 'Klien'}
             </div>
           </div>
           <button
             type="submit"
             className="w-full rounded-2xl bg-[var(--slate-900)] py-4 text-sm font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5"
           >
-            Save Changes
+            Simpan Perubahan
           </button>
         </form>
       </GlassPanel>
 
       <GlassPanel className="p-8">
-        <h2 className="text-2xl font-semibold text-[var(--slate-900)]">Workspace Identity</h2>
-        <p className="mt-1 text-sm text-[var(--slate-500)]">Details of the agency you belong to.</p>
+        <h2 className="text-2xl font-semibold text-[var(--slate-900)]">Identitas Ruang Kerja</h2>
+        <p className="mt-1 text-sm text-[var(--slate-500)]">Detail agensi tempat Anda bergabung.</p>
 
         <div className="mt-6 space-y-4">
           <div className="flex items-center justify-between rounded-2xl border border-[var(--slate-150)] bg-white/70 p-4">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider text-[var(--slate-500)]">
-                Agency Name
+                Nama Agensi
               </p>
               <p className="mt-1 font-semibold text-[var(--slate-900)]">
-                {agency?.name || 'Loading...'}
+                {agency?.name || 'Memuat...'}
               </p>
             </div>
             <Link href="/settings" className="text-sm font-semibold text-[var(--purple-strong)]">
-              Manage
+              Kelola
             </Link>
           </div>
         </div>

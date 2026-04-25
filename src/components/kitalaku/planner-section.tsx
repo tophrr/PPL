@@ -14,12 +14,13 @@ import { useWorkspace } from './workspace-context';
 
 export function PlannerSection() {
   const router = useRouter();
+  const currentUser = useQuery(api.users.getCurrentUser);
 
   // Structured Briefing States
   const [targetAudience, setTargetAudience] = useState('');
   const [topic, setTopic] = useState('');
   const [goal, setGoal] = useState('');
-  const [contentType, setContentType] = useState('Social Media Copy');
+  const [contentType, setContentType] = useState('Konten Media Sosial');
   const [tone, setTone] = useState('Refined & Warm');
   const [platform, setPlatform] = useState('Instagram');
 
@@ -31,7 +32,6 @@ export function PlannerSection() {
 
   const { selectedBrandId, selectedProjectId } = useWorkspace();
 
-  const currentUser = useQuery(api.users.getCurrentUser);
   const contentLock = useQuery(
     api.collaborativeLocks.getLock,
     draftId ? { documentId: draftId, field: 'content' } : 'skip',
@@ -69,7 +69,7 @@ export function PlannerSection() {
 
   const handleGenerate = async () => {
     if (!targetAudience.trim() || !topic.trim()) {
-      setError('Target Audience and Topic are required.');
+      setError('Target Audiens dan Topik wajib diisi.');
       return;
     }
 
@@ -95,7 +95,7 @@ export function PlannerSection() {
       setDraftId(null);
       setSaveStatus('');
     } catch (err: any) {
-      setError(err.message || 'Failed to generate content.');
+      setError(err.message || 'Gagal menghasilkan konten.');
     } finally {
       setIsGenerating(false);
     }
@@ -103,18 +103,18 @@ export function PlannerSection() {
 
   const handleSaveDraft = async () => {
     if (!selectedBrandId || !selectedProjectId) {
-      setError('Please select a brand and project in the sidebar to save the draft.');
+      setError('Mohon pilih brand dan proyek di sidebar untuk menyimpan draf.');
       return;
     }
     if (!generatedText.trim()) {
-      setError('No generated content to save.');
+      setError('Tidak ada konten untuk disimpan.');
       return;
     }
 
     const combinedBrief = `Audience: ${targetAudience} | Topic: ${topic}`;
 
     try {
-      setSaveStatus('Saving...');
+      setSaveStatus('Menyimpan...');
       const newDraftId = await saveDraftMutation({
         brandId: selectedBrandId as Id<'brands'>,
         projectId: selectedProjectId as Id<'projects'>,
@@ -123,9 +123,9 @@ export function PlannerSection() {
         platform,
       });
       setDraftId(newDraftId);
-      setSaveStatus('Saved to Drafts');
+      setSaveStatus('Tersimpan ke Draf');
     } catch (err: any) {
-      setError(err.message || 'Failed to save draft.');
+      setError(err.message || 'Gagal menyimpan draf.');
       setSaveStatus('');
     }
   };
@@ -133,31 +133,33 @@ export function PlannerSection() {
   const handleAutoSave = async (newContent: string) => {
     if (!draftId) return;
     try {
-      setSaveStatus('Auto-saving...');
+      setSaveStatus('Menyimpan otomatis...');
       await updateDraftMutation({
         draftId,
         content: newContent,
       });
-      setSaveStatus('Saved to Drafts');
+      setSaveStatus('Tersimpan ke Draf');
     } catch (err) {
       console.error('Auto-save failed', err);
-      setSaveStatus('Auto-save failed');
+      setSaveStatus('Gagal simpan otomatis');
     }
   };
 
   const handleUpdateStatus = async (newStatus: 'Draft' | 'Review' | 'Approved') => {
     if (!draftId) return;
     try {
-      setSaveStatus(`Updating to ${newStatus}...`);
+      setSaveStatus(`Memperbarui ke ${newStatus}...`);
       await updateDraftStatusMutation({
         draftId,
         status: newStatus,
         revisionNotes: newStatus === 'Draft' ? revisionNotes : undefined,
       });
-      setSaveStatus(`Status: ${newStatus}`);
+      setSaveStatus(
+        `Status: ${newStatus === 'Draft' ? 'Draf' : newStatus === 'Review' ? 'Ditinjau' : 'Disetujui'}`,
+      );
       if (newStatus !== 'Draft') setRevisionNotes('');
     } catch (err: any) {
-      setError(err.message || 'Failed to update status.');
+      setError(err.message || 'Gagal memperbarui status.');
     }
   };
 
@@ -191,6 +193,24 @@ export function PlannerSection() {
     setError(null);
   };
 
+  if (currentUser?.role === 'Client') {
+    return (
+      <GlassPanel className="p-12 text-center">
+        <h2 className="text-2xl font-bold text-[var(--slate-900)]">Akses Terbatas</h2>
+        <p className="mt-4 text-[var(--slate-600)]">
+          Sebagai Klien, Anda memiliki akses untuk meninjau dan menyetujui konten, namun tidak untuk
+          membuat draf baru.
+        </p>
+        <button
+          onClick={() => router.push('/dashboard/approval-analytics')}
+          className="mt-8 rounded-xl bg-[var(--purple-strong)] px-6 py-3 text-sm font-bold text-white shadow-lg transition-all hover:opacity-90"
+        >
+          Buka Persetujuan & Analitik
+        </button>
+      </GlassPanel>
+    );
+  }
+
   return (
     <div id="planner" className="space-y-6">
       {/* 1. Briefing Section */}
@@ -203,7 +223,7 @@ export function PlannerSection() {
             </div>
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--slate-500)]">
-                AI Content Ideation
+                Ideasi Konten AI
               </p>
               <h2 className="font-display mt-1 text-4xl text-[var(--slate-900)]">
                 Rancang Konsep Konten.
@@ -214,18 +234,18 @@ export function PlannerSection() {
           <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <div className="space-y-2">
               <label className="text-xs font-bold uppercase tracking-wider text-[var(--slate-500)]">
-                Content Type
+                Jenis Konten
               </label>
               <select
                 value={contentType}
                 onChange={(e) => setContentType(e.target.value)}
                 className="w-full rounded-xl border border-[var(--slate-200)] bg-white px-4 py-2.5 text-sm outline-none transition-all focus:border-[var(--purple-border)]"
               >
-                <option>Social Media Copy</option>
-                <option>Video Script (Reels/TikTok)</option>
-                <option>Blog Post Outline</option>
-                <option>Storyboard Concept</option>
-                <option>Email Newsletter</option>
+                <option>Konten Media Sosial</option>
+                <option>Skrip Video (Reels/TikTok)</option>
+                <option>Outline Blog Post</option>
+                <option>Konsep Storyboard</option>
+                <option>Newsletter Email</option>
               </select>
             </div>
 
@@ -247,7 +267,7 @@ export function PlannerSection() {
 
             <div className="space-y-2">
               <label className="text-xs font-bold uppercase tracking-wider text-[var(--slate-500)]">
-                Tone of Voice
+                Gaya Bahasa (Tone)
               </label>
               <select
                 value={tone}
@@ -263,39 +283,39 @@ export function PlannerSection() {
 
             <div className="md:col-span-2 lg:col-span-1 space-y-2">
               <label className="text-xs font-bold uppercase tracking-wider text-[var(--slate-500)]">
-                Target Audience
+                Target Audiens
               </label>
               <textarea
                 rows={3}
                 value={targetAudience}
                 onChange={(e) => setTargetAudience(e.target.value)}
-                placeholder="Gen Z Urban, Tech Founders, Busy Moms..."
+                placeholder="Gen Z Perkotaan, Founder Startup, Ibu Rumah Tangga..."
                 className="w-full rounded-xl border border-[var(--slate-200)] bg-white px-4 py-2.5 text-sm outline-none transition-all focus:border-[var(--purple-border)] resize-none"
               />
             </div>
 
             <div className="md:col-span-2 lg:col-span-1 space-y-2">
               <label className="text-xs font-bold uppercase tracking-wider text-[var(--slate-500)]">
-                The Topic / Hook
+                Topik / Hook
               </label>
               <textarea
                 rows={3}
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
-                placeholder="Product launch, educational tip, trend response..."
+                placeholder="Peluncuran produk, tips edukasi, respon tren..."
                 className="w-full rounded-xl border border-[var(--slate-200)] bg-white px-4 py-2.5 text-sm outline-none transition-all focus:border-[var(--purple-border)] resize-none"
               />
             </div>
 
             <div className="md:col-span-2 lg:col-span-1 space-y-2">
               <label className="text-xs font-bold uppercase tracking-wider text-[var(--slate-500)]">
-                Objective / Goal
+                Objektif / Goal
               </label>
               <textarea
                 rows={3}
                 value={goal}
                 onChange={(e) => setGoal(e.target.value)}
-                placeholder="Engagement, brand awareness, direct sale..."
+                placeholder="Engagement, kesadaran brand, penjualan langsung..."
                 className="w-full rounded-xl border border-[var(--slate-200)] bg-white px-4 py-2.5 text-sm outline-none transition-all focus:border-[var(--purple-border)] resize-none"
               />
             </div>
@@ -314,11 +334,11 @@ export function PlannerSection() {
               className="inline-flex items-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:opacity-90 disabled:opacity-50"
             >
               {isGenerating ? (
-                <span className="animate-pulse">Crafting your content...</span>
+                <span className="animate-pulse">Menyusun konten Anda...</span>
               ) : (
                 <>
                   <IconWand />
-                  <span>Generate AI Draft</span>
+                  <span>Hasilkan Draf AI</span>
                 </>
               )}
             </button>
@@ -339,15 +359,15 @@ export function PlannerSection() {
           <GlassPanel className="p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-lg font-semibold text-[var(--slate-900)]">Draft Editor</h3>
+                <h3 className="text-lg font-semibold text-[var(--slate-900)]">Editor Draf</h3>
                 <p className="text-xs text-[var(--slate-500)] mt-0.5">
-                  Refine your AI generated content here.
+                  Poles konten hasil AI Anda di sini.
                 </p>
               </div>
               <div className="flex items-center gap-2">
                 {draftId ? (
                   <span className="flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-bold uppercase text-emerald-600 border border-emerald-100">
-                    <IconCheck /> Syncing
+                    <IconCheck /> Sinkronisasi
                   </span>
                 ) : (
                   <button
@@ -355,7 +375,7 @@ export function PlannerSection() {
                     disabled={!generatedText || !selectedProjectId}
                     className="rounded-xl bg-[var(--slate-900)] px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-[var(--slate-800)] disabled:opacity-50 transition-all"
                   >
-                    Save to Project
+                    Simpan ke Proyek
                   </button>
                 )}
               </div>
@@ -363,7 +383,7 @@ export function PlannerSection() {
 
             {isLockedByOther && (
               <div className="mb-4 rounded-xl border border-red-100 bg-red-50 p-3 text-xs text-red-600 font-medium">
-                🔒 Locked by {contentLock.userName}
+                🔒 Terkunci oleh {contentLock.userName}
               </div>
             )}
 
@@ -378,7 +398,7 @@ export function PlannerSection() {
 
             <div className="mt-8 border-t border-[var(--slate-100)] pt-6">
               <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--slate-400)] mb-4">
-                Media Assets
+                Aset Media
               </h4>
               <MediaUploader draftId={draftId} />
 
@@ -398,12 +418,12 @@ export function PlannerSection() {
           {draftId ? (
             <GlassPanel className="p-6">
               <h3 className="text-sm font-bold uppercase tracking-wider text-[var(--slate-900)]">
-                Workflow Status
+                Status Alur Kerja
               </h3>
 
               <div className="mt-6 space-y-6">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-[var(--slate-500)]">Current Status</span>
+                  <span className="text-xs text-[var(--slate-500)]">Status Saat Ini</span>
                   <span
                     className={cn(
                       'rounded-full px-2.5 py-1 text-[10px] font-bold uppercase',
@@ -414,7 +434,11 @@ export function PlannerSection() {
                           : 'bg-emerald-100 text-emerald-700',
                     )}
                   >
-                    {draft?.status}
+                    {draft?.status === 'Draft'
+                      ? 'Draf'
+                      : draft?.status === 'Review'
+                        ? 'Ditinjau'
+                        : 'Disetujui'}
                   </span>
                 </div>
 
@@ -424,7 +448,7 @@ export function PlannerSection() {
                       onClick={() => handleUpdateStatus('Review')}
                       className="w-full rounded-xl bg-[var(--purple-strong)] py-2.5 text-sm font-semibold text-white shadow-sm hover:opacity-90 transition-all"
                     >
-                      Send for Review
+                      Kirim untuk Ditinjau
                     </button>
                   )}
 
@@ -434,11 +458,11 @@ export function PlannerSection() {
                         onClick={() => handleUpdateStatus('Approved')}
                         className="w-full rounded-xl bg-emerald-600 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 transition-all"
                       >
-                        Approve
+                        Setujui
                       </button>
                       <button
                         onClick={() => {
-                          const notes = prompt('Revision notes:');
+                          const notes = prompt('Catatan revisi:');
                           if (notes) {
                             handleUpdateStatus('Draft');
                             setRevisionNotes(notes);
@@ -446,7 +470,7 @@ export function PlannerSection() {
                         }}
                         className="w-full rounded-xl border border-red-200 bg-red-50 py-2.5 text-sm font-semibold text-red-600 hover:bg-red-100 transition-all"
                       >
-                        Request Revision
+                        Minta Revisi
                       </button>
                     </div>
                   )}
@@ -458,14 +482,14 @@ export function PlannerSection() {
                     className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-[var(--slate-200)] bg-white py-2.5 text-sm font-semibold text-[var(--slate-700)] hover:border-[var(--purple-border)] transition-all"
                   >
                     <IconCalendar />
-                    <span>View in Scheduler</span>
+                    <span>Lihat di Penjadwal</span>
                   </button>
                 </div>
               </div>
 
               {draft?.revisionNotes && draft.status === 'Draft' && (
                 <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
-                  <p className="font-bold uppercase text-[9px] mb-1">Feedback</p>
+                  <p className="font-bold uppercase text-[9px] mb-1">Umpan Balik</p>
                   <p className="italic">"{draft.revisionNotes}"</p>
                 </div>
               )}
@@ -475,9 +499,11 @@ export function PlannerSection() {
               <div className="mx-auto w-10 h-10 rounded-full bg-[var(--slate-100)] flex items-center justify-center mb-4">
                 <IconCheck />
               </div>
-              <h3 className="text-sm font-semibold text-[var(--slate-900)]">Save to get started</h3>
+              <h3 className="text-sm font-semibold text-[var(--slate-900)]">
+                Simpan untuk memulai
+              </h3>
               <p className="text-xs text-[var(--slate-500)] mt-2">
-                Your draft status and media management will appear here once saved.
+                Status draf dan manajemen media akan muncul di sini setelah draf disimpan.
               </p>
             </GlassPanel>
           )}

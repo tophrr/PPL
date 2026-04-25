@@ -5,13 +5,7 @@ import { SignInButton, SignOutButton, useAuth, UserButton, SignIn } from '@clerk
 import { Authenticated, Unauthenticated } from 'convex/react';
 import { AppShell } from './app-shell';
 import { GlassPanel } from './primitives';
-import {
-  ApprovalAnalyticsSection,
-  CalendarSection,
-  DashboardSection,
-  ProfileSection,
-  SubscriptionSection,
-} from './sections';
+import { ApprovalAnalyticsSection, DashboardSection, ProfileSection } from './sections';
 import { PlannerSection } from './planner-section';
 import { SchedulerSection } from './scheduler-section';
 

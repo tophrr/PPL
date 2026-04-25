@@ -46,19 +46,17 @@ export function AppShell({ active, children }: { active: string; children: React
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   const pageDescriptions: Record<string, string> = {
-    Dashboard: 'Monitor priorities, approvals, and performance without leaving the workspace.',
-    'AI Planner': 'Generate strategic content directions, then refine them before review.',
-    Scheduler:
-      'Keep publishing timelines visible so the team can move faster with less back-and-forth.',
-    'Approval & Analytics': 'Track approvals and campaign performance in one decision-ready view.',
-    Subscription:
-      'Track plan limits, billing cycle, and Convex-backed usage status from one place.',
-    Profile: 'Keep account identity and workspace profile details aligned with your brand.',
-    Settings: 'Manage team access, integrations, and workspace preferences from one place.',
+    Dasbor: 'Pantau prioritas, persetujuan, dan performa tanpa meninggalkan ruang kerja.',
+    'Perencana AI': 'Buat konsep konten strategis, lalu poles sebelum dikirim untuk ditinjau.',
+    Penjadwal: 'Pastikan jadwal publikasi terlihat jelas agar tim bisa bergerak lebih cepat.',
+    'Persetujuan & Analitik':
+      'Pantau persetujuan dan performa kampanye dalam satu tampilan siap-ambil-keputusan.',
+    Profil: 'Kelola identitas akun dan detail profil ruang kerja yang selaras dengan brand Anda.',
+    Pengaturan: 'Kelola akses tim, integrasi, dan preferensi ruang kerja dari satu tempat.',
   };
 
   const activeDescription =
-    pageDescriptions[active] ?? 'Move work forward from one calm workspace.';
+    pageDescriptions[active] ?? 'Gerakkan pekerjaan dari satu ruang kerja yang tenang.';
 
   const openNotifications = () => {
     setNotificationsMounted(true);
@@ -106,16 +104,16 @@ export function AppShell({ active, children }: { active: string; children: React
               Kitalaku.in
             </p>
             <p className="mt-1 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--slate-700)]">
-              Creative OS
+              Sistem Operasi Kreatif
             </p>
             <p className="mt-4 text-sm leading-6 text-[var(--slate-600)]">
-              Planner, scheduler, approval, and analytics in one premium workspace.
+              Perencana, penjadwal, persetujuan, dan analitik dalam satu ruang kerja premium.
             </p>
           </GlassPanel>
 
           <div className="mt-6 px-1">
             <p className="px-3 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--slate-400)]">
-              Navigation
+              Navigasi
             </p>
           </div>
 
@@ -125,27 +123,22 @@ export function AppShell({ active, children }: { active: string; children: React
                 if (!currentUser) return true;
                 if (currentUser.role === 'Client') {
                   return (
-                    item.label === 'Dashboard' ||
-                    item.label === 'Scheduler' ||
-                    item.label === 'Approval & Analytics'
+                    item.label === 'Dasbor' ||
+                    item.label === 'Penjadwal' ||
+                    item.label === 'Persetujuan & Analitik'
                   );
-                }
-                if (currentUser.role === 'Creator') {
-                  return item.label !== 'Subscription';
                 }
                 return true;
               })
               .map((item) => {
                 const current = item.label === active;
                 const icon =
-                  item.label === 'Dashboard' ? (
+                  item.label === 'Dasbor' ? (
                     <IconGrid />
-                  ) : item.label === 'AI Planner' ? (
+                  ) : item.label === 'Perencana AI' ? (
                     <IconWand />
-                  ) : item.label === 'Scheduler' ? (
+                  ) : item.label === 'Penjadwal' ? (
                     <IconCalendar />
-                  ) : item.label === 'Subscription' ? (
-                    <IconCard />
                   ) : (
                     <IconAnalytics />
                   );
@@ -173,7 +166,7 @@ export function AppShell({ active, children }: { active: string; children: React
           <GlassPanel className="p-4 space-y-4">
             <div>
               <label className="text-[10px] font-bold uppercase tracking-wider text-[var(--slate-400)]">
-                Selected Brand
+                Brand Terpilih
               </label>
               <select
                 value={selectedBrandId}
@@ -183,7 +176,7 @@ export function AppShell({ active, children }: { active: string; children: React
                 }}
                 className="mt-1.5 w-full rounded-xl border border-[var(--slate-200)] bg-white/50 px-3 py-2 text-sm font-semibold text-[var(--slate-700)] outline-none transition-all hover:border-[var(--purple-border)]"
               >
-                <option value="">Select Brand</option>
+                <option value="">Pilih Brand</option>
                 {brands.map((b) => (
                   <option key={b._id} value={b._id}>
                     {b.name}
@@ -194,7 +187,7 @@ export function AppShell({ active, children }: { active: string; children: React
 
             <div>
               <label className="text-[10px] font-bold uppercase tracking-wider text-[var(--slate-400)]">
-                Active Project
+                Proyek Aktif
               </label>
               <select
                 value={selectedProjectId}
@@ -202,7 +195,7 @@ export function AppShell({ active, children }: { active: string; children: React
                 onChange={(e) => setSelectedProjectId(e.target.value as Id<'projects'>)}
                 className="mt-1.5 w-full rounded-xl border border-[var(--slate-200)] bg-white/50 px-3 py-2 text-sm font-semibold text-[var(--slate-700)] outline-none transition-all hover:border-[var(--purple-border)] disabled:opacity-50"
               >
-                <option value="">Select Project</option>
+                <option value="">Pilih Proyek</option>
                 {projects.map((p) => (
                   <option key={p._id} value={p._id}>
                     {p.name}
@@ -215,13 +208,13 @@ export function AppShell({ active, children }: { active: string; children: React
           <GlassPanel className="border-[rgba(124,58,237,0.16)] p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold text-[var(--slate-700)]">AI Quota</p>
+                <p className="text-sm font-semibold text-[var(--slate-700)]">Kuota AI</p>
                 <p className="mt-1 text-2xl font-semibold tracking-tight text-[var(--slate-900)]">
                   {agency?.tokenQuotaRemaining?.toLocaleString() || '0'}
                 </p>
               </div>
               <span className="rounded-full bg-[rgba(16,185,129,0.14)] px-3 py-1 text-xs font-semibold text-[var(--emerald-strong)]">
-                {agency ? 'Active' : 'No Agency'}
+                {agency ? 'Aktif' : 'Tanpa Agency'}
               </span>
             </div>
             <div className="mt-4 h-2 rounded-full bg-white/85">
@@ -234,8 +227,8 @@ export function AppShell({ active, children }: { active: string; children: React
             </div>
             <p className="mt-3 text-xs leading-5 text-[var(--slate-500)]">
               {agency
-                ? 'Sufficient credit balance to keep draft generation and review workflows running.'
-                : 'Please set up an agency to use AI features.'}
+                ? 'Saldo kredit cukup untuk menjalankan workflow pembuatan draf dan peninjauan.'
+                : 'Mohon siapkan agency untuk menggunakan fitur AI.'}
             </p>
           </GlassPanel>
         </div>
@@ -247,7 +240,7 @@ export function AppShell({ active, children }: { active: string; children: React
             <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--slate-700)]">
-                  Workspace Overview
+                  Ikhtisar Ruang Kerja
                 </p>
                 <p className="font-display mt-3 text-3xl leading-[1.04] text-[var(--slate-900)]">
                   {active}
@@ -263,7 +256,7 @@ export function AppShell({ active, children }: { active: string; children: React
                   className="flex w-full items-center gap-3 rounded-2xl border border-[rgba(219,227,238,0.88)] bg-white/82 px-4 py-3 text-left text-[var(--slate-500)] shadow-[0_10px_20px_rgba(30,41,59,0.05)] sm:w-[340px]"
                 >
                   <IconSearch />
-                  <span className="flex-1 text-sm">Search content, campaigns, or insights...</span>
+                  <span className="flex-1 text-sm">Cari konten, kampanye, atau wawasan...</span>
                   <span className="rounded-lg bg-[var(--slate-100)] px-2 py-1 text-[10px] font-semibold text-[var(--slate-400)]">
                     /
                   </span>
@@ -273,7 +266,7 @@ export function AppShell({ active, children }: { active: string; children: React
                   <button
                     type="button"
                     onClick={openNotifications}
-                    aria-label="Open notifications"
+                    aria-label="Buka notifikasi"
                     className={cn(
                       'relative flex items-center justify-center rounded-2xl border bg-white/80 p-3 shadow-[0_2px_10px_rgba(30,41,59,0.04)] backdrop-blur-md transition-all duration-200 hover:bg-white hover:shadow-[0_8px_20px_rgba(30,41,59,0.08)]',
                       notificationsMounted
@@ -290,10 +283,10 @@ export function AppShell({ active, children }: { active: string; children: React
                   {(currentUser?.role === 'Admin' || currentUser?.role === 'Creative Manager') && (
                     <Link
                       href="/settings"
-                      aria-label="Open settings"
+                      aria-label="Buka pengaturan"
                       className={cn(
                         'flex items-center justify-center rounded-2xl border bg-white/80 p-3 shadow-[0_2px_10px_rgba(30,41,59,0.04)] backdrop-blur-md transition-all duration-200 hover:bg-white hover:shadow-[0_8px_20px_rgba(30,41,59,0.08)]',
-                        active === 'Settings'
+                        active === 'Pengaturan'
                           ? 'border-[var(--purple-border)] text-[var(--purple-strong)]'
                           : 'border-transparent text-[var(--slate-600)]',
                       )}
@@ -306,7 +299,7 @@ export function AppShell({ active, children }: { active: string; children: React
                     href="/profile"
                     className={cn(
                       'flex items-center gap-3 rounded-2xl border bg-white/80 px-3 py-2.5 shadow-[0_2px_10px_rgba(30,41,59,0.04)] backdrop-blur-md transition-all duration-200 hover:bg-white hover:shadow-[0_8px_20px_rgba(30,41,59,0.08)]',
-                      active === 'Profile'
+                      active === 'Profil'
                         ? 'border-[var(--purple-border)] ring-1 ring-[rgba(124,58,237,0.08)]'
                         : 'border-transparent',
                     )}
@@ -316,10 +309,10 @@ export function AppShell({ active, children }: { active: string; children: React
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-[var(--slate-900)]">
-                        {currentUser?.name || 'Loading...'}
+                        {currentUser?.name || 'Memuat...'}
                       </p>
                       <p className="text-xs text-[var(--slate-500)]">
-                        {currentUser?.role || 'User'}
+                        {currentUser?.role || 'Pengguna'}
                       </p>
                     </div>
                   </Link>
@@ -359,7 +352,7 @@ export function AppShell({ active, children }: { active: string; children: React
         <>
           <button
             type="button"
-            aria-label="Close notifications"
+            aria-label="Tutup notifikasi"
             onClick={closeNotifications}
             className={cn(
               'fixed inset-0 z-40 bg-[rgba(15,23,42,0.28)] transition-opacity duration-200 ease-out',
@@ -380,13 +373,13 @@ export function AppShell({ active, children }: { active: string; children: React
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--slate-700)]">
-                    Inbox
+                    Kotak Masuk
                   </p>
                   <h2
                     id="notification-title"
                     className="mt-1 text-xl font-semibold tracking-tight text-[var(--slate-900)]"
                   >
-                    Notifications
+                    Notifikasi
                   </h2>
                 </div>
                 <button
@@ -394,14 +387,14 @@ export function AppShell({ active, children }: { active: string; children: React
                   onClick={closeNotifications}
                   className="rounded-xl border border-[rgba(219,227,238,0.9)] bg-white/85 px-3 py-1.5 text-xs font-semibold text-[var(--slate-600)]"
                 >
-                  Close
+                  Tutup
                 </button>
               </div>
 
               <div className="mt-4 space-y-3">
                 {notifications.length === 0 ? (
                   <p className="text-center text-xs text-[var(--slate-400)] py-8">
-                    No notifications yet.
+                    Belum ada notifikasi.
                   </p>
                 ) : (
                   notifications.map((item) => (

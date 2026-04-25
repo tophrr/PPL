@@ -1,23 +1,23 @@
 export type StatusTone = 'draft' | 'review' | 'approved';
 
 export const sideNav = [
-  { label: 'Dashboard', href: '/dashboard' },
-  { label: 'AI Planner', href: '/dashboard/planner' },
-  { label: 'Scheduler', href: '/dashboard/scheduler' },
-  { label: 'Approval & Analytics', href: '/dashboard/approval-analytics' },
+  { label: 'Dasbor', href: '/dashboard' },
+  { label: 'Perencana AI', href: '/dashboard/planner' },
+  { label: 'Penjadwal', href: '/dashboard/scheduler' },
+  { label: 'Persetujuan & Analitik', href: '/dashboard/approval-analytics' },
 ];
 
 export const dashboardMetrics = [
-  { label: 'Total Content', value: '156', note: '+12% from last month', tone: 'purple' },
-  { label: 'Engagement Rate', value: '8.4%', note: '+2.3% from last week', tone: 'green' },
-  { label: 'Active Campaigns', value: '7', note: '3 ending this week', tone: 'purple' },
-  { label: 'AI Credits Used', value: '420', note: '580 remaining', tone: 'amber' },
+  { label: 'Total Konten', value: '156', note: '+12% dari bulan lalu', tone: 'purple' },
+  { label: 'Tingkat Engagement', value: '8.4%', note: '+2.3% dari minggu lalu', tone: 'green' },
+  { label: 'Kampanye Aktif', value: '7', note: '3 berakhir minggu ini', tone: 'purple' },
+  { label: 'Kredit AI Terpakai', value: '420', note: '580 tersisa', tone: 'amber' },
 ];
 
 export const contentStatus = [
-  { label: 'Draft', value: '12', tone: 'draft' as StatusTone },
-  { label: 'Review', value: '8', tone: 'review' as StatusTone },
-  { label: 'Approved', value: '24', tone: 'approved' as StatusTone },
+  { label: 'Draf', value: '12', tone: 'draft' as StatusTone },
+  { label: 'Ditinjau', value: '8', tone: 'review' as StatusTone },
+  { label: 'Disetujui', value: '24', tone: 'approved' as StatusTone },
 ];
 
 export const activities = [

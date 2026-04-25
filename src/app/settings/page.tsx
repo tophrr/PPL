@@ -59,7 +59,7 @@ export default function SettingsPage() {
     if (!newBrandName) return;
     try {
       if (!currentUser?.agencyId) {
-        throw new Error('You must belong to an agency to create a brand.');
+        throw new Error('Anda harus bergabung dengan agensi untuk membuat brand.');
       }
       await createBrand({
         name: newBrandName,
@@ -82,7 +82,7 @@ export default function SettingsPage() {
         role: inviteRole,
       });
       setInviteEmail('');
-      alert('User invited successfully.');
+      alert('Pengguna berhasil diundang.');
     } catch (error: any) {
       alert(error.message);
     }
@@ -134,14 +134,14 @@ export default function SettingsPage() {
   const clientsInAgency = agencyUsers.filter((u) => u.role === 'Client');
 
   return (
-    <AppShell active="Settings">
+    <AppShell active="Pengaturan">
       <div className="space-y-6">
         <header className="mb-8">
           <h2 className="text-3xl font-bold tracking-tight text-[var(--slate-900)]">
-            Workspace Settings
+            Pengaturan Ruang Kerja
           </h2>
           <p className="mt-1 text-sm text-[var(--slate-500)] font-medium">
-            Manage your agency's brands, projects, and team permissions.
+            Kelola brand, proyek, dan izin tim agensi Anda.
           </p>
         </header>
 
@@ -150,9 +150,9 @@ export default function SettingsPage() {
           <div className="space-y-6">
             <GlassPanel className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-bold text-[var(--slate-900)]">Brand Management</h3>
+                <h3 className="text-lg font-bold text-[var(--slate-900)]">Manajemen Brand</h3>
                 <span className="text-xs font-bold uppercase tracking-wider text-[var(--slate-400)]">
-                  {brands.length} Brands
+                  {brands.length} Brand
                 </span>
               </div>
 
@@ -162,20 +162,22 @@ export default function SettingsPage() {
                   value={newBrandName}
                   onChange={(e) => setNewBrandName(e.target.value)}
                   className="flex-1 rounded-xl border border-[var(--slate-200)] bg-white px-4 py-2.5 text-sm outline-none transition-all focus:border-[var(--purple-border)]"
-                  placeholder="Brand name (e.g. Acme Corp)"
+                  placeholder="Nama brand (cth. Acme Corp)"
                 />
                 <button
                   type="submit"
                   className="rounded-xl bg-[var(--slate-900)] px-5 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-[var(--slate-800)]"
                 >
-                  Add Brand
+                  Tambah Brand
                 </button>
               </form>
 
               <div className="mt-8 space-y-4">
                 {brands.length === 0 && (
                   <div className="py-8 text-center border-2 border-dashed border-[var(--slate-100)] rounded-2xl">
-                    <p className="text-sm text-[var(--slate-400)] italic">No brands created yet.</p>
+                    <p className="text-sm text-[var(--slate-400)] italic">
+                      Belum ada brand yang dibuat.
+                    </p>
                   </div>
                 )}
                 {brands.map((brand) => (
@@ -190,27 +192,27 @@ export default function SettingsPage() {
                           onClick={() => archiveBrand({ brandId: brand._id })}
                           className="text-[10px] font-bold uppercase text-[var(--slate-400)] hover:text-[var(--purple-strong)]"
                         >
-                          Archive
+                          Arsip
                         </button>
                         <button
                           onClick={() => {
-                            if (confirm('Delete brand?')) softDeleteBrand({ brandId: brand._id });
+                            if (confirm('Hapus brand?')) softDeleteBrand({ brandId: brand._id });
                           }}
                           className="text-[10px] font-bold uppercase text-red-300 hover:text-red-500"
                         >
-                          Delete
+                          Hapus
                         </button>
                       </div>
                     </div>
 
                     <div className="mt-4 pt-4 border-t border-[var(--slate-100)]">
                       <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--slate-400)] mb-3">
-                        Client Visibility
+                        Visibilitas Klien
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {clientsInAgency.length === 0 ? (
                           <p className="text-[11px] text-[var(--slate-400)] italic">
-                            No clients in agency. Add them in Team Access.
+                            Tidak ada klien di agensi. Tambahkan di Akses Tim.
                           </p>
                         ) : (
                           clientsInAgency.map((client) => {
@@ -241,13 +243,13 @@ export default function SettingsPage() {
 
             <GlassPanel className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-bold text-[var(--slate-900)]">Project Catalog</h3>
+                <h3 className="text-lg font-bold text-[var(--slate-900)]">Katalog Proyek</h3>
                 <select
                   value={selectedBrandForProject}
                   onChange={(e) => setSelectedBrandForProject(e.target.value as Id<'brands'>)}
                   className="text-xs font-bold bg-white border border-[var(--slate-200)] rounded-lg px-2 py-1 outline-none"
                 >
-                  <option value="">Select Brand</option>
+                  <option value="">Pilih Brand</option>
                   {brands.map((b) => (
                     <option key={b._id} value={b._id}>
                       {b.name}
@@ -264,7 +266,7 @@ export default function SettingsPage() {
                       value={newProjectName}
                       onChange={(e) => setNewProjectName(e.target.value)}
                       className="w-full rounded-xl border border-[var(--slate-200)] bg-white px-4 py-2 text-sm outline-none"
-                      placeholder="Project name"
+                      placeholder="Nama proyek"
                     />
                     <div className="flex gap-2">
                       <input
@@ -272,13 +274,13 @@ export default function SettingsPage() {
                         value={newProjectDesc}
                         onChange={(e) => setNewProjectDesc(e.target.value)}
                         className="flex-1 rounded-xl border border-[var(--slate-200)] bg-white px-4 py-2 text-sm outline-none"
-                        placeholder="Description (optional)"
+                        placeholder="Deskripsi (opsional)"
                       />
                       <button
                         type="submit"
                         className="rounded-xl bg-[var(--slate-900)] px-4 py-2 text-xs font-bold text-white whitespace-nowrap"
                       >
-                        New Project
+                        Proyek Baru
                       </button>
                     </div>
                   </form>
@@ -295,15 +297,15 @@ export default function SettingsPage() {
                             onClick={() => archiveProject({ projectId: p._id })}
                             className="text-[10px] font-bold text-[var(--slate-400)]"
                           >
-                            Archive
+                            Arsip
                           </button>
                           <button
                             onClick={() => {
-                              if (confirm('Delete?')) softDeleteProject({ projectId: p._id });
+                              if (confirm('Hapus?')) softDeleteProject({ projectId: p._id });
                             }}
                             className="text-[10px] font-bold text-red-300"
                           >
-                            Delete
+                            Hapus
                           </button>
                         </div>
                       </div>
@@ -312,7 +314,7 @@ export default function SettingsPage() {
                 </>
               ) : (
                 <div className="py-12 text-center opacity-40">
-                  <p className="text-sm italic">Select a brand to manage its projects.</p>
+                  <p className="text-sm italic">Pilih brand untuk mengelola proyeknya.</p>
                 </div>
               )}
             </GlassPanel>
@@ -321,9 +323,9 @@ export default function SettingsPage() {
           {/* 2. Team & Role Management */}
           <div className="space-y-6">
             <GlassPanel className="p-6">
-              <h3 className="text-lg font-bold text-[var(--slate-900)] mb-2">Team Access</h3>
+              <h3 className="text-lg font-bold text-[var(--slate-900)] mb-2">Akses Tim</h3>
               <p className="text-xs text-[var(--slate-500)] mb-6">
-                Invite members and assign system-wide permissions.
+                Unduh anggota dan tetapkan izin sistem.
               </p>
 
               <form
@@ -332,20 +334,20 @@ export default function SettingsPage() {
               >
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-bold uppercase tracking-wider text-[var(--slate-500)]">
-                    Email Address
+                    Alamat Email
                   </label>
                   <input
                     type="email"
                     value={inviteEmail}
                     onChange={(e) => setInviteEmail(e.target.value)}
                     className="w-full rounded-xl border border-[var(--slate-200)] bg-white px-4 py-2.5 text-sm outline-none"
-                    placeholder="teammate@agency.com"
+                    placeholder="rekan@agensi.com"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-[10px] font-bold uppercase tracking-wider text-[var(--slate-500)]">
-                      System Role
+                      Peran Sistem
                     </label>
                     <select
                       value={inviteRole}
@@ -353,9 +355,9 @@ export default function SettingsPage() {
                       className="w-full rounded-xl border border-[var(--slate-200)] bg-white px-4 py-2.5 text-sm outline-none"
                     >
                       <option value="Admin">Admin</option>
-                      <option value="Creative Manager">Creative Manager</option>
-                      <option value="Creator">Creator</option>
-                      <option value="Client">Client</option>
+                      <option value="Creative Manager">Manajer Kreatif</option>
+                      <option value="Creator">Kreator</option>
+                      <option value="Client">Klien</option>
                     </select>
                   </div>
                   <div className="flex items-end">
@@ -363,7 +365,7 @@ export default function SettingsPage() {
                       type="submit"
                       className="w-full h-[46px] rounded-xl bg-[var(--slate-900)] text-sm font-bold text-white shadow-md hover:bg-black transition-all"
                     >
-                      Invite Member
+                      Undang Anggota
                     </button>
                   </div>
                 </div>
@@ -373,8 +375,8 @@ export default function SettingsPage() {
                 <table className="w-full text-left text-sm border-separate border-spacing-y-2">
                   <thead className="text-[10px] font-bold uppercase text-[var(--slate-400)]">
                     <tr>
-                      <th className="px-4 pb-2">Name</th>
-                      <th className="px-4 pb-2">Role</th>
+                      <th className="px-4 pb-2">Nama</th>
+                      <th className="px-4 pb-2">Peran</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -396,9 +398,9 @@ export default function SettingsPage() {
                             className="text-xs font-bold bg-white border border-[var(--slate-200)] rounded-lg px-2 py-1.5 outline-none transition-all focus:border-[var(--purple-border)]"
                           >
                             <option value="Admin">Admin</option>
-                            <option value="Creative Manager">Creative Manager</option>
-                            <option value="Creator">Creator</option>
-                            <option value="Client">Client</option>
+                            <option value="Creative Manager">Manajer Kreatif</option>
+                            <option value="Creator">Kreator</option>
+                            <option value="Client">Klien</option>
                           </select>
                         </td>
                       </tr>
