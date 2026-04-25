@@ -41,6 +41,18 @@ export function AppShell({ active, children }: { active: string; children: React
       selectedBrandId ? { brandId: selectedBrandId as Id<'brands'> } : 'skip',
     ) || [];
 
+  useEffect(() => {
+    if (!selectedBrandId && brands.length > 0) {
+      setSelectedBrandId(brands[0]._id);
+    }
+  }, [brands, selectedBrandId, setSelectedBrandId]);
+
+  useEffect(() => {
+    if (!selectedProjectId && projects.length > 0) {
+      setSelectedProjectId(projects[0]._id);
+    }
+  }, [projects, selectedProjectId, setSelectedProjectId]);
+
   const notifications = useQuery(api.notifications.getNotifications) || [];
   const markAsReadMutation = useMutation(api.notifications.markAsRead);
   const unreadCount = notifications.filter((n) => !n.isRead).length;
@@ -55,8 +67,7 @@ export function AppShell({ active, children }: { active: string; children: React
     Pengaturan: 'Kelola akses tim, integrasi, dan preferensi ruang kerja dari satu tempat.',
   };
 
-  const activeDescription =
-    pageDescriptions[active] ?? 'Gerakkan pekerjaan dari satu ruang kerja yang tenang.';
+  const activeDescription = pageDescriptions[active] ?? '';
 
   const openNotifications = () => {
     setNotificationsMounted(true);
@@ -177,6 +188,9 @@ export function AppShell({ active, children }: { active: string; children: React
                 className="mt-1.5 w-full rounded-xl border border-[var(--slate-200)] bg-white/50 px-3 py-2 text-sm font-semibold text-[var(--slate-700)] outline-none transition-all hover:border-[var(--purple-border)]"
               >
                 <option value="">Pilih Brand</option>
+                {brands.length === 0 && !selectedBrandId && (
+                  <option disabled>Memuat brand...</option>
+                )}
                 {brands.map((b) => (
                   <option key={b._id} value={b._id}>
                     {b.name}
@@ -196,6 +210,9 @@ export function AppShell({ active, children }: { active: string; children: React
                 className="mt-1.5 w-full rounded-xl border border-[var(--slate-200)] bg-white/50 px-3 py-2 text-sm font-semibold text-[var(--slate-700)] outline-none transition-all hover:border-[var(--purple-border)] disabled:opacity-50"
               >
                 <option value="">Pilih Proyek</option>
+                {selectedBrandId && projects.length === 0 && (
+                  <option disabled>Memuat proyek...</option>
+                )}
                 {projects.map((p) => (
                   <option key={p._id} value={p._id}>
                     {p.name}
@@ -205,32 +222,34 @@ export function AppShell({ active, children }: { active: string; children: React
             </div>
           </GlassPanel>
 
-          <GlassPanel className="border-[rgba(124,58,237,0.16)] p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-semibold text-[var(--slate-700)]">Kuota AI</p>
-                <p className="mt-1 text-2xl font-semibold tracking-tight text-[var(--slate-900)]">
-                  {agency?.tokenQuotaRemaining?.toLocaleString() || '0'}
-                </p>
+          {currentUser?.role !== 'Client' && (
+            <GlassPanel className="border-[rgba(124,58,237,0.16)] p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-[var(--slate-700)]">Kuota AI</p>
+                  <p className="mt-1 text-2xl font-semibold tracking-tight text-[var(--slate-900)]">
+                    {agency?.tokenQuotaRemaining?.toLocaleString() || '0'}
+                  </p>
+                </div>
+                <span className="rounded-full bg-[rgba(16,185,129,0.14)] px-3 py-1 text-xs font-semibold text-[var(--emerald-strong)]">
+                  {agency ? 'Aktif' : 'Tanpa Agency'}
+                </span>
               </div>
-              <span className="rounded-full bg-[rgba(16,185,129,0.14)] px-3 py-1 text-xs font-semibold text-[var(--emerald-strong)]">
-                {agency ? 'Aktif' : 'Tanpa Agency'}
-              </span>
-            </div>
-            <div className="mt-4 h-2 rounded-full bg-white/85">
-              <div
-                className="h-2 rounded-full bg-[linear-gradient(90deg,#8b5cf6,#7c3aed)]"
-                style={{
-                  width: `${Math.min(100, ((agency?.tokenQuotaRemaining || 0) / 1000) * 100)}%`,
-                }}
-              />
-            </div>
-            <p className="mt-3 text-xs leading-5 text-[var(--slate-500)]">
-              {agency
-                ? 'Saldo kredit cukup untuk menjalankan workflow pembuatan draf dan peninjauan.'
-                : 'Mohon siapkan agency untuk menggunakan fitur AI.'}
-            </p>
-          </GlassPanel>
+              <div className="mt-4 h-2 rounded-full bg-white/85">
+                <div
+                  className="h-2 rounded-full bg-[linear-gradient(90deg,#8b5cf6,#7c3aed)]"
+                  style={{
+                    width: `${Math.min(100, ((agency?.tokenQuotaRemaining || 0) / 1000) * 100)}%`,
+                  }}
+                />
+              </div>
+              <p className="mt-3 text-xs leading-5 text-[var(--slate-500)]">
+                {agency
+                  ? 'Saldo kredit cukup untuk menjalankan workflow pembuatan draf dan peninjauan.'
+                  : 'Mohon siapkan agency untuk menggunakan fitur AI.'}
+              </p>
+            </GlassPanel>
+          )}
         </div>
       </aside>
 
@@ -239,9 +258,6 @@ export function AppShell({ active, children }: { active: string; children: React
           <div className="mx-auto flex max-w-[1240px] flex-col gap-4 px-4 py-4 md:px-6">
             <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--slate-700)]">
-                  Ikhtisar Ruang Kerja
-                </p>
                 <p className="font-display mt-3 text-3xl leading-[1.04] text-[var(--slate-900)]">
                   {active}
                 </p>
@@ -256,7 +272,7 @@ export function AppShell({ active, children }: { active: string; children: React
                   className="flex w-full items-center gap-3 rounded-2xl border border-[rgba(219,227,238,0.88)] bg-white/82 px-4 py-3 text-left text-[var(--slate-500)] shadow-[0_10px_20px_rgba(30,41,59,0.05)] sm:w-[340px]"
                 >
                   <IconSearch />
-                  <span className="flex-1 text-sm">Cari konten, kampanye, atau wawasan...</span>
+                  <span className="flex-1 text-sm">Cari konten...</span>
                   <span className="rounded-lg bg-[var(--slate-100)] px-2 py-1 text-[10px] font-semibold text-[var(--slate-400)]">
                     /
                   </span>
@@ -321,24 +337,36 @@ export function AppShell({ active, children }: { active: string; children: React
             </div>
 
             <div className="flex gap-2 overflow-x-auto pb-1 md:hidden">
-              {sideNav.map((item) => {
-                const current = item.label === active;
+              {sideNav
+                .filter((item) => {
+                  if (!currentUser) return true;
+                  if (currentUser.role === 'Client') {
+                    return (
+                      item.label === 'Dasbor' ||
+                      item.label === 'Penjadwal' ||
+                      item.label === 'Persetujuan & Analitik'
+                    );
+                  }
+                  return true;
+                })
+                .map((item) => {
+                  const current = item.label === active;
 
-                return (
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    className={cn(
-                      'whitespace-nowrap rounded-full border px-4 py-2 text-sm font-medium',
-                      current
-                        ? 'border-[var(--purple-border)] bg-white text-[var(--purple-strong)] shadow-sm'
-                        : 'border-transparent bg-white/60 text-[var(--slate-600)] hover:bg-white/90',
-                    )}
-                  >
-                    {item.label}
-                  </Link>
-                );
-              })}
+                  return (
+                    <Link
+                      key={item.label}
+                      href={item.href}
+                      className={cn(
+                        'whitespace-nowrap rounded-full border px-4 py-2 text-sm font-medium',
+                        current
+                          ? 'border-[var(--purple-border)] bg-white text-[var(--purple-strong)] shadow-sm'
+                          : 'border-transparent bg-white/60 text-[var(--slate-600)] hover:bg-white/90',
+                      )}
+                    >
+                      {item.label}
+                    </Link>
+                  );
+                })}
             </div>
           </div>
         </header>

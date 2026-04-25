@@ -369,10 +369,14 @@ export function PlannerSection() {
                   <span className="flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-bold uppercase text-emerald-600 border border-emerald-100">
                     <IconCheck /> Sinkronisasi
                   </span>
+                ) : !selectedBrandId || !selectedProjectId ? (
+                  <span className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-[10px] font-semibold text-amber-700">
+                    ⚠ Pilih Brand & Proyek di sidebar
+                  </span>
                 ) : (
                   <button
                     onClick={handleSaveDraft}
-                    disabled={!generatedText || !selectedProjectId}
+                    disabled={!generatedText}
                     className="rounded-xl bg-[var(--slate-900)] px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-[var(--slate-800)] disabled:opacity-50 transition-all"
                   >
                     Simpan ke Proyek
@@ -400,6 +404,11 @@ export function PlannerSection() {
               <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--slate-400)] mb-4">
                 Aset Media
               </h4>
+              {!draftId && (
+                <p className="mb-3 rounded-xl border border-amber-100 bg-amber-50 px-3 py-2 text-xs text-amber-700">
+                  💡 Simpan draf terlebih dahulu untuk mengunggah media.
+                </p>
+              )}
               <MediaUploader draftId={draftId} />
 
               {draft?.mediaAssetIds && draft.mediaAssetIds.length > 0 && (

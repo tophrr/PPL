@@ -246,32 +246,9 @@ export function LoginPageDesign({
               >
                 Kitalaku.in
               </Link>
-              <p className="mt-8 text-xs font-semibold uppercase tracking-[0.24em] text-[var(--slate-700)]">
-                Secure Workspace Access
-              </p>
               <h1 className="font-display mt-4 text-5xl leading-[0.98] text-[var(--slate-900)]">
-                Masuk ke workspace yang terasa rapi sejak layar pertama.
+                Masuk ke workspace
               </h1>
-              <p className="mt-5 max-w-xl text-base leading-8 text-[var(--slate-700)]">
-                Planner, scheduler, approval, dan analytics dibuka dari satu gerbang yang lebih
-                tenang, lebih eksklusif, dan tetap jelas untuk semua peran.
-              </p>
-            </div>
-
-            <div className="relative z-10 grid gap-3 sm:grid-cols-3">
-              {[
-                ['4 Modules', 'Planner, schedule, approval, analytics'],
-                ['Role Based', 'Admin, manager, creator, and client'],
-                ['Persistent', 'Secure session between workflow steps'],
-              ].map(([title, desc]) => (
-                <div
-                  key={title}
-                  className="rounded-2xl border border-white/12 bg-white/8 p-4 backdrop-blur-sm"
-                >
-                  <p className="text-lg font-semibold">{title}</p>
-                  <p className="mt-2 text-sm leading-6 text-[var(--slate-700)]">{desc}</p>
-                </div>
-              ))}
             </div>
           </section>
 
@@ -291,56 +268,7 @@ export function LoginPageDesign({
               <div className="absolute right-0 top-0 h-36 w-36 bg-[radial-gradient(circle,rgba(139,92,246,0.14),transparent_68%)]" />
 
               <div className="relative z-10">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--slate-700)]">
-                  Secure Access
-                </p>
-                <h2 className="font-display mt-4 text-5xl leading-[1] text-[var(--slate-900)]">
-                  {title || 'Sign in to Kitalaku.in'}
-                </h2>
-                <p className="mt-3 max-w-xl text-base leading-7 text-[var(--slate-500)]">
-                  {subtitle ||
-                    'A streamlined, secure entry point that connects you directly to your top-priority creative tasks.'}
-                </p>
-
-                <div className="mt-6 grid gap-3 sm:grid-cols-3">
-                  {[
-                    ['Protected', 'Secure workspace'],
-                    ['Fast access', 'Persistent session'],
-                    ['Team ready', 'Role-aware entry'],
-                  ].map(([title, desc]) => (
-                    <div
-                      key={title}
-                      className="rounded-2xl border border-[rgba(219,227,238,0.88)] bg-white/72 px-4 py-3"
-                    >
-                      <p className="text-sm font-semibold text-[var(--slate-900)]">{title}</p>
-                      <p className="mt-1 text-xs leading-5 text-[var(--slate-500)]">{desc}</p>
-                    </div>
-                  ))}
-                </div>
-
                 <div className="mt-8 flex justify-center w-full">{children}</div>
-
-                <div className="mt-4 rounded-2xl border border-[rgba(16,185,129,0.2)] bg-[rgba(16,185,129,0.08)] px-4 py-3 text-sm leading-6 text-[var(--emerald-strong)]">
-                  Your secure session will persist seamlessly as you navigate between the planner,
-                  scheduler, and approvals.
-                </div>
-
-                <div className="mt-5 flex flex-col gap-3 rounded-2xl border border-[rgba(219,227,238,0.88)] bg-white/70 p-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <p className="text-sm font-semibold text-[var(--slate-900)]">
-                      Need a quick UI preview?
-                    </p>
-                    <p className="mt-1 text-sm text-[var(--slate-500)]">
-                      Open the dashboard directly to review the new information hierarchy.
-                    </p>
-                  </div>
-                  <Link
-                    href="/dashboard"
-                    className="inline-flex items-center justify-center rounded-xl border border-[rgba(219,227,238,0.88)] bg-white px-4 py-2.5 text-sm font-semibold text-[var(--slate-700)]"
-                  >
-                    Open Dashboard
-                  </Link>
-                </div>
               </div>
             </GlassPanel>
           </div>

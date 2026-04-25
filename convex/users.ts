@@ -154,9 +154,17 @@ export const storeUser = mutation({
         updates.tokenIdentifier = identity.tokenIdentifier;
       }
 
-      if (user.name !== identity.name || user.email !== identity.email) {
-        updates.name = identity.name ?? 'Unknown';
-        updates.email = identity.email ?? '';
+      const identityName =
+        identity.name ||
+        (identity.givenName && identity.familyName
+          ? `${identity.givenName} ${identity.familyName}`
+          : identity.givenName || identity.familyName);
+
+      if (identityName && user.name !== identityName) {
+        updates.name = identityName;
+      }
+      if (identity.email && user.email !== identity.email) {
+        updates.email = identity.email;
       }
 
       if (!user.agencyId) {
@@ -181,9 +189,15 @@ export const storeUser = mutation({
       tokenQuotaRemaining: 1000,
     });
 
+    const identityName =
+      identity.name ||
+      (identity.givenName && identity.familyName
+        ? `${identity.givenName} ${identity.familyName}`
+        : identity.givenName || identity.familyName);
+
     return await ctx.db.insert('users', {
       tokenIdentifier: identity.tokenIdentifier,
-      name: identity.name ?? 'Unknown',
+      name: identityName ?? identity.email?.split('@')[0] ?? 'Unknown',
       email: identity.email ?? '',
       role: 'Admin', // Give them Admin role so they can create brands
       agencyId: agencyId,

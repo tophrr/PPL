@@ -216,7 +216,7 @@ export default function SettingsPage() {
                           </p>
                         ) : (
                           clientsInAgency.map((client) => {
-                            const hasAccess = brand.clientIds.includes(client._id);
+                            const hasAccess = brand.clientIds.some((id) => id === client._id);
                             return (
                               <button
                                 key={client._id}

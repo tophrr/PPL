@@ -39,7 +39,7 @@ export const getDraft = query({
     const isTeam =
       user.agencyId === brand.agencyId &&
       (user.role === 'Admin' || user.role === 'Creative Manager' || user.role === 'Creator');
-    const isClient = user.role === 'Client' && brand.clientIds.includes(user._id);
+    const isClient = user.role === 'Client' && brand.clientIds.some((id) => id === user._id);
 
     if (!isTeam && !isClient) {
       throw new Error('Unauthorized access to this draft');
@@ -203,7 +203,9 @@ export const getDashboardStats = query({
     let accessibleBrandIds = brands.map((b) => b._id);
 
     if (user.role === 'Client') {
-      accessibleBrandIds = brands.filter((b) => b.clientIds.includes(user._id)).map((b) => b._id);
+      accessibleBrandIds = brands
+        .filter((b) => b.clientIds.some((id) => id === user._id))
+        .map((b) => b._id);
     }
 
     const drafts = await ctx.db
@@ -248,7 +250,9 @@ export const getDraftsByAgency = query({
     let accessibleBrandIds = brands.map((b) => b._id);
 
     if (user.role === 'Client') {
-      accessibleBrandIds = brands.filter((b) => b.clientIds.includes(user._id)).map((b) => b._id);
+      accessibleBrandIds = brands
+        .filter((b) => b.clientIds.some((id) => id === user._id))
+        .map((b) => b._id);
     }
 
     const drafts = await ctx.db

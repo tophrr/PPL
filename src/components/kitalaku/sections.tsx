@@ -66,7 +66,16 @@ export function DashboardSection() {
       note: 'Siap dipublikasikan',
       tone: 'green',
     },
-    { label: 'Kredit AI', value: 'Seimbang', note: 'Kuota sehat', tone: 'purple' },
+    ...(currentUser?.role !== 'Client'
+      ? [
+          {
+            label: 'Kredit AI',
+            value: 'Tersedia',
+            note: 'Kuota sehat',
+            tone: 'purple' as const,
+          },
+        ]
+      : []),
   ];
 
   const totalItems = stats?.total || 0;
@@ -90,7 +99,12 @@ export function DashboardSection() {
       detail: 'Lihat persetujuan dan keterlibatan tanpa ganti konteks.',
       icon: <IconAnalytics />,
     },
-  ];
+  ].filter((action) => {
+    if (currentUser?.role === 'Client') {
+      return action.title !== 'Buka Perencana';
+    }
+    return true;
+  });
 
   const focusItems = latestDrafts.map((d) => ({
     title: d.content.substring(0, 40).replace(/<[^>]*>/g, '') + '...',
@@ -108,9 +122,6 @@ export function DashboardSection() {
           <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.4),rgba(255,255,255,0.05))] pointer-events-none" />
 
           <div className="relative z-10">
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--purple-strong)]">
-              PUSAT KOMANDO
-            </p>
             <h1 className="font-display mt-4 max-w-4xl text-4xl leading-[1.04] text-[var(--slate-900)] md:text-5xl">
               Keputusan konten jadi lebih jelas secara instan.
             </h1>
@@ -194,7 +205,9 @@ export function DashboardSection() {
           <div className="mt-5 space-y-3">
             {focusItems.length === 0 ? (
               <p className="text-sm text-[var(--slate-400)] italic p-4">
-                Belum ada draf untuk difokuskan. Buka Perencana AI untuk memulai.
+                {currentUser?.role === 'Client'
+                  ? 'Belum ada draf untuk difokuskan saat ini.'
+                  : 'Belum ada draf untuk difokuskan. Buka Perencana AI untuk memulai.'}
               </p>
             ) : (
               focusItems.map((item, index) => (
@@ -259,13 +272,15 @@ export function DashboardSection() {
           >
             Lihat Persetujuan
           </Link>
-          <Link
-            href="/dashboard/planner"
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] px-5 py-3 text-sm font-semibold text-[var(--slate-900)] shadow-[var(--shadow-soft)]"
-          >
-            <IconWand />
-            <span>Buat Draf AI</span>
-          </Link>
+          {currentUser?.role !== 'Client' && (
+            <Link
+              href="/dashboard/planner"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] px-5 py-3 text-sm font-semibold text-[var(--slate-900)] shadow-[var(--shadow-soft)]"
+            >
+              <IconWand />
+              <span>Buat Draf AI</span>
+            </Link>
+          )}
         </div>
       </div>
 

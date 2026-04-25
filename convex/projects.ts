@@ -12,19 +12,19 @@ export const getProjects = query({
       .withIndex('by_token', (q) => q.eq('tokenIdentifier', identity.tokenIdentifier))
       .unique();
 
-    if (!user) throw new Error('User not found');
+    if (!user) return [];
 
     const brand = await ctx.db.get(args.brandId);
-    if (!brand) throw new Error('Brand not found');
+    if (!brand) return [];
 
     // Verify access
     const isTeam =
       user.agencyId === brand.agencyId &&
       (user.role === 'Admin' || user.role === 'Creative Manager' || user.role === 'Creator');
-    const isClient = user.role === 'Client' && brand.clientIds.includes(user._id);
+    const isClient = user.role === 'Client' && brand.clientIds.some((id) => id === user._id);
 
     if (!isTeam && !isClient) {
-      throw new Error('Unauthorized access to this brand');
+      return [];
     }
 
     return await ctx.db

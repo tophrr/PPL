@@ -3,10 +3,7 @@ import { SignUp } from '@clerk/nextjs';
 
 export default function SignUpPage() {
   return (
-    <LoginPageDesign
-      title="Create your Workspace"
-      subtitle="Mulai kolaborasi yang lebih rapi dan terkontrol bersama tim dan klien Anda."
-    >
+    <LoginPageDesign title=" " subtitle=" ">
       <SignUp routing="hash" />
     </LoginPageDesign>
   );

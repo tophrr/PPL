@@ -31,7 +31,7 @@ export function MediaUploader({ draftId }: { draftId: Id<'contentDrafts'> | null
   const handleUpload = async () => {
     if (!selectedFile) return;
     if (!draftId) {
-      setError('Please save the draft first before uploading media.');
+      setError('Simpan draf terlebih dahulu sebelum mengunggah media.');
       return;
     }
 
@@ -94,8 +94,10 @@ export function MediaUploader({ draftId }: { draftId: Id<'contentDrafts'> | null
 
   return (
     <div className="mt-4 rounded-xl border border-[var(--slate-150)] bg-white p-4">
-      <h4 className="text-sm font-semibold text-[var(--slate-900)]">Media Assets</h4>
-      <p className="mt-1 text-xs text-[var(--slate-500)]">Attach images or videos (Max 100MB)</p>
+      <h4 className="text-sm font-semibold text-[var(--slate-900)]">Aset Media</h4>
+      <p className="mt-1 text-xs text-[var(--slate-500)]">
+        Lampirkan gambar atau video (Maks 100MB)
+      </p>
 
       <div className="mt-3 flex items-center gap-3">
         <input
@@ -110,7 +112,7 @@ export function MediaUploader({ draftId }: { draftId: Id<'contentDrafts'> | null
           disabled={!selectedFile || isUploading}
           className="rounded-xl bg-[var(--slate-900)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
         >
-          {isUploading ? 'Uploading...' : 'Upload'}
+          {isUploading ? 'Mengunggah...' : 'Unggah'}
         </button>
       </div>
 

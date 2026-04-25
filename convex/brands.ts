@@ -35,7 +35,7 @@ export const getBrands = query({
         .collect();
 
       // Filter in JS since Convex doesn't support .includes() natively for array fields
-      return agencyBrands.filter((b) => b.clientIds.includes(user._id));
+      return agencyBrands.filter((b) => b.clientIds.some((id) => id === user._id));
     }
 
     return [];
