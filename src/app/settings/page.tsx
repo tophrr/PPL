@@ -21,6 +21,11 @@ export default function SettingsPage() {
   const [newProjectDesc, setNewProjectDesc] = useState('');
   const createProject = useMutation(api.projects.createProject);
 
+  const archiveBrand = useMutation(api.brands.archiveBrand);
+  const softDeleteBrand = useMutation(api.brands.softDeleteBrand);
+  const archiveProject = useMutation(api.projects.archiveProject);
+  const softDeleteProject = useMutation(api.projects.softDeleteProject);
+
   const projects =
     useQuery(
       api.projects.getProjects,
@@ -110,9 +115,26 @@ export default function SettingsPage() {
                   className="rounded-2xl border border-[var(--slate-200)] bg-white/60 p-4 text-sm flex justify-between items-center shadow-sm"
                 >
                   <span>{b.name}</span>
-                  <span className="text-xs text-[var(--slate-500)]">
-                    {b.isArchived ? 'Archived' : 'Active'}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {!b.isArchived && (
+                      <button
+                        onClick={() => archiveBrand({ brandId: b._id })}
+                        className="text-[10px] font-bold uppercase text-[var(--slate-400)] hover:text-[var(--purple-strong)]"
+                      >
+                        Archive
+                      </button>
+                    )}
+                    <button
+                      onClick={() => {
+                        if (confirm('Move brand to trash? It will be deleted in 30 days.')) {
+                          softDeleteBrand({ brandId: b._id });
+                        }
+                      }}
+                      className="text-[10px] font-bold uppercase text-red-300 hover:text-red-500"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -181,9 +203,26 @@ export default function SettingsPage() {
                     className="rounded-2xl border border-[var(--slate-200)] bg-white/60 p-4 text-sm flex justify-between items-center shadow-sm"
                   >
                     <span>{p.name}</span>
-                    <span className="text-xs text-[var(--slate-500)]">
-                      {p.isArchived ? 'Archived' : 'Active'}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      {!p.isArchived && (
+                        <button
+                          onClick={() => archiveProject({ projectId: p._id })}
+                          className="text-[10px] font-bold uppercase text-[var(--slate-400)] hover:text-[var(--purple-strong)]"
+                        >
+                          Archive
+                        </button>
+                      )}
+                      <button
+                        onClick={() => {
+                          if (confirm('Move project to trash? It will be deleted in 30 days.')) {
+                            softDeleteProject({ projectId: p._id });
+                          }
+                        }}
+                        className="text-[10px] font-bold uppercase text-red-300 hover:text-red-500"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>

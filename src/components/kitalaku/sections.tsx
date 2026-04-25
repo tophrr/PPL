@@ -15,7 +15,16 @@ import {
   plannerTopics,
   platformPerformance,
 } from './data';
-import { IconAnalytics, IconCalendar, IconCopy, IconGrid, IconThumb, IconWand } from './icons';
+import {
+  IconAnalytics,
+  IconCalendar,
+  IconCheck,
+  IconCopy,
+  IconGrid,
+  IconThumb,
+  IconWand,
+} from './icons';
+import { AnalyticsDashboard } from './analytics-dashboard';
 import { cn, GlassPanel, toneDot, toneSurface } from './primitives';
 
 export function DashboardSection() {
@@ -932,64 +941,5 @@ export function SubscriptionSection() {
 }
 
 export function ApprovalAnalyticsSection() {
-  return (
-    <div id="analytics" className="grid gap-5 xl:grid-cols-[1fr_0.8fr]">
-      <GlassPanel className="p-5">
-        <div className="rounded-[20px] bg-[linear-gradient(135deg,#16a34a_0%,#22c55e_100%)] px-5 py-4 text-[var(--slate-900)]">
-          <h2 className="font-display text-4xl leading-[0.98]">Approval System</h2>
-          <p className="mt-2 text-sm text-[var(--slate-900)]">
-            Agency-client workflow dengan keputusan yang lebih cepat dan tetap terdokumentasi.
-          </p>
-        </div>
-        <div className="mt-4 grid gap-4 sm:grid-cols-3">
-          {approvalStats.map((stat) => (
-            <div
-              key={stat.label}
-              className="rounded-2xl border border-[var(--slate-150)] bg-white/75 px-4 py-5 text-center"
-            >
-              <p className="text-4xl font-semibold text-[var(--slate-900)]">{stat.value}</p>
-              <p className="mt-1 text-sm text-[var(--slate-500)]">{stat.label}</p>
-            </div>
-          ))}
-        </div>
-      </GlassPanel>
-
-      <GlassPanel className="p-5">
-        <div className="rounded-[20px] bg-[linear-gradient(135deg,#7c3aed_0%,#a855f7_100%)] px-5 py-4 text-[var(--slate-900)]">
-          <h2 className="font-display text-4xl leading-[0.98]">Analytics</h2>
-          <p className="mt-2 text-sm text-[var(--slate-900)]">
-            Performance metrics yang lebih siap dibaca untuk evaluasi campaign dan next move.
-          </p>
-        </div>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          {analyticsSummary.map((item) => (
-            <div
-              key={item.label}
-              className="rounded-2xl border border-[var(--slate-150)] bg-white/75 p-4"
-            >
-              <p className="text-sm text-[var(--slate-500)]">{item.label}</p>
-              <p className="mt-2 text-4xl font-semibold text-[var(--slate-900)]">{item.value}</p>
-              <p className="mt-2 text-sm text-[var(--slate-500)]">{item.delta}</p>
-            </div>
-          ))}
-        </div>
-        <div className="mt-5 space-y-4 rounded-2xl border border-[var(--slate-150)] bg-white/75 p-4">
-          {platformPerformance.map((item) => (
-            <div key={item.label}>
-              <div className="mb-2 flex items-center justify-between text-sm text-[var(--slate-600)]">
-                <span>{item.label}</span>
-                <span>{item.value}</span>
-              </div>
-              <div className="h-3 rounded-full bg-[var(--slate-100)]">
-                <div
-                  className="h-3 rounded-full bg-[linear-gradient(90deg,#c084fc_0%,#9333ea_100%)]"
-                  style={{ width: item.width }}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-      </GlassPanel>
-    </div>
-  );
+  return <AnalyticsDashboard />;
 }

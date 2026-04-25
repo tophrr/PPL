@@ -182,3 +182,16 @@ export function IconChevronRight() {
     </svg>
   );
 }
+export function IconCheck() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="h-4 w-4"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+    >
+      <path d="M20 6 9 17l-5-5" />
+    </svg>
+  );
+}

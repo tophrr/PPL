@@ -10,7 +10,7 @@ export const getProjects = query({
     return await ctx.db
       .query('projects')
       .withIndex('by_brand', (q) => q.eq('brandId', args.brandId))
-      .filter((q) => q.eq(q.field('isArchived'), false))
+      .filter((q) => q.and(q.eq(q.field('isArchived'), false), q.eq(q.field('isDeleted'), false)))
       .collect();
   },
 });
@@ -30,6 +30,7 @@ export const createProject = mutation({
       brandId: args.brandId,
       description: args.description,
       isArchived: false,
+      isDeleted: false,
     });
     return projectId;
   },
@@ -42,5 +43,18 @@ export const archiveProject = mutation({
     if (!identity) throw new Error('Unauthenticated');
 
     await ctx.db.patch(args.projectId, { isArchived: true });
+  },
+});
+
+export const softDeleteProject = mutation({
+  args: { projectId: v.id('projects') },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error('Unauthenticated');
+
+    await ctx.db.patch(args.projectId, {
+      isDeleted: true,
+      deletedAt: Date.now(),
+    });
   },
 });

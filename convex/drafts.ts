@@ -1,5 +1,6 @@
 import { v } from 'convex/values';
 import { mutation, query, internalMutation } from './_generated/server';
+import { internal } from './_generated/api';
 
 export const getDrafts = query({
   args: { projectId: v.id('projects') },
@@ -12,6 +13,15 @@ export const getDrafts = query({
       .withIndex('by_project', (q) => q.eq('projectId', args.projectId))
       .filter((q) => q.eq(q.field('isDeleted'), false))
       .collect();
+  },
+});
+
+export const getDraft = query({
+  args: { draftId: v.id('contentDrafts') },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error('Unauthenticated');
+    return await ctx.db.get(args.draftId);
   },
 });
 
@@ -76,6 +86,36 @@ export const updateDraftSchedule = mutation({
   },
 });
 
+export const updateDraftStatus = mutation({
+  args: {
+    draftId: v.id('contentDrafts'),
+    status: v.union(v.literal('Draft'), v.literal('Review'), v.literal('Approved')),
+    revisionNotes: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error('Unauthenticated');
+
+    const patch: any = { status: args.status };
+    if (args.revisionNotes !== undefined) {
+      patch.revisionNotes = args.revisionNotes;
+    }
+
+    await ctx.db.patch(args.draftId, patch);
+
+    // Trigger notification
+    const draft = await ctx.db.get(args.draftId);
+    if (draft) {
+      await ctx.runMutation(internal.notifications.createNotificationInternal, {
+        userId: draft.authorId,
+        title: `Draft Status Updated`,
+        message: `Your draft has been moved to ${args.status}.`,
+        link: `/dashboard/planner`,
+      });
+    }
+  },
+});
+
 export const softDeleteDraft = mutation({
   args: { draftId: v.id('contentDrafts') },
   handler: async (ctx, args) => {
@@ -95,18 +135,23 @@ export const hardDeleteOldDrafts = internalMutation({
     const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
     const threshold = Date.now() - THIRTY_DAYS_MS;
 
-    const oldDrafts = await ctx.db
-      .query('contentDrafts')
-      .filter((q) => q.eq(q.field('isDeleted'), true))
-      .collect();
-
+    const tables = ['contentDrafts', 'brands', 'projects'] as const;
     let deletedCount = 0;
-    for (const draft of oldDrafts) {
-      if (draft.deletedAt && draft.deletedAt < threshold) {
-        await ctx.db.delete(draft._id);
-        deletedCount++;
+
+    for (const table of tables) {
+      const oldRecords = await ctx.db
+        .query(table)
+        .filter((q) => q.eq(q.field('isDeleted'), true))
+        .collect();
+
+      for (const record of oldRecords) {
+        if (record.deletedAt && record.deletedAt < threshold) {
+          await ctx.db.delete(record._id);
+          deletedCount++;
+        }
       }
     }
-    console.log(`Deleted ${deletedCount} old drafts from trash.`);
+
+    console.log(`Hard deleted ${deletedCount} old records from trash.`);
   },
 });

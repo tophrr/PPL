@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useQuery, useMutation } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 import { sideNav } from './data';
 import {
   IconAnalytics,
@@ -20,6 +22,11 @@ const NOTIFICATION_TRANSITION_MS = 260;
 export function AppShell({ active, children }: { active: string; children: React.ReactNode }) {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [notificationsMounted, setNotificationsMounted] = useState(false);
+
+  const currentUser = useQuery(api.users.getCurrentUser);
+  const notifications = useQuery(api.notifications.getNotifications) || [];
+  const markAsReadMutation = useMutation(api.notifications.markAsRead);
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   const pageDescriptions: Record<string, string> = {
     Dashboard: 'Monitor priorities, approvals, and performance without leaving the workspace.',
@@ -135,7 +142,9 @@ export function AppShell({ active, children }: { active: string; children: React
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-semibold text-[var(--slate-700)]">AI Quota</p>
-                <p className="mt-1 text-xs text-[var(--slate-500)]">420 / 1000 credits used</p>
+                <p className="mt-1 text-xs text-[var(--slate-500)]">
+                  {currentUser?.agencyId ? 'Balanced' : 'No Agency'}
+                </p>
               </div>
               <span className="rounded-full bg-[rgba(16,185,129,0.12)] px-2.5 py-1 text-xs font-semibold text-[var(--emerald-strong)]">
                 Healthy
@@ -192,7 +201,9 @@ export function AppShell({ active, children }: { active: string; children: React
                     )}
                   >
                     <IconBell />
-                    <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500" />
+                    {unreadCount > 0 && (
+                      <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500" />
+                    )}
                   </button>
 
                   <Link
@@ -217,12 +228,16 @@ export function AppShell({ active, children }: { active: string; children: React
                         : 'border-transparent',
                     )}
                   >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] text-sm font-semibold text-[var(--slate-900)]">
-                      JD
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] text-sm font-semibold text-white">
+                      {currentUser?.name?.substring(0, 2).toUpperCase() || '??'}
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-[var(--slate-900)]">John Doe</p>
-                      <p className="text-xs text-[var(--slate-500)]">Admin / KennySoft</p>
+                      <p className="text-sm font-semibold text-[var(--slate-900)]">
+                        {currentUser?.name || 'Loading...'}
+                      </p>
+                      <p className="text-xs text-[var(--slate-500)]">
+                        {currentUser?.role || 'User'}
+                      </p>
                     </div>
                   </Link>
                 </div>
@@ -301,47 +316,41 @@ export function AppShell({ active, children }: { active: string; children: React
               </div>
 
               <div className="mt-4 space-y-3">
-                {[
-                  {
-                    title: 'Approval updated',
-                    detail: 'Blog Post - Marketing Tips changed to Approved.',
-                    time: '5m ago',
-                  },
-                  {
-                    title: 'New review requested',
-                    detail: 'Instagram Carousel - April Promo is waiting for your review.',
-                    time: '18m ago',
-                  },
-                  {
-                    title: 'Schedule adjusted',
-                    detail: 'Weekly newsletter moved to Friday 10:00 AM.',
-                    time: '42m ago',
-                  },
-                  {
-                    title: 'AI draft completed',
-                    detail: '3 caption drafts for Product Launch are ready.',
-                    time: '1h ago',
-                  },
-                ].map((item) => (
-                  <div
-                    key={item.title}
-                    className="rounded-2xl border border-[rgba(219,227,238,0.88)] bg-[var(--surface-strong)] px-4 py-3"
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <p className="text-sm font-semibold text-[var(--slate-900)]">
-                          {item.title}
-                        </p>
-                        <p className="mt-1 text-xs leading-5 text-[var(--slate-500)]">
-                          {item.detail}
-                        </p>
+                {notifications.length === 0 ? (
+                  <p className="text-center text-xs text-[var(--slate-400)] py-8">
+                    No notifications yet.
+                  </p>
+                ) : (
+                  notifications.map((item) => (
+                    <div
+                      key={item._id}
+                      onClick={() => markAsReadMutation({ notificationId: item._id })}
+                      className={cn(
+                        'rounded-2xl border px-4 py-3 cursor-pointer transition-colors',
+                        item.isRead
+                          ? 'border-[rgba(219,227,238,0.88)] bg-[var(--surface-strong)] opacity-60'
+                          : 'border-[var(--purple-border)] bg-white shadow-sm',
+                      )}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <p className="text-sm font-semibold text-[var(--slate-900)]">
+                            {item.title}
+                          </p>
+                          <p className="mt-1 text-xs leading-5 text-[var(--slate-500)]">
+                            {item.message}
+                          </p>
+                        </div>
+                        <span className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--slate-400)]">
+                          {new Date(item.createdAt).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </span>
                       </div>
-                      <span className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--slate-400)]">
-                        {item.time}
-                      </span>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </section>
           </div>

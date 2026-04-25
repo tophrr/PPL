@@ -21,10 +21,12 @@ export const saveMediaAsset = mutation({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error('Unauthenticated');
 
+    const url = await ctx.storage.getUrl(args.storageId);
     const mediaId = await ctx.db.insert('mediaAssets', {
       storageId: args.storageId,
       size: args.size,
       contentType: args.contentType,
+      url: url || undefined,
     });
 
     if (args.draftId) {
@@ -44,5 +46,12 @@ export const getMediaUrl = query({
   args: { storageId: v.id('_storage') },
   handler: async (ctx, args) => {
     return await ctx.storage.getUrl(args.storageId);
+  },
+});
+
+export const getMediaAsset = query({
+  args: { assetId: v.id('mediaAssets') },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.assetId);
   },
 });

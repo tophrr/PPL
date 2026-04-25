@@ -25,6 +25,8 @@ export default defineSchema({
     agencyId: v.id('agencies'),
     clientIds: v.array(v.id('users')),
     isArchived: v.boolean(),
+    isDeleted: v.boolean(),
+    deletedAt: v.optional(v.number()),
   }).index('by_agency', ['agencyId']),
 
   projects: defineTable({
@@ -32,6 +34,8 @@ export default defineSchema({
     brandId: v.id('brands'),
     description: v.optional(v.string()),
     isArchived: v.boolean(),
+    isDeleted: v.boolean(),
+    deletedAt: v.optional(v.number()),
   }).index('by_brand', ['brandId']),
 
   contentDrafts: defineTable({
@@ -55,6 +59,7 @@ export default defineSchema({
     storageId: v.id('_storage'),
     size: v.number(),
     contentType: v.string(),
+    url: v.optional(v.string()),
   }),
 
   collaborativeLocks: defineTable({
@@ -70,4 +75,13 @@ export default defineSchema({
     entityId: v.string(),
     performedBy: v.id('users'),
   }).index('by_entity', ['entityType', 'entityId']),
+
+  notifications: defineTable({
+    userId: v.id('users'),
+    title: v.string(),
+    message: v.string(),
+    link: v.string(),
+    isRead: v.boolean(),
+    createdAt: v.number(),
+  }).index('by_user', ['userId', 'isRead']),
 });

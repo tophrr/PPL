@@ -8,6 +8,7 @@ import { cn, GlassPanel } from './primitives';
 import { Id } from '@/convex/_generated/dataModel';
 import { RichTextEditor } from './rich-text-editor';
 import { MediaUploader } from './media-uploader';
+import { MediaItem } from './media-item';
 
 export function PlannerSection() {
   const [brief, setBrief] = useState('');
@@ -36,9 +37,17 @@ export function PlannerSection() {
       api.projects.getProjects,
       selectedBrandId ? { brandId: selectedBrandId as Id<'brands'> } : 'skip',
     ) || [];
+
+  const agencyQuota = useQuery(api.brands.getAgencyQuota);
+  const quotaExhausted = agencyQuota && agencyQuota.tokenQuotaRemaining <= 0;
+
   const generateDraftAction = useAction(api.ai.generateDraft);
   const saveDraftMutation = useMutation(api.drafts.createDraft);
   const updateDraftMutation = useMutation(api.drafts.updateDraftContent);
+  const updateDraftStatusMutation = useMutation(api.drafts.updateDraftStatus);
+
+  const draft = useQuery(api.drafts.getDraft, draftId ? { draftId } : 'skip');
+  const [revisionNotes, setRevisionNotes] = useState('');
 
   const handleGenerate = async () => {
     if (!brief.trim()) {
@@ -108,6 +117,22 @@ export function PlannerSection() {
     } catch (err) {
       console.error('Auto-save failed', err);
       setSaveStatus('Auto-save failed');
+    }
+  };
+
+  const handleUpdateStatus = async (newStatus: 'Draft' | 'Review' | 'Approved') => {
+    if (!draftId) return;
+    try {
+      setSaveStatus(`Updating to ${newStatus}...`);
+      await updateDraftStatusMutation({
+        draftId,
+        status: newStatus,
+        revisionNotes: newStatus === 'Draft' ? revisionNotes : undefined,
+      });
+      setSaveStatus(`Status: ${newStatus}`);
+      if (newStatus !== 'Draft') setRevisionNotes('');
+    } catch (err: any) {
+      setError(err.message || 'Failed to update status.');
     }
   };
 
@@ -222,10 +247,16 @@ export function PlannerSection() {
             </div>
           )}
 
+          {quotaExhausted && (
+            <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700 font-medium">
+              ⚠️ AI Quota Exhausted. Please contact your administrator to top up tokens.
+            </div>
+          )}
+
           <div className="mt-5 flex flex-wrap items-center gap-3">
             <button
               onClick={handleGenerate}
-              disabled={isGenerating}
+              disabled={isGenerating || !!quotaExhausted}
               className="inline-flex items-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] px-6 py-3 text-sm font-semibold text-white shadow-[0_16px_40px_rgba(124,58,237,0.28)] transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[0_20px_45px_rgba(124,58,237,0.36)] disabled:opacity-50 disabled:hover:transform-none"
             >
               {isGenerating ? (
@@ -297,6 +328,89 @@ export function PlannerSection() {
             >
               {saveStatus || (draftId ? 'Saved' : 'Save to Drafts')}
             </button>
+
+            {draftId && (
+              <div className="mt-4 space-y-3 border-t border-[var(--slate-100)] pt-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-[var(--slate-500)] uppercase tracking-wider">
+                    Approval Workflow
+                  </span>
+                  <span
+                    className={cn(
+                      'rounded-full px-2 py-0.5 text-[10px] font-bold uppercase',
+                      draft?.status === 'Draft'
+                        ? 'bg-amber-100 text-amber-700'
+                        : draft?.status === 'Review'
+                          ? 'bg-purple-100 text-purple-700'
+                          : 'bg-emerald-100 text-emerald-700',
+                    )}
+                  >
+                    {draft?.status}
+                  </span>
+                </div>
+
+                <div className="mt-4">
+                  <span className="text-xs font-semibold text-[var(--slate-500)] uppercase tracking-wider block mb-3">
+                    Media Assets
+                  </span>
+                  <MediaUpload draftId={draftId} />
+
+                  {draft?.mediaAssetIds && draft.mediaAssetIds.length > 0 && (
+                    <div className="mt-4 grid grid-cols-2 gap-2">
+                      {draft.mediaAssetIds.map((assetId) => (
+                        <MediaItem key={assetId} assetId={assetId} />
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  {draft?.status === 'Draft' && (
+                    <button
+                      onClick={() => handleUpdateStatus('Review')}
+                      className="col-span-2 rounded-xl bg-[var(--purple-strong)] px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-[var(--slate-900)]"
+                    >
+                      Submit for Review
+                    </button>
+                  )}
+
+                  {draft?.status === 'Review' && (
+                    <>
+                      <button
+                        onClick={() => handleUpdateStatus('Approved')}
+                        className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-emerald-700"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => {
+                          const notes = prompt('Enter revision notes:');
+                          if (notes) {
+                            setRevisionNotes(notes);
+                            // We need to wait for state to update or just pass it directly
+                            updateDraftStatusMutation({
+                              draftId,
+                              status: 'Draft',
+                              revisionNotes: notes,
+                            });
+                          }
+                        }}
+                        className="rounded-xl bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 transition-all hover:bg-red-100"
+                      >
+                        Request Revision
+                      </button>
+                    </>
+                  )}
+                </div>
+
+                {draft?.revisionNotes && draft.status === 'Draft' && (
+                  <div className="rounded-xl border border-amber-200 bg-amber-50 p-3">
+                    <p className="text-[10px] font-bold uppercase text-amber-700">Revision Notes</p>
+                    <p className="mt-1 text-xs text-amber-800 italic">{draft.revisionNotes}</p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </GlassPanel>
 
