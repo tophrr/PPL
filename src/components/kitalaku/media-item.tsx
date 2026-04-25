@@ -4,6 +4,8 @@ import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
 
+import Image from 'next/image';
+
 export function MediaItem({ assetId }: { assetId: Id<'mediaAssets'> }) {
   const asset = useQuery(api.media.getMediaAsset, { assetId });
 
@@ -16,10 +18,12 @@ export function MediaItem({ assetId }: { assetId: Id<'mediaAssets'> }) {
   return (
     <div className="group relative aspect-square overflow-hidden rounded-xl border border-[var(--slate-200)] bg-[var(--slate-50)]">
       {isImage ? (
-        <img
+        <Image
           src={asset.url || ''}
           alt="Media Asset"
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          fill
+          unoptimized
+          className="object-cover transition-transform duration-300 group-hover:scale-105"
         />
       ) : (
         <div className="flex h-full w-full items-center justify-center bg-[var(--slate-900)] text-white text-[10px] font-bold uppercase">
