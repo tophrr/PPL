@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
+import { useWorkspace } from './workspace-context';
+import { Id } from '@/convex/_generated/dataModel';
 import { sideNav } from './data';
 import {
   IconAnalytics,
@@ -28,6 +30,16 @@ export function AppShell({ active, children }: { active: string; children: React
     api.agencies.getAgency,
     currentUser?.agencyId ? { agencyId: currentUser.agencyId } : 'skip',
   );
+
+  const { selectedBrandId, setSelectedBrandId, selectedProjectId, setSelectedProjectId } =
+    useWorkspace();
+
+  const brands = useQuery(api.brands.getBrands) || [];
+  const projects =
+    useQuery(
+      api.projects.getProjects,
+      selectedBrandId ? { brandId: selectedBrandId as Id<'brands'> } : 'skip',
+    ) || [];
 
   const notifications = useQuery(api.notifications.getNotifications) || [];
   const markAsReadMutation = useMutation(api.notifications.markAsRead);
@@ -157,7 +169,49 @@ export function AppShell({ active, children }: { active: string; children: React
           </nav>
         </div>
 
-        <div className="px-5 pb-5">
+        <div className="px-5 pb-5 space-y-4">
+          <GlassPanel className="p-4 space-y-4">
+            <div>
+              <label className="text-[10px] font-bold uppercase tracking-wider text-[var(--slate-400)]">
+                Selected Brand
+              </label>
+              <select
+                value={selectedBrandId}
+                onChange={(e) => {
+                  setSelectedBrandId(e.target.value as Id<'brands'>);
+                  setSelectedProjectId('');
+                }}
+                className="mt-1.5 w-full rounded-xl border border-[var(--slate-200)] bg-white/50 px-3 py-2 text-sm font-semibold text-[var(--slate-700)] outline-none transition-all hover:border-[var(--purple-border)]"
+              >
+                <option value="">Select Brand</option>
+                {brands.map((b) => (
+                  <option key={b._id} value={b._id}>
+                    {b.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="text-[10px] font-bold uppercase tracking-wider text-[var(--slate-400)]">
+                Active Project
+              </label>
+              <select
+                value={selectedProjectId}
+                disabled={!selectedBrandId}
+                onChange={(e) => setSelectedProjectId(e.target.value as Id<'projects'>)}
+                className="mt-1.5 w-full rounded-xl border border-[var(--slate-200)] bg-white/50 px-3 py-2 text-sm font-semibold text-[var(--slate-700)] outline-none transition-all hover:border-[var(--purple-border)] disabled:opacity-50"
+              >
+                <option value="">Select Project</option>
+                {projects.map((p) => (
+                  <option key={p._id} value={p._id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </GlassPanel>
+
           <GlassPanel className="border-[rgba(124,58,237,0.16)] p-4">
             <div className="flex items-center justify-between">
               <div>

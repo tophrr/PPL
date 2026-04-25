@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useAction, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { IconCopy, IconThumb, IconWand } from './icons';
@@ -9,6 +9,7 @@ import { Id } from '@/convex/_generated/dataModel';
 import { RichTextEditor } from './rich-text-editor';
 import { MediaUploader } from './media-uploader';
 import { MediaItem } from './media-item';
+import { useWorkspace } from './workspace-context';
 
 export function PlannerSection() {
   const [brief, setBrief] = useState('');
@@ -20,8 +21,7 @@ export function PlannerSection() {
   const [draftId, setDraftId] = useState<Id<'contentDrafts'> | null>(null);
   const [saveStatus, setSaveStatus] = useState<string>('');
 
-  const [selectedBrandId, setSelectedBrandId] = useState<Id<'brands'> | ''>('');
-  const [selectedProjectId, setSelectedProjectId] = useState<Id<'projects'> | ''>('');
+  const { selectedBrandId, selectedProjectId } = useWorkspace();
 
   const currentUser = useQuery(api.users.getCurrentUser);
   const contentLock = useQuery(
@@ -80,7 +80,7 @@ export function PlannerSection() {
 
   const handleSaveDraft = async () => {
     if (!selectedBrandId || !selectedProjectId) {
-      setError('Please select a brand and project to save the draft.');
+      setError('Please select a brand and project in the sidebar to save the draft.');
       return;
     }
     if (!generatedText.trim()) {
@@ -136,7 +136,8 @@ export function PlannerSection() {
     }
   };
 
-  const isLockedByOther = contentLock && currentUser && contentLock.lockedBy !== currentUser._id;
+  const isLockedByOther =
+    contentLock && currentUser && (contentLock.lockedBy as any) !== currentUser._id;
 
   const handleEditorFocus = async () => {
     if (draftId && !isLockedByOther) {
@@ -232,10 +233,10 @@ export function PlannerSection() {
                   onChange={(e) => setTone(e.target.value)}
                   className="mt-2 w-full rounded-2xl border border-[var(--slate-200)] bg-white px-4 py-3 text-sm font-medium text-[var(--slate-700)] shadow-[inset_0_1px_0_rgba(255,255,255,0.92)] outline-none transition-all duration-200 focus:border-[var(--purple-border)] focus:shadow-[0_0_0_4px_rgba(139,92,246,0.1)] hover:border-[var(--slate-300)]"
                 >
-                  <option>Refined &amp; Warm</option>
-                  <option>Professional &amp; Confident</option>
-                  <option>Playful &amp; Conversational</option>
-                  <option>Minimal &amp; Elegant</option>
+                  <option>Refined & Warm</option>
+                  <option>Professional & Confident</option>
+                  <option>Playful & Conversational</option>
+                  <option>Minimal & Elegant</option>
                 </select>
               </div>
             </div>
@@ -278,62 +279,45 @@ export function PlannerSection() {
         </div>
       </GlassPanel>
 
-      <div className="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
-        <GlassPanel className="p-5">
-          <div className="flex flex-col gap-4">
-            <h3 className="text-lg font-semibold text-[var(--slate-900)]">Workspace Destination</h3>
-            <div>
-              <label className="text-sm font-medium text-[var(--slate-900)]">Select Brand</label>
-              <select
-                value={selectedBrandId}
-                onChange={(e) => {
-                  setSelectedBrandId(e.target.value as Id<'brands'>);
-                  setSelectedProjectId(''); // reset project
-                }}
-                className="mt-2 w-full rounded-2xl border border-[var(--slate-200)] bg-white px-4 py-3 text-sm font-medium text-[var(--slate-700)] shadow-[inset_0_1px_0_rgba(255,255,255,0.92)] outline-none transition-all duration-200 focus:border-[var(--purple-border)] focus:shadow-[0_0_0_4px_rgba(139,92,246,0.1)] hover:border-[var(--slate-300)]"
+      <div className="grid gap-6 lg:grid-cols-[340px_minmax(0,1fr)]">
+        {/* Left Side: Parameters & Workflow */}
+        <div className="space-y-6">
+          <GlassPanel className="p-6">
+            <h3 className="text-lg font-semibold text-[var(--slate-900)]">Workspace Info</h3>
+            <p className="mt-1 text-xs text-[var(--slate-500)]">Inherited from sidebar.</p>
+
+            <div className="mt-6 space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-[var(--slate-400)]">
+                  Active Brand
+                </label>
+                <div className="rounded-xl border border-[var(--slate-100)] bg-[var(--slate-50)] px-3 py-2 text-sm font-semibold text-[var(--slate-600)]">
+                  {brands.find((b) => b._id === selectedBrandId)?.name || 'Select in sidebar'}
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-[var(--slate-400)]">
+                  Target Project
+                </label>
+                <div className="rounded-xl border border-[var(--slate-100)] bg-[var(--slate-50)] px-3 py-2 text-sm font-semibold text-[var(--slate-600)]">
+                  {projects.find((p) => p._id === selectedProjectId)?.name || 'Select in sidebar'}
+                </div>
+              </div>
+
+              <button
+                onClick={handleSaveDraft}
+                disabled={!generatedText || !selectedProjectId || draftId !== null}
+                className="w-full rounded-xl bg-[var(--slate-900)] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[var(--slate-800)] disabled:opacity-50"
               >
-                <option value="">-- Choose Brand --</option>
-                {brands.map((b) => (
-                  <option key={b._id} value={b._id}>
-                    {b.name}
-                  </option>
-                ))}
-              </select>
+                {saveStatus || (draftId ? 'Saved' : 'Save to Drafts')}
+              </button>
             </div>
 
-            {selectedBrandId && (
-              <div>
-                <label className="text-sm font-medium text-[var(--slate-900)]">
-                  Select Project
-                </label>
-                <select
-                  value={selectedProjectId}
-                  onChange={(e) => setSelectedProjectId(e.target.value as Id<'projects'>)}
-                  className="mt-2 w-full rounded-2xl border border-[var(--slate-200)] bg-white px-4 py-3 text-sm font-medium text-[var(--slate-700)] shadow-[inset_0_1px_0_rgba(255,255,255,0.92)] outline-none transition-all duration-200 focus:border-[var(--purple-border)] focus:shadow-[0_0_0_4px_rgba(139,92,246,0.1)] hover:border-[var(--slate-300)]"
-                >
-                  <option value="">-- Choose Project --</option>
-                  {projects.map((p) => (
-                    <option key={p._id} value={p._id}>
-                      {p.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-            <button
-              onClick={handleSaveDraft}
-              disabled={!generatedText || !selectedProjectId || draftId !== null}
-              className="mt-4 rounded-xl bg-[var(--slate-900)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              {saveStatus || (draftId ? 'Saved' : 'Save to Drafts')}
-            </button>
-
             {draftId && (
-              <div className="mt-4 space-y-3 border-t border-[var(--slate-100)] pt-4">
+              <div className="mt-6 space-y-4 border-t border-[var(--slate-100)] pt-6">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-[var(--slate-500)] uppercase tracking-wider">
-                    Approval Workflow
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--slate-400)]">
+                    Status
                   </span>
                   <span
                     className={cn(
@@ -349,58 +333,43 @@ export function PlannerSection() {
                   </span>
                 </div>
 
-                <div className="mt-4">
-                  <span className="text-xs font-semibold text-[var(--slate-500)] uppercase tracking-wider block mb-3">
-                    Media Assets
+                <div className="space-y-2">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--slate-400)]">
+                    Actions
                   </span>
-                  <MediaUpload draftId={draftId} />
-
-                  {draft?.mediaAssetIds && draft.mediaAssetIds.length > 0 && (
-                    <div className="mt-4 grid grid-cols-2 gap-2">
-                      {draft.mediaAssetIds.map((assetId) => (
-                        <MediaItem key={assetId} assetId={assetId} />
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-2 gap-2">
-                  {draft?.status === 'Draft' && (
-                    <button
-                      onClick={() => handleUpdateStatus('Review')}
-                      className="col-span-2 rounded-xl bg-[var(--purple-strong)] px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-[var(--slate-900)]"
-                    >
-                      Submit for Review
-                    </button>
-                  )}
-
-                  {draft?.status === 'Review' && (
-                    <>
+                  <div className="grid gap-2">
+                    {draft?.status === 'Draft' && (
                       <button
-                        onClick={() => handleUpdateStatus('Approved')}
-                        className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-emerald-700"
+                        onClick={() => handleUpdateStatus('Review')}
+                        className="w-full rounded-xl bg-[var(--purple-strong)] px-4 py-2 text-sm font-semibold text-white transition-all hover:opacity-90"
                       >
-                        Approve
+                        Submit for Review
                       </button>
-                      <button
-                        onClick={() => {
-                          const notes = prompt('Enter revision notes:');
-                          if (notes) {
-                            setRevisionNotes(notes);
-                            // We need to wait for state to update or just pass it directly
-                            updateDraftStatusMutation({
-                              draftId,
-                              status: 'Draft',
-                              revisionNotes: notes,
-                            });
-                          }
-                        }}
-                        className="rounded-xl bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 transition-all hover:bg-red-100"
-                      >
-                        Request Revision
-                      </button>
-                    </>
-                  )}
+                    )}
+
+                    {draft?.status === 'Review' && (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleUpdateStatus('Approved')}
+                          className="flex-1 rounded-xl bg-emerald-600 px-3 py-2 text-sm font-semibold text-white transition-all hover:bg-emerald-700"
+                        >
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => {
+                            const notes = prompt('Enter revision notes:');
+                            if (notes) {
+                              handleUpdateStatus('Draft');
+                              setRevisionNotes(notes);
+                            }
+                          }}
+                          className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-600 transition-all hover:bg-red-100"
+                        >
+                          Revise
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {draft?.revisionNotes && draft.status === 'Draft' && (
@@ -411,33 +380,17 @@ export function PlannerSection() {
                 )}
               </div>
             )}
-          </div>
-        </GlassPanel>
+          </GlassPanel>
+        </div>
 
-        <GlassPanel className="p-5">
-          <div className="flex items-center justify-between gap-3">
-            <h3 className="text-lg font-semibold text-[var(--slate-900)]">Manual Edit Panel</h3>
-            <span className="text-xs text-[var(--slate-400)]">
-              {generatedText.length} characters
-            </span>
-          </div>
-          <div className="mt-4 flex gap-3">
-            <div className="rounded-lg border border-[var(--slate-150)] bg-white/70 px-3 py-2 text-sm text-[var(--slate-700)]">
-              Platform: {platform}
-            </div>
-            <div className="rounded-lg border border-[var(--slate-150)] bg-white/70 px-3 py-2 text-sm text-[var(--slate-700)]">
-              Tone: {tone}
-            </div>
+        {/* Right Side: Editor */}
+        <GlassPanel className="p-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-[var(--slate-900)]">Content Editor</h3>
+            <span className="text-xs text-[var(--slate-400)]">{generatedText.length} chars</span>
           </div>
 
-          {isLockedByOther && (
-            <div className="mt-4 rounded-xl border border-[rgba(239,68,68,0.2)] bg-[rgba(239,68,68,0.08)] p-3 text-sm font-medium text-red-600 flex items-center justify-between">
-              <span>🔒 This content is currently being edited by {contentLock.userName}</span>
-              <span className="text-xs">You cannot edit until they finish.</span>
-            </div>
-          )}
-
-          <div className="mt-4">
+          <div className="mt-6">
             <RichTextEditor
               value={generatedText}
               onChange={setGeneratedText}
@@ -447,12 +400,16 @@ export function PlannerSection() {
               onBlur={handleEditorBlur}
             />
           </div>
-          <div className="mt-4 flex items-center justify-end">
-            {draftId && (
-              <span className="text-xs font-semibold text-[var(--slate-500)]">{saveStatus}</span>
-            )}
+
+          <div className="mt-6 border-t border-[var(--slate-100)] pt-6">
+            <MediaUploader draftId={draftId} />
           </div>
-          <MediaUploader draftId={draftId} />
+
+          {draftId && (
+            <div className="mt-4 flex items-center justify-end">
+              <span className="text-xs font-semibold text-[var(--slate-500)]">{saveStatus}</span>
+            </div>
+          )}
         </GlassPanel>
       </div>
     </div>

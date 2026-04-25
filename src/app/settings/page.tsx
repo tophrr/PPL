@@ -6,23 +6,30 @@ import { api } from '@/convex/_generated/api';
 import { AppShell } from '@/src/components/kitalaku/app-shell';
 import { GlassPanel } from '@/src/components/kitalaku/primitives';
 import { Id } from '@/convex/_generated/dataModel';
+import { useWorkspace } from '@/src/components/kitalaku/workspace-context';
 
 export default function SettingsPage() {
   const currentUser = useQuery(api.users.getCurrentUser);
   const brands = useQuery(api.brands.getBrands) || [];
 
-  // Basic states for creating a new Brand
   const [newBrandName, setNewBrandName] = useState('');
   const createBrand = useMutation(api.brands.createBrand);
 
-  // Basic states for creating a new Project
-  const [selectedBrandForProject, setSelectedBrandForProject] = useState<Id<'brands'> | ''>('');
+  const {
+    selectedBrandId: selectedBrandForProject,
+    setSelectedBrandId: setSelectedBrandForProject,
+    selectedProjectId,
+    setSelectedProjectId,
+  } = useWorkspace();
+
   const [newProjectName, setNewProjectName] = useState('');
   const [newProjectDesc, setNewProjectDesc] = useState('');
   const createProject = useMutation(api.projects.createProject);
 
   const archiveProject = useMutation(api.projects.archiveProject);
   const softDeleteProject = useMutation(api.projects.softDeleteProject);
+  const archiveBrand = useMutation(api.brands.archiveBrand);
+  const softDeleteBrand = useMutation(api.brands.softDeleteBrand);
 
   // Team Management states
   const [inviteEmail, setInviteEmail] = useState('');
@@ -85,6 +92,23 @@ export default function SettingsPage() {
         userId,
         role: role as 'Admin' | 'Creative Manager' | 'Creator' | 'Client',
       });
+    } catch (error: any) {
+      alert(error.message);
+    }
+  };
+
+  const handleCreateProject = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newProjectName || !selectedBrandForProject) return;
+    try {
+      await createProject({
+        name: newProjectName,
+        brandId: selectedBrandForProject as Id<'brands'>,
+        description: newProjectDesc,
+      });
+      setNewProjectName('');
+      setNewProjectDesc('');
+      alert('Project created');
     } catch (error: any) {
       alert(error.message);
     }

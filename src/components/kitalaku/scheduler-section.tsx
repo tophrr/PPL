@@ -6,16 +6,15 @@ import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
 import { GlassPanel, cn } from './primitives';
 import { IconCalendar } from './icons';
+import { useWorkspace } from './workspace-context';
 
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin, { Draggable } from '@fullcalendar/interaction';
 
 export function SchedulerSection() {
-  const [selectedBrandId, setSelectedBrandId] = useState<Id<'brands'> | ''>('');
-  const [selectedProjectId, setSelectedProjectId] = useState<Id<'projects'> | ''>('');
+  const { selectedBrandId, selectedProjectId } = useWorkspace();
 
-  const brands = useQuery(api.brands.getBrands) || [];
   const projects =
     useQuery(
       api.projects.getProjects,
@@ -67,8 +66,6 @@ export function SchedulerSection() {
     const draftId = info.event.id as Id<'contentDrafts'>;
     const newDate = info.event.start.getTime();
 
-    // Optimistic UI updates are built into FullCalendar if we don't strictly bind to the exact state immediately,
-    // but React's render cycle will sync it. We just fire the mutation.
     try {
       await updateDraftSchedule({ draftId, scheduledDate: newDate });
     } catch (error) {
@@ -84,7 +81,6 @@ export function SchedulerSection() {
 
     try {
       await updateDraftSchedule({ draftId, scheduledDate: newDate });
-      // Remove from calendar temporarily until React state updates, otherwise it creates duplicates if not handled well.
       info.event.remove();
     } catch (error) {
       console.error('Failed to schedule draft:', error);
@@ -98,88 +94,64 @@ export function SchedulerSection() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-xl font-semibold text-[var(--slate-900)] flex items-center gap-2">
-              <IconCalendar /> Scheduler Workspace
+              <IconCalendar /> Editorial Scheduler
             </h2>
             <p className="mt-1 text-sm text-[var(--slate-500)]">
-              Drag drafts onto the calendar to assign publication dates.
+              Selection inherited from global workspace in sidebar.
             </p>
-          </div>
-          <div className="flex gap-3">
-            <select
-              value={selectedBrandId}
-              onChange={(e) => {
-                setSelectedBrandId(e.target.value as Id<'brands'>);
-                setSelectedProjectId('');
-              }}
-              className="rounded-xl border border-[var(--slate-200)] bg-white px-3 py-2 text-sm outline-none transition-all duration-200 focus:border-[var(--purple-border)] focus:shadow-[0_0_0_4px_rgba(139,92,246,0.1)] hover:border-[var(--slate-300)]"
-            >
-              <option value="">-- Brand --</option>
-              {brands.map((b) => (
-                <option key={b._id} value={b._id}>
-                  {b.name}
-                </option>
-              ))}
-            </select>
-            <select
-              value={selectedProjectId}
-              onChange={(e) => setSelectedProjectId(e.target.value as Id<'projects'>)}
-              disabled={!selectedBrandId}
-              className="rounded-xl border border-[var(--slate-200)] bg-white px-3 py-2 text-sm outline-none transition-all duration-200 focus:border-[var(--purple-border)] focus:shadow-[0_0_0_4px_rgba(139,92,246,0.1)] hover:border-[var(--slate-300)] disabled:opacity-50"
-            >
-              <option value="">-- Project --</option>
-              {projects.map((p) => (
-                <option key={p._id} value={p._id}>
-                  {p.name}
-                </option>
-              ))}
-            </select>
           </div>
         </div>
       </GlassPanel>
 
       {selectedProjectId ? (
-        <div className="grid gap-6 xl:grid-cols-[280px_minmax(0,1fr)]">
-          <GlassPanel className="flex flex-col p-5">
-            <h3 className="text-sm font-semibold uppercase tracking-[0.1em] text-[var(--slate-700)]">
-              Unscheduled Backlog
-            </h3>
-            <p className="mt-1 text-xs text-[var(--slate-500)] mb-4">
-              Drag these items onto the calendar.
-            </p>
+        <div className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)]">
+          {/* Sidebar: Backlog */}
+          <GlassPanel className="p-5 h-fit">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-[var(--slate-800)] text-sm uppercase tracking-wider">
+                Unscheduled Drafts
+              </h3>
+              <span className="bg-[var(--slate-100)] text-[var(--slate-600)] text-[10px] font-bold px-2 py-0.5 rounded-full">
+                {unscheduledDrafts.length}
+              </span>
+            </div>
 
-            <div
-              ref={backlogRef}
-              className="flex-1 space-y-3 overflow-y-auto"
-              style={{ minHeight: '300px' }}
-            >
+            <div ref={backlogRef} className="space-y-3 min-h-[300px]">
               {unscheduledDrafts.length === 0 ? (
-                <div className="rounded-xl border border-dashed border-[var(--slate-200)] bg-[var(--slate-50)] p-4 text-center text-xs text-[var(--slate-400)]">
-                  No unscheduled drafts.
-                </div>
+                <p className="text-xs text-[var(--slate-400)] italic p-4 text-center border-2 border-dashed border-[var(--slate-100)] rounded-xl">
+                  All drafts are scheduled or none found
+                </p>
               ) : (
                 unscheduledDrafts.map((d) => (
                   <div
                     key={d._id}
+                    className="fc-event cursor-grab active:cursor-grabbing p-3 rounded-xl border border-[var(--slate-200)] bg-white shadow-sm hover:shadow-md transition-all hover:border-[var(--purple-border)]"
                     data-id={d._id}
-                    data-title={d.content.replace(/<[^>]*>?/gm, '').substring(0, 30) || 'Untitled'}
-                    className="fc-event cursor-move rounded-xl border border-[rgba(219,227,238,0.88)] bg-white p-3 shadow-sm hover:border-[var(--purple-border)] hover:shadow-md transition-all duration-200"
+                    data-title={d.content.replace(/<[^>]*>?/gm, '').substring(0, 30) + '...'}
                   >
-                    <p className="text-sm font-semibold text-[var(--slate-900)] truncate">
-                      {d.content.replace(/<[^>]*>?/gm, '').substring(0, 30) || 'Untitled Draft'}
-                    </p>
-                    <div className="mt-2 flex items-center justify-between">
-                      <span
-                        className={cn(
-                          'rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider',
-                          d.status === 'Draft'
-                            ? 'bg-amber-100 text-amber-700'
-                            : d.status === 'Review'
-                              ? 'bg-purple-100 text-purple-700'
-                              : 'bg-emerald-100 text-emerald-700',
-                        )}
-                      >
-                        {d.status}
-                      </span>
+                    <div className="flex flex-col gap-2">
+                      <p className="text-xs font-medium text-[var(--slate-800)] line-clamp-2 leading-relaxed">
+                        {d.content.replace(/<[^>]*>?/gm, '').substring(0, 80) ||
+                          d.aiPrompt ||
+                          'Untitled Draft'}
+                      </p>
+                      <div className="flex items-center justify-between mt-1">
+                        <span className="text-[9px] font-bold uppercase text-[var(--slate-400)]">
+                          {d.platform}
+                        </span>
+                        <span
+                          className={cn(
+                            'px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase',
+                            d.status === 'Draft'
+                              ? 'bg-amber-100 text-amber-600'
+                              : d.status === 'Review'
+                                ? 'bg-purple-100 text-purple-600'
+                                : 'bg-emerald-100 text-emerald-600',
+                          )}
+                        >
+                          {d.status}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 ))
@@ -187,7 +159,8 @@ export function SchedulerSection() {
             </div>
           </GlassPanel>
 
-          <GlassPanel className="p-6 overflow-hidden">
+          {/* Main: Calendar */}
+          <GlassPanel className="p-6">
             <style>
               {`
                 .fc-theme-standard td, .fc-theme-standard th {
@@ -240,7 +213,7 @@ export function SchedulerSection() {
       ) : (
         <GlassPanel className="p-12 text-center">
           <p className="text-sm font-semibold text-[var(--slate-500)]">
-            Please select a Brand and Project to view the calendar.
+            Please select a Brand and Project in the sidebar to view the calendar.
           </p>
         </GlassPanel>
       )}

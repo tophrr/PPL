@@ -13,7 +13,9 @@ export default defineSchema({
       v.literal('Client'),
     ),
     agencyId: v.optional(v.id('agencies')),
-  }).index('by_token', ['tokenIdentifier']),
+  })
+    .index('by_token', ['tokenIdentifier'])
+    .index('by_agency', ['agencyId']),
 
   agencies: defineTable({
     name: v.string(),
