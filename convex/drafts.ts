@@ -77,7 +77,7 @@ export const createDraft = mutation({
       status: 'Draft',
       isDeleted: false,
       mediaAssetIds: [],
-      // platform: args.platform // Not in schema currently, but could be added if needed or we use tags
+      platform: args.platform,
     });
     return draftId;
   },

@@ -526,3 +526,14 @@ export function ProfileSection() {
     </div>
   );
 }
+
+export function SubscriptionSection() {
+  return (
+    <GlassPanel className="p-12 text-center">
+      <h2 className="text-2xl font-bold text-[var(--slate-900)]">Fitur Langganan</h2>
+      <p className="mt-4 text-[var(--slate-600)]">
+        Halaman manajemen langganan sedang dalam pengembangan. Segera hadir!
+      </p>
+    </GlassPanel>
+  );
+}

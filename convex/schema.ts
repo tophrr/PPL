@@ -50,6 +50,7 @@ export default defineSchema({
     status: v.union(v.literal('Draft'), v.literal('Review'), v.literal('Approved')),
     revisionNotes: v.optional(v.string()),
     scheduledDate: v.optional(v.number()), // Timestamp
+    platform: v.optional(v.string()),
     isDeleted: v.boolean(),
     deletedAt: v.optional(v.number()),
     mediaAssetIds: v.array(v.id('mediaAssets')),

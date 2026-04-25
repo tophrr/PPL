@@ -1,11 +1,17 @@
 'use client';
 
+import { Suspense, useState } from 'react';
 import Link from 'next/link';
 import { SignInButton, SignOutButton, useAuth, UserButton, SignIn } from '@clerk/nextjs';
 import { Authenticated, Unauthenticated } from 'convex/react';
 import { AppShell } from './app-shell';
 import { GlassPanel } from './primitives';
-import { ApprovalAnalyticsSection, DashboardSection, ProfileSection } from './sections';
+import {
+  ApprovalAnalyticsSection,
+  DashboardSection,
+  ProfileSection,
+  SubscriptionSection,
+} from './sections';
 import { PlannerSection } from './planner-section';
 import { SchedulerSection } from './scheduler-section';
 
@@ -35,7 +41,7 @@ function LandingNav() {
           >
             Open Dashboard
           </Link>
-          <UserButton afterSignOutUrl="/" />
+          <UserButton />
         </Authenticated>
 
         <Unauthenticated>
@@ -107,10 +113,7 @@ function LandingHero() {
       <Authenticated>
         <GlassPanel className="p-8 flex flex-col justify-center items-center text-center">
           <div className="w-16 h-16 rounded-full bg-[var(--purple-soft)] flex items-center justify-center mb-6">
-            <UserButton
-              afterSignOutUrl="/"
-              appearance={{ elements: { userButtonAvatarBox: 'w-16 h-16' } }}
-            />
+            <UserButton appearance={{ elements: { userButtonAvatarBox: 'w-16 h-16' } }} />
           </div>
           <h2 className="font-display text-3xl leading-[1.08] text-[var(--slate-900)] md:text-4xl">
             Selamat datang kembali!
@@ -183,7 +186,13 @@ export function DashboardPageDesign() {
 export function PlannerPageDesign() {
   return (
     <AppShell active="AI Planner">
-      <PlannerSection />
+      <Suspense
+        fallback={
+          <div className="p-8 text-center text-sm text-[var(--slate-500)]">Memuat Perencana...</div>
+        }
+      >
+        <PlannerSection />
+      </Suspense>
     </AppShell>
   );
 }
