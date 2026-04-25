@@ -30,10 +30,12 @@ export function SchedulerSection() {
   const updateDraftSchedule = useMutation(api.drafts.updateDraftSchedule);
 
   const backlogRef = useRef<HTMLDivElement>(null);
+  const draggableRef = useRef<Draggable | null>(null);
 
+  // Correct Draggable initialization with cleanup
   useEffect(() => {
-    if (backlogRef.current) {
-      new Draggable(backlogRef.current, {
+    if (backlogRef.current && !draggableRef.current) {
+      draggableRef.current = new Draggable(backlogRef.current, {
         itemSelector: '.fc-event',
         eventData: function (eventEl) {
           const id = eventEl.getAttribute('data-id');
@@ -41,11 +43,15 @@ export function SchedulerSection() {
           return {
             id,
             title,
+            allDay: true,
           };
         },
       });
     }
-  }, [drafts]);
+
+    // Optional: Cleanup if needed, but Draggable usually attaches to DOM.
+    // If the component unmounts, the ref is gone.
+  }, [selectedProjectId]); // Re-init only when project changes (which clears the backlog)
 
   const scheduledDrafts = drafts.filter((d) => d.scheduledDate !== undefined);
   const unscheduledDrafts = drafts.filter((d) => d.scheduledDate === undefined);
@@ -56,7 +62,8 @@ export function SchedulerSection() {
       d.content.replace(/<[^>]*>?/gm, '').substring(0, 30) + '...' ||
       d.aiPrompt ||
       'Untitled Draft',
-    date: new Date(d.scheduledDate!).toISOString().split('T')[0], // yyyy-mm-dd
+    start: d.scheduledDate, // Use raw timestamp, FullCalendar handles it
+    allDay: true,
     extendedProps: {
       status: d.status,
     },
@@ -64,6 +71,7 @@ export function SchedulerSection() {
 
   const handleEventDrop = async (info: any) => {
     const draftId = info.event.id as Id<'contentDrafts'>;
+    // FullCalendar gives us a Date object for 'start'
     const newDate = info.event.start.getTime();
 
     try {
@@ -81,6 +89,8 @@ export function SchedulerSection() {
 
     try {
       await updateDraftSchedule({ draftId, scheduledDate: newDate });
+      // We remove the temporary event because the Convex subscription will
+      // trigger a re-render with the updated drafts list, creating the "real" event.
       info.event.remove();
     } catch (error) {
       console.error('Failed to schedule draft:', error);
@@ -97,7 +107,7 @@ export function SchedulerSection() {
               <IconCalendar /> Editorial Scheduler
             </h2>
             <p className="mt-1 text-sm text-[var(--slate-500)]">
-              Selection inherited from global workspace in sidebar.
+              Drag drafts from the sidebar into the calendar to set publication dates.
             </p>
           </div>
         </div>
@@ -106,7 +116,7 @@ export function SchedulerSection() {
       {selectedProjectId ? (
         <div className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)]">
           {/* Sidebar: Backlog */}
-          <GlassPanel className="p-5 h-fit">
+          <GlassPanel className="p-5 h-fit max-h-[800px] flex flex-col">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-[var(--slate-800)] text-sm uppercase tracking-wider">
                 Unscheduled Drafts
@@ -116,10 +126,10 @@ export function SchedulerSection() {
               </span>
             </div>
 
-            <div ref={backlogRef} className="space-y-3 min-h-[300px]">
+            <div ref={backlogRef} className="space-y-3 overflow-y-auto pr-1 custom-scrollbar">
               {unscheduledDrafts.length === 0 ? (
                 <p className="text-xs text-[var(--slate-400)] italic p-4 text-center border-2 border-dashed border-[var(--slate-100)] rounded-xl">
-                  All drafts are scheduled or none found
+                  No unscheduled drafts found for this project.
                 </p>
               ) : (
                 unscheduledDrafts.map((d) => (
@@ -187,9 +197,21 @@ export function SchedulerSection() {
                   border: 1px solid var(--purple-border);
                   color: var(--purple-strong);
                   font-weight: 500;
-                  padding: 2px 4px;
-                  border-radius: 4px;
+                  padding: 4px 8px;
+                  border-radius: 8px;
                   cursor: pointer;
+                  font-size: 11px;
+                  border-left: 4px solid var(--purple-strong);
+                }
+                .custom-scrollbar::-webkit-scrollbar {
+                  width: 4px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-track {
+                  background: transparent;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb {
+                  background: var(--slate-200);
+                  border-radius: 10px;
                 }
               `}
             </style>

@@ -7,6 +7,7 @@ import { AppShell } from '@/src/components/kitalaku/app-shell';
 import { GlassPanel } from '@/src/components/kitalaku/primitives';
 import { Id } from '@/convex/_generated/dataModel';
 import { useWorkspace } from '@/src/components/kitalaku/workspace-context';
+import { IconCheck } from '@/src/components/kitalaku/icons';
 
 export default function SettingsPage() {
   const currentUser = useQuery(api.users.getCurrentUser);
@@ -30,6 +31,8 @@ export default function SettingsPage() {
   const softDeleteProject = useMutation(api.projects.softDeleteProject);
   const archiveBrand = useMutation(api.brands.archiveBrand);
   const softDeleteBrand = useMutation(api.brands.softDeleteBrand);
+  const addClientToBrand = useMutation(api.brands.addClientToBrand);
+  const removeClientFromBrand = useMutation(api.brands.removeClientFromBrand);
 
   // Team Management states
   const [inviteEmail, setInviteEmail] = useState('');
@@ -64,7 +67,6 @@ export default function SettingsPage() {
         clientIds: [],
       });
       setNewBrandName('');
-      alert('Brand created');
     } catch (error: any) {
       alert(error.message);
     }
@@ -80,7 +82,7 @@ export default function SettingsPage() {
         role: inviteRole,
       });
       setInviteEmail('');
-      alert('User added to agency.');
+      alert('User invited successfully.');
     } catch (error: any) {
       alert(error.message);
     }
@@ -108,97 +110,144 @@ export default function SettingsPage() {
       });
       setNewProjectName('');
       setNewProjectDesc('');
-      alert('Project created');
     } catch (error: any) {
       alert(error.message);
     }
   };
 
+  const toggleClientAccess = async (
+    brandId: Id<'brands'>,
+    userId: Id<'users'>,
+    hasAccess: boolean,
+  ) => {
+    try {
+      if (hasAccess) {
+        await removeClientFromBrand({ brandId, userId });
+      } else {
+        await addClientToBrand({ brandId, userId });
+      }
+    } catch (error: any) {
+      alert(error.message);
+    }
+  };
+
+  const clientsInAgency = agencyUsers.filter((u) => u.role === 'Client');
+
   return (
     <AppShell active="Settings">
       <div className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-semibold text-[var(--slate-900)]">Workspace Settings</h2>
-          <p className="mt-1 text-sm text-[var(--slate-500)]">
-            Manage brands, projects, and team access.
+        <header className="mb-8">
+          <h2 className="text-3xl font-bold tracking-tight text-[var(--slate-900)]">
+            Workspace Settings
+          </h2>
+          <p className="mt-1 text-sm text-[var(--slate-500)] font-medium">
+            Manage your agency's brands, projects, and team permissions.
           </p>
-        </div>
+        </header>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          {/* Brand Management */}
-          <GlassPanel className="p-6">
-            <h3 className="text-lg font-semibold text-[var(--slate-900)]">Brands</h3>
+        <div className="grid gap-6 xl:grid-cols-2">
+          {/* 1. Brand & Client Access Management */}
+          <div className="space-y-6">
+            <GlassPanel className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-bold text-[var(--slate-900)]">Brand Management</h3>
+                <span className="text-xs font-bold uppercase tracking-wider text-[var(--slate-400)]">
+                  {brands.length} Brands
+                </span>
+              </div>
 
-            <form onSubmit={handleCreateBrand} className="mt-4 space-y-4">
-              <div>
-                <label className="text-sm font-medium text-[var(--slate-900)]">
-                  New Brand Name
-                </label>
+              <form onSubmit={handleCreateBrand} className="flex gap-2">
                 <input
                   type="text"
                   value={newBrandName}
                   onChange={(e) => setNewBrandName(e.target.value)}
-                  className="mt-2 w-full rounded-2xl border border-[var(--slate-200)] bg-white px-4 py-3 text-sm font-medium text-[var(--slate-700)] shadow-[inset_0_1px_0_rgba(255,255,255,0.92)] outline-none transition-all duration-200 focus:border-[var(--purple-border)] focus:shadow-[0_0_0_4px_rgba(139,92,246,0.1)] hover:border-[var(--slate-300)]"
-                  placeholder="Acme Corp"
+                  className="flex-1 rounded-xl border border-[var(--slate-200)] bg-white px-4 py-2.5 text-sm outline-none transition-all focus:border-[var(--purple-border)]"
+                  placeholder="Brand name (e.g. Acme Corp)"
                 />
-              </div>
-              <button
-                type="submit"
-                className="rounded-2xl bg-[var(--slate-900)] px-6 py-3 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(30,41,59,0.12)] transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[0_12px_24px_rgba(30,41,59,0.18)]"
-              >
-                Create Brand
-              </button>
-            </form>
-
-            <div className="mt-6 space-y-3">
-              <h4 className="text-sm font-medium text-[var(--slate-500)]">Existing Brands</h4>
-              {brands.length === 0 ? (
-                <p className="text-xs text-[var(--slate-400)]">No brands found.</p>
-              ) : null}
-              {brands.map((b) => (
-                <div
-                  key={b._id}
-                  className="rounded-2xl border border-[var(--slate-200)] bg-white/60 p-4 text-sm flex justify-between items-center shadow-sm"
+                <button
+                  type="submit"
+                  className="rounded-xl bg-[var(--slate-900)] px-5 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-[var(--slate-800)]"
                 >
-                  <span>{b.name}</span>
-                  <div className="flex items-center gap-2">
-                    {!b.isArchived && (
-                      <button
-                        onClick={() => archiveBrand({ brandId: b._id })}
-                        className="text-[10px] font-bold uppercase text-[var(--slate-400)] hover:text-[var(--purple-strong)]"
-                      >
-                        Archive
-                      </button>
-                    )}
-                    <button
-                      onClick={() => {
-                        if (confirm('Move brand to trash? It will be deleted in 30 days.')) {
-                          softDeleteBrand({ brandId: b._id });
-                        }
-                      }}
-                      className="text-[10px] font-bold uppercase text-red-300 hover:text-red-500"
-                    >
-                      Delete
-                    </button>
+                  Add Brand
+                </button>
+              </form>
+
+              <div className="mt-8 space-y-4">
+                {brands.length === 0 && (
+                  <div className="py-8 text-center border-2 border-dashed border-[var(--slate-100)] rounded-2xl">
+                    <p className="text-sm text-[var(--slate-400)] italic">No brands created yet.</p>
                   </div>
-                </div>
-              ))}
-            </div>
-          </GlassPanel>
+                )}
+                {brands.map((brand) => (
+                  <div
+                    key={brand._id}
+                    className="rounded-2xl border border-[var(--slate-200)] bg-white/50 p-4 shadow-sm"
+                  >
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-bold text-[var(--slate-800)]">{brand.name}</h4>
+                      <div className="flex gap-3">
+                        <button
+                          onClick={() => archiveBrand({ brandId: brand._id })}
+                          className="text-[10px] font-bold uppercase text-[var(--slate-400)] hover:text-[var(--purple-strong)]"
+                        >
+                          Archive
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (confirm('Delete brand?')) softDeleteBrand({ brandId: brand._id });
+                          }}
+                          className="text-[10px] font-bold uppercase text-red-300 hover:text-red-500"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
 
-          {/* Project Management */}
-          <GlassPanel className="p-6">
-            <h3 className="text-lg font-semibold text-[var(--slate-900)]">Projects</h3>
+                    <div className="mt-4 pt-4 border-t border-[var(--slate-100)]">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--slate-400)] mb-3">
+                        Client Visibility
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {clientsInAgency.length === 0 ? (
+                          <p className="text-[11px] text-[var(--slate-400)] italic">
+                            No clients in agency. Add them in Team Access.
+                          </p>
+                        ) : (
+                          clientsInAgency.map((client) => {
+                            const hasAccess = brand.clientIds.includes(client._id);
+                            return (
+                              <button
+                                key={client._id}
+                                onClick={() => toggleClientAccess(brand._id, client._id, hasAccess)}
+                                className={cn(
+                                  'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold transition-all border',
+                                  hasAccess
+                                    ? 'bg-[var(--purple-soft)] border-[var(--purple-border)] text-[var(--purple-strong)]'
+                                    : 'bg-white border-[var(--slate-200)] text-[var(--slate-500)] hover:border-[var(--slate-300)]',
+                                )}
+                              >
+                                {hasAccess && <IconCheck />}
+                                {client.name}
+                              </button>
+                            );
+                          })
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </GlassPanel>
 
-            <form onSubmit={handleCreateProject} className="mt-4 space-y-4">
-              <div>
-                <label className="text-sm font-medium text-[var(--slate-900)]">Select Brand</label>
+            <GlassPanel className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-bold text-[var(--slate-900)]">Project Catalog</h3>
                 <select
                   value={selectedBrandForProject}
                   onChange={(e) => setSelectedBrandForProject(e.target.value as Id<'brands'>)}
-                  className="mt-2 w-full rounded-2xl border border-[var(--slate-200)] bg-white px-4 py-3 text-sm font-medium text-[var(--slate-700)] shadow-[inset_0_1px_0_rgba(255,255,255,0.92)] outline-none transition-all duration-200 focus:border-[var(--purple-border)] focus:shadow-[0_0_0_4px_rgba(139,92,246,0.1)] hover:border-[var(--slate-300)]"
+                  className="text-xs font-bold bg-white border border-[var(--slate-200)] rounded-lg px-2 py-1 outline-none"
                 >
-                  <option value="">-- Select --</option>
+                  <option value="">Select Brand</option>
                   {brands.map((b) => (
                     <option key={b._id} value={b._id}>
                       {b.name}
@@ -206,150 +255,166 @@ export default function SettingsPage() {
                   ))}
                 </select>
               </div>
-              <div>
-                <label className="text-sm font-medium text-[var(--slate-900)]">
-                  New Project Name
-                </label>
-                <input
-                  type="text"
-                  value={newProjectName}
-                  onChange={(e) => setNewProjectName(e.target.value)}
-                  className="mt-2 w-full rounded-2xl border border-[var(--slate-200)] bg-white px-4 py-3 text-sm font-medium text-[var(--slate-700)] shadow-[inset_0_1px_0_rgba(255,255,255,0.92)] outline-none transition-all duration-200 focus:border-[var(--purple-border)] focus:shadow-[0_0_0_4px_rgba(139,92,246,0.1)] hover:border-[var(--slate-300)]"
-                  placeholder="Q3 Campaign"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-[var(--slate-900)]">Description</label>
-                <input
-                  type="text"
-                  value={newProjectDesc}
-                  onChange={(e) => setNewProjectDesc(e.target.value)}
-                  className="mt-2 w-full rounded-2xl border border-[var(--slate-200)] bg-white px-4 py-3 text-sm font-medium text-[var(--slate-700)] shadow-[inset_0_1px_0_rgba(255,255,255,0.92)] outline-none transition-all duration-200 focus:border-[var(--purple-border)] focus:shadow-[0_0_0_4px_rgba(139,92,246,0.1)] hover:border-[var(--slate-300)]"
-                  placeholder="Optional description"
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={!selectedBrandForProject}
-                className="rounded-2xl bg-[var(--slate-900)] px-6 py-3 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(30,41,59,0.12)] transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[0_12px_24px_rgba(30,41,59,0.18)] disabled:opacity-50 disabled:hover:transform-none disabled:hover:shadow-[0_8px_20px_rgba(30,41,59,0.12)]"
-              >
-                Create Project
-              </button>
-            </form>
 
-            {selectedBrandForProject && (
-              <div className="mt-6 space-y-3">
-                <h4 className="text-sm font-medium text-[var(--slate-500)]">Projects for Brand</h4>
-                {projects.length === 0 ? (
-                  <p className="text-xs text-[var(--slate-400)]">No projects found.</p>
-                ) : null}
-                {projects.map((p) => (
-                  <div
-                    key={p._id}
-                    className="rounded-2xl border border-[var(--slate-200)] bg-white/60 p-4 text-sm flex justify-between items-center shadow-sm"
-                  >
-                    <span>{p.name}</span>
-                    <div className="flex items-center gap-2">
-                      {!p.isArchived && (
-                        <button
-                          onClick={() => archiveProject({ projectId: p._id })}
-                          className="text-[10px] font-bold uppercase text-[var(--slate-400)] hover:text-[var(--purple-strong)]"
-                        >
-                          Archive
-                        </button>
-                      )}
+              {selectedBrandForProject ? (
+                <>
+                  <form onSubmit={handleCreateProject} className="space-y-3 mb-6">
+                    <input
+                      type="text"
+                      value={newProjectName}
+                      onChange={(e) => setNewProjectName(e.target.value)}
+                      className="w-full rounded-xl border border-[var(--slate-200)] bg-white px-4 py-2 text-sm outline-none"
+                      placeholder="Project name"
+                    />
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={newProjectDesc}
+                        onChange={(e) => setNewProjectDesc(e.target.value)}
+                        className="flex-1 rounded-xl border border-[var(--slate-200)] bg-white px-4 py-2 text-sm outline-none"
+                        placeholder="Description (optional)"
+                      />
                       <button
-                        onClick={() => {
-                          if (confirm('Move project to trash? It will be deleted in 30 days.')) {
-                            softDeleteProject({ projectId: p._id });
-                          }
-                        }}
-                        className="text-[10px] font-bold uppercase text-red-300 hover:text-red-500"
+                        type="submit"
+                        className="rounded-xl bg-[var(--slate-900)] px-4 py-2 text-xs font-bold text-white whitespace-nowrap"
                       >
-                        Delete
+                        New Project
                       </button>
                     </div>
+                  </form>
+
+                  <div className="space-y-3">
+                    {projects.map((p) => (
+                      <div
+                        key={p._id}
+                        className="flex items-center justify-between p-3 rounded-xl bg-white/40 border border-[var(--slate-100)] text-sm"
+                      >
+                        <span className="font-medium">{p.name}</span>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => archiveProject({ projectId: p._id })}
+                            className="text-[10px] font-bold text-[var(--slate-400)]"
+                          >
+                            Archive
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (confirm('Delete?')) softDeleteProject({ projectId: p._id });
+                            }}
+                            className="text-[10px] font-bold text-red-300"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            )}
-          </GlassPanel>
-        </div>
+                </>
+              ) : (
+                <div className="py-12 text-center opacity-40">
+                  <p className="text-sm italic">Select a brand to manage its projects.</p>
+                </div>
+              )}
+            </GlassPanel>
+          </div>
 
-        {currentUser?.role === 'Admin' && (
-          <GlassPanel className="p-6">
-            <h3 className="text-lg font-semibold text-[var(--slate-900)]">Team Access</h3>
-            <p className="mt-1 text-sm text-[var(--slate-500)]">
-              Invite team members and manage their system roles.
-            </p>
+          {/* 2. Team & Role Management */}
+          <div className="space-y-6">
+            <GlassPanel className="p-6">
+              <h3 className="text-lg font-bold text-[var(--slate-900)] mb-2">Team Access</h3>
+              <p className="text-xs text-[var(--slate-500)] mb-6">
+                Invite members and assign system-wide permissions.
+              </p>
 
-            <form onSubmit={handleInviteUser} className="mt-4 flex flex-wrap items-end gap-4">
-              <div className="flex-1 min-w-[200px]">
-                <label className="text-sm font-medium text-[var(--slate-900)]">Email Address</label>
-                <input
-                  type="email"
-                  value={inviteEmail}
-                  onChange={(e) => setInviteEmail(e.target.value)}
-                  className="mt-2 w-full rounded-2xl border border-[var(--slate-200)] bg-white px-4 py-3 text-sm font-medium text-[var(--slate-700)] outline-none transition-all duration-200 focus:border-[var(--purple-border)]"
-                  placeholder="name@company.com"
-                />
-              </div>
-              <div className="w-[180px]">
-                <label className="text-sm font-medium text-[var(--slate-900)]">Assign Role</label>
-                <select
-                  value={inviteRole}
-                  onChange={(e) => setInviteRole(e.target.value as any)}
-                  className="mt-2 w-full rounded-2xl border border-[var(--slate-200)] bg-white px-4 py-3 text-sm font-medium text-[var(--slate-700)] outline-none transition-all duration-200 focus:border-[var(--purple-border)]"
-                >
-                  <option value="Admin">Admin</option>
-                  <option value="Creative Manager">Creative Manager</option>
-                  <option value="Creator">Creator</option>
-                  <option value="Client">Client</option>
-                </select>
-              </div>
-              <button
-                type="submit"
-                className="h-[48px] rounded-2xl bg-[var(--slate-900)] px-6 text-sm font-semibold text-white shadow-sm transition-all hover:-translate-y-[1px]"
+              <form
+                onSubmit={handleInviteUser}
+                className="space-y-4 p-5 rounded-2xl bg-[var(--slate-50)] border border-[var(--slate-100)] mb-8"
               >
-                Add Member
-              </button>
-            </form>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-[var(--slate-500)]">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    value={inviteEmail}
+                    onChange={(e) => setInviteEmail(e.target.value)}
+                    className="w-full rounded-xl border border-[var(--slate-200)] bg-white px-4 py-2.5 text-sm outline-none"
+                    placeholder="teammate@agency.com"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-[var(--slate-500)]">
+                      System Role
+                    </label>
+                    <select
+                      value={inviteRole}
+                      onChange={(e) => setInviteRole(e.target.value as any)}
+                      className="w-full rounded-xl border border-[var(--slate-200)] bg-white px-4 py-2.5 text-sm outline-none"
+                    >
+                      <option value="Admin">Admin</option>
+                      <option value="Creative Manager">Creative Manager</option>
+                      <option value="Creator">Creator</option>
+                      <option value="Client">Client</option>
+                    </select>
+                  </div>
+                  <div className="flex items-end">
+                    <button
+                      type="submit"
+                      className="w-full h-[46px] rounded-xl bg-[var(--slate-900)] text-sm font-bold text-white shadow-md hover:bg-black transition-all"
+                    >
+                      Invite Member
+                    </button>
+                  </div>
+                </div>
+              </form>
 
-            <div className="mt-8 overflow-hidden rounded-2xl border border-[var(--slate-200)]">
-              <table className="w-full text-left text-sm">
-                <thead className="bg-[var(--slate-50)] text-xs font-semibold uppercase tracking-wider text-[var(--slate-500)]">
-                  <tr>
-                    <th className="px-6 py-4">Name</th>
-                    <th className="px-6 py-4">Email</th>
-                    <th className="px-6 py-4">Role</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[var(--slate-200)] bg-white/60">
-                  {agencyUsers.map((user) => (
-                    <tr key={user._id}>
-                      <td className="px-6 py-4 font-medium text-[var(--slate-900)]">{user.name}</td>
-                      <td className="px-6 py-4 text-[var(--slate-600)]">{user.email}</td>
-                      <td className="px-6 py-4">
-                        <select
-                          value={user.role}
-                          disabled={user._id === currentUser._id}
-                          onChange={(e) => handleUpdateRole(user._id, e.target.value)}
-                          className="rounded-lg border border-[var(--slate-200)] bg-transparent px-2 py-1 text-xs font-semibold outline-none focus:border-[var(--purple-border)]"
-                        >
-                          <option value="Admin">Admin</option>
-                          <option value="Creative Manager">Creative Manager</option>
-                          <option value="Creator">Creator</option>
-                          <option value="Client">Client</option>
-                        </select>
-                      </td>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm border-separate border-spacing-y-2">
+                  <thead className="text-[10px] font-bold uppercase text-[var(--slate-400)]">
+                    <tr>
+                      <th className="px-4 pb-2">Name</th>
+                      <th className="px-4 pb-2">Role</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </GlassPanel>
-        )}
+                  </thead>
+                  <tbody>
+                    {agencyUsers.map((user) => (
+                      <tr key={user._id} className="bg-white/60 group">
+                        <td className="px-4 py-3 rounded-l-2xl border-y border-l border-[var(--slate-100)]">
+                          <div className="flex flex-col">
+                            <span className="font-bold text-[var(--slate-800)]">{user.name}</span>
+                            <span className="text-[11px] text-[var(--slate-500)]">
+                              {user.email}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 rounded-r-2xl border-y border-r border-[var(--slate-100)] text-right">
+                          <select
+                            value={user.role}
+                            disabled={user._id === currentUser?._id}
+                            onChange={(e) => handleUpdateRole(user._id, e.target.value)}
+                            className="text-xs font-bold bg-white border border-[var(--slate-200)] rounded-lg px-2 py-1.5 outline-none transition-all focus:border-[var(--purple-border)]"
+                          >
+                            <option value="Admin">Admin</option>
+                            <option value="Creative Manager">Creative Manager</option>
+                            <option value="Creator">Creator</option>
+                            <option value="Client">Client</option>
+                          </select>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </GlassPanel>
+          </div>
+        </div>
       </div>
     </AppShell>
   );
+}
+
+// Helper for conditional classes
+function cn(...classes: any[]) {
+  return classes.filter(Boolean).join(' ');
 }

@@ -15,7 +15,8 @@ export default defineSchema({
     agencyId: v.optional(v.id('agencies')),
   })
     .index('by_token', ['tokenIdentifier'])
-    .index('by_agency', ['agencyId']),
+    .index('by_agency', ['agencyId'])
+    .index('by_email', ['email']),
 
   agencies: defineTable({
     name: v.string(),

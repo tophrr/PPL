@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useQuery, useAction, useMutation } from 'convex/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { api } from '@/convex/_generated/api';
 import { IconCopy, IconThumb, IconWand, IconCalendar, IconCheck } from './icons';
 import { cn, GlassPanel } from './primitives';
@@ -47,8 +47,25 @@ export function PlannerSection() {
   const updateDraftMutation = useMutation(api.drafts.updateDraftContent);
   const updateDraftStatusMutation = useMutation(api.drafts.updateDraftStatus);
 
+  const searchParams = useSearchParams();
+  const urlDraftId = searchParams.get('draftId');
+
   const draft = useQuery(api.drafts.getDraft, draftId ? { draftId } : 'skip');
   const [revisionNotes, setRevisionNotes] = useState('');
+
+  // Effect to load draft from URL
+  useEffect(() => {
+    if (urlDraftId) {
+      setDraftId(urlDraftId as Id<'contentDrafts'>);
+    }
+  }, [urlDraftId]);
+
+  // Effect to sync content when draft is loaded
+  useEffect(() => {
+    if (draft && draft._id === draftId) {
+      setGeneratedText(draft.content);
+    }
+  }, [draft, draftId]);
 
   const handleGenerate = async () => {
     if (!targetAudience.trim() || !topic.trim()) {

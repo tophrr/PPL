@@ -133,13 +133,26 @@ export const storeUser = mutation({
       throw new Error('Called storeUser without authentication present');
     }
 
-    const user = await ctx.db
+    let user = await ctx.db
       .query('users')
       .withIndex('by_token', (q) => q.eq('tokenIdentifier', identity.tokenIdentifier))
       .unique();
 
+    // Fallback: Check if they were invited by email
+    if (user === null && identity.email) {
+      user = await ctx.db
+        .query('users')
+        .withIndex('by_email', (q) => q.eq('email', identity.email!))
+        .unique();
+    }
+
     if (user !== null) {
       const updates: any = {};
+
+      // If they were invited, they'll have a placeholder tokenIdentifier. Update it.
+      if (user.tokenIdentifier !== identity.tokenIdentifier) {
+        updates.tokenIdentifier = identity.tokenIdentifier;
+      }
 
       if (user.name !== identity.name || user.email !== identity.email) {
         updates.name = identity.name ?? 'Unknown';
@@ -245,7 +258,7 @@ export const inviteUserByEmail = mutation({
     // Check if user already exists
     const existingUser = await ctx.db
       .query('users')
-      .filter((q) => q.eq(q.field('email'), args.email))
+      .withIndex('by_email', (q) => q.eq('email', args.email))
       .unique();
 
     if (existingUser) {
@@ -259,6 +272,13 @@ export const inviteUserByEmail = mutation({
       return existingUser._id;
     }
 
-    throw new Error('User must have logged in once to be invited by email in this version.');
+    // Create a placeholder user
+    return await ctx.db.insert('users', {
+      tokenIdentifier: `invited_${args.email}`,
+      email: args.email,
+      name: args.email.split('@')[0],
+      role: args.role,
+      agencyId: args.agencyId,
+    });
   },
 });

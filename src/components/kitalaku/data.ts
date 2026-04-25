@@ -5,7 +5,6 @@ export const sideNav = [
   { label: 'AI Planner', href: '/dashboard/planner' },
   { label: 'Scheduler', href: '/dashboard/scheduler' },
   { label: 'Approval & Analytics', href: '/dashboard/approval-analytics' },
-  { label: 'Subscription', href: '/dashboard/subscription' },
 ];
 
 export const dashboardMetrics = [

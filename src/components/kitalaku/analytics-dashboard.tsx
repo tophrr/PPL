@@ -1,15 +1,27 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useQuery, useMutation } from 'convex/react';
+import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
 import { GlassPanel, cn } from './primitives';
-import { IconAnalytics, IconCalendar } from './icons';
+import { IconAnalytics, IconCalendar, IconCheck, IconCopy } from './icons';
 
 export function AnalyticsDashboard() {
+  const currentUser = useQuery(api.users.getCurrentUser);
+  const agencyDrafts =
+    useQuery(
+      api.drafts.getDraftsByAgency,
+      currentUser?.agencyId ? { agencyId: currentUser.agencyId } : 'skip',
+    ) || [];
+
+  const updateDraftStatus = useMutation(api.drafts.updateDraftStatus);
+
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Persistence logic
+  // Persistence logic for filters
   useEffect(() => {
     const savedStart = localStorage.getItem('analytics_start_date');
     const savedEnd = localStorage.getItem('analytics_end_date');
@@ -25,7 +37,29 @@ export function AnalyticsDashboard() {
     }
   }, [startDate, endDate, isLoaded]);
 
-  const hasData = startDate && endDate && new Date(startDate) < new Date(endDate);
+  const reviewDrafts = agencyDrafts.filter((d) => d.status === 'Review');
+  const approvedDrafts = agencyDrafts.filter((d) => d.status === 'Approved');
+
+  const handleApprove = async (draftId: Id<'contentDrafts'>) => {
+    try {
+      await updateDraftStatus({ draftId, status: 'Approved' });
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
+  const handleRevise = async (draftId: Id<'contentDrafts'>) => {
+    const notes = prompt('Enter revision feedback for the creator:');
+    if (notes) {
+      try {
+        await updateDraftStatus({ draftId, status: 'Draft', revisionNotes: notes });
+      } catch (err: any) {
+        alert(err.message);
+      }
+    }
+  };
+
+  const hasRangeData = startDate && endDate && new Date(startDate) < new Date(endDate);
 
   const mockMetrics = [
     { label: 'Total Engagement', value: '124.5k', delta: '+12.3%', tone: 'positive' },
@@ -38,123 +72,114 @@ export function AnalyticsDashboard() {
     { label: 'Instagram', value: 85 },
     { label: 'LinkedIn', value: 62 },
     { label: 'Twitter/X', value: 45 },
-    { label: 'Facebook', value: 38 },
+    { label: 'TikTok', value: 38 },
   ];
 
   return (
     <div className="space-y-6">
-      <GlassPanel className="p-6">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <h2 className="text-xl font-semibold text-[var(--slate-900)] flex items-center gap-2">
-              <IconAnalytics /> Performance Insights
-            </h2>
-            <p className="mt-1 text-sm text-[var(--slate-500)]">
-              Decision-ready metrics for campaign evaluation and strategic planning.
-            </p>
-          </div>
+      <header>
+        <h2 className="text-2xl font-bold text-[var(--slate-900)]">Approval & Analytics</h2>
+        <p className="text-sm text-[var(--slate-500)] mt-1">
+          Review pending content and track workspace performance.
+        </p>
+      </header>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="flex items-center gap-2 rounded-xl border border-[var(--slate-200)] bg-white px-3 py-2">
-              <span className="text-xs font-semibold text-[var(--slate-400)] uppercase">From</span>
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="text-sm font-medium text-[var(--slate-700)] outline-none"
-              />
+      <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
+        <div className="space-y-6">
+          {/* Approval Queue */}
+          <GlassPanel className="p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-bold text-[var(--slate-900)]">Awaiting Approval</h3>
+              <span className="bg-purple-100 text-[var(--purple-strong)] text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">
+                {reviewDrafts.length} Pending
+              </span>
             </div>
-            <div className="flex items-center gap-2 rounded-xl border border-[var(--slate-200)] bg-white px-3 py-2">
-              <span className="text-xs font-semibold text-[var(--slate-400)] uppercase">To</span>
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="text-sm font-medium text-[var(--slate-700)] outline-none"
-              />
-            </div>
+
+            {reviewDrafts.length === 0 ? (
+              <div className="py-12 text-center border-2 border-dashed border-[var(--slate-100)] rounded-2xl">
+                <p className="text-sm text-[var(--slate-400)] italic">
+                  All caught up! No drafts currently in review.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {reviewDrafts.map((draft) => (
+                  <div
+                    key={draft._id}
+                    className="rounded-2xl border border-[var(--slate-200)] bg-white/60 p-5 shadow-sm transition-all hover:border-[var(--purple-border)]"
+                  >
+                    <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm leading-relaxed text-[var(--slate-800)] line-clamp-3">
+                          {draft.content.replace(/<[^>]*>?/gm, '') || 'Empty content'}
+                        </p>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          <span className="bg-[var(--slate-100)] text-[var(--slate-600)] text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">
+                            {draft.platform || 'General'}
+                          </span>
+                          <span className="text-[10px] text-[var(--slate-400)] font-medium">
+                            Created {new Date(draft._creationTime).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 w-full md:w-auto">
+                        <button
+                          onClick={() => handleApprove(draft._id)}
+                          className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-emerald-700 transition-all"
+                        >
+                          <IconCheck /> Approve
+                        </button>
+                        <button
+                          onClick={() => handleRevise(draft._id)}
+                          className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-xs font-bold text-red-600 hover:bg-red-100 transition-all"
+                        >
+                          Revise
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </GlassPanel>
+
+          {/* Performance Snapshot */}
+          <div className="grid gap-4 md:grid-cols-2">
+            {mockMetrics.map((m) => (
+              <GlassPanel key={m.label} className="p-5">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--slate-400)]">
+                  {m.label}
+                </p>
+                <div className="mt-2 flex items-baseline gap-2">
+                  <p className="text-3xl font-bold text-[var(--slate-900)]">{m.value}</p>
+                  <p
+                    className={cn(
+                      'text-[11px] font-bold',
+                      m.tone === 'positive' ? 'text-emerald-600' : 'text-red-500',
+                    )}
+                  >
+                    {m.delta}
+                  </p>
+                </div>
+              </GlassPanel>
+            ))}
           </div>
         </div>
 
-        {!hasData && startDate && endDate && new Date(startDate) >= new Date(endDate) && (
-          <p className="mt-4 text-xs font-semibold text-red-500">
-            Error: End date must be strictly after the start date.
-          </p>
-        )}
-      </GlassPanel>
-
-      {!hasData ? (
-        <GlassPanel className="flex flex-col items-center justify-center p-20 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--slate-50)] text-[var(--slate-300)]">
-            <IconAnalytics />
-          </div>
-          <h3 className="mt-6 text-lg font-semibold text-[var(--slate-900)]">
-            No Data range selected
-          </h3>
-          <p className="mt-2 max-w-sm text-sm text-[var(--slate-500)]">
-            Please select a valid date range to visualize your workspace performance and approval
-            metrics.
-          </p>
-        </GlassPanel>
-      ) : (
-        <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-4">
-          {mockMetrics.map((m) => (
-            <GlassPanel key={m.label} className="p-5">
-              <p className="text-xs font-bold uppercase tracking-wider text-[var(--slate-400)]">
-                {m.label}
-              </p>
-              <p className="mt-3 text-3xl font-semibold text-[var(--slate-900)]">{m.value}</p>
-              <p
-                className={cn(
-                  'mt-2 text-xs font-bold',
-                  m.tone === 'positive' ? 'text-emerald-600' : 'text-red-500',
-                )}
-              >
-                {m.delta}{' '}
-                <span className="font-normal text-[var(--slate-400)]">vs prev. period</span>
-              </p>
-            </GlassPanel>
-          ))}
-
-          <GlassPanel className="lg:col-span-2 xl:col-span-3 p-6">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-[var(--slate-700)]">
-              Engagement Trends
+        {/* Analytics Sidebar */}
+        <div className="space-y-6">
+          <GlassPanel className="p-6">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-[var(--slate-700)] mb-6">
+              Platform Mix
             </h3>
-            <div className="mt-8 flex h-64 items-end justify-between gap-2">
-              {[40, 65, 45, 90, 55, 75, 40, 85, 60, 95, 70, 80].map((h, i) => (
-                <div key={i} className="group relative flex-1">
-                  <div
-                    className="w-full rounded-t-lg bg-[var(--purple-soft)] transition-all duration-500 hover:bg-[var(--purple-border)]"
-                    style={{ height: `${h}%` }}
-                  />
-                  <div className="absolute -top-8 left-1/2 -translate-x-1/2 rounded bg-[var(--slate-900)] px-1.5 py-0.5 text-[10px] font-bold text-white opacity-0 transition-opacity group-hover:opacity-100">
-                    {h}%
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="mt-4 flex justify-between px-2 text-[10px] font-bold uppercase tracking-wider text-[var(--slate-400)]">
-              <span>Jan</span>
-              <span>Mar</span>
-              <span>May</span>
-              <span>Jul</span>
-              <span>Sep</span>
-              <span>Nov</span>
-            </div>
-          </GlassPanel>
-
-          <GlassPanel className="xl:col-span-1 p-6">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-[var(--slate-700)]">
-              Platform Share
-            </h3>
-            <div className="mt-8 space-y-6">
+            <div className="space-y-6">
               {platformData.map((p) => (
                 <div key={p.label}>
                   <div className="mb-2 flex justify-between text-xs font-bold">
                     <span className="text-[var(--slate-600)]">{p.label}</span>
                     <span className="text-[var(--slate-900)]">{p.value}%</span>
                   </div>
-                  <div className="h-2 w-full rounded-full bg-[var(--slate-100)] overflow-hidden">
+                  <div className="h-1.5 w-full rounded-full bg-[var(--slate-100)] overflow-hidden">
                     <div
                       className="h-full bg-[linear-gradient(90deg,#8b5cf6,#7c3aed)] rounded-full transition-all duration-1000"
                       style={{ width: `${p.value}%` }}
@@ -164,8 +189,25 @@ export function AnalyticsDashboard() {
               ))}
             </div>
           </GlassPanel>
+
+          <GlassPanel className="p-6">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-[var(--slate-700)] mb-4">
+              Export Reports
+            </h3>
+            <p className="text-xs text-[var(--slate-500)] leading-relaxed mb-6">
+              Download your campaign performance and approval logs for internal reporting.
+            </p>
+            <div className="space-y-2">
+              <button className="w-full rounded-xl border border-[var(--slate-200)] bg-white py-2.5 text-xs font-bold text-[var(--slate-700)] hover:bg-[var(--slate-50)] transition-all">
+                Download CSV
+              </button>
+              <button className="w-full rounded-xl border border-[var(--slate-200)] bg-white py-2.5 text-xs font-bold text-[var(--slate-700)] hover:bg-[var(--slate-50)] transition-all">
+                Download PDF
+              </button>
+            </div>
+          </GlassPanel>
         </div>
-      )}
+      </div>
     </div>
   );
 }

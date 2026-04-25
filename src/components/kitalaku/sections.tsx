@@ -91,7 +91,7 @@ export function DashboardSection() {
   const focusItems = latestDrafts.map((d) => ({
     title: d.content.substring(0, 40).replace(/<[^>]*>/g, '') + '...',
     detail: `Awaiting ${d.status} processing.`,
-    href: '/dashboard/planner',
+    href: `/dashboard/planner?draftId=${d._id}`,
     tone: d.status.toLowerCase() as StatusTone,
   }));
 
