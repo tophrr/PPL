@@ -1,4 +1,8 @@
+'use client';
+
 import Link from 'next/link';
+import { SignInButton, SignOutButton, useAuth, UserButton, SignIn } from '@clerk/nextjs';
+import { Authenticated, Unauthenticated } from 'convex/react';
 import { AppShell } from './app-shell';
 import { GlassPanel } from './primitives';
 import {
@@ -12,22 +16,42 @@ import { PlannerSection } from './planner-section';
 import { SchedulerSection } from './scheduler-section';
 
 function LandingNav() {
+  const { isSignedIn } = useAuth();
   return (
     <header className="mx-auto flex w-full max-w-[1200px] items-center justify-between rounded-2xl border border-[rgba(255,255,255,0.7)] bg-[rgba(255,255,255,0.72)] px-5 py-4 backdrop-blur-xl">
       <p className="font-display text-2xl leading-[0.95] text-[var(--slate-900)]">Kitalaku.in</p>
-      <div className="flex items-center gap-2">
-        <Link
-          href="/login"
-          className="rounded-lg border border-[var(--slate-150)] bg-white/80 px-4 py-2 text-sm font-semibold text-[var(--slate-700)]"
-        >
-          Login
-        </Link>
-        <Link
-          href="/dashboard"
-          className="rounded-lg bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] px-4 py-2 text-sm font-semibold text-[var(--slate-900)]"
-        >
-          Open Dashboard
-        </Link>
+      <div className="flex items-center gap-3">
+        <Unauthenticated>
+          <SignInButton mode="modal">
+            <button className="rounded-lg border border-[var(--slate-150)] bg-white/80 px-4 py-2 text-sm font-semibold text-[var(--slate-700)] hover:bg-white transition-all">
+              Login
+            </button>
+          </SignInButton>
+        </Unauthenticated>
+
+        <Authenticated>
+          <SignOutButton>
+            <button className="rounded-lg border border-[var(--slate-150)] bg-white/80 px-4 py-2 text-sm font-semibold text-[var(--slate-700)] hover:bg-white transition-all">
+              Logout
+            </button>
+          </SignOutButton>
+          <Link
+            href="/dashboard"
+            className="rounded-lg bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:opacity-90 transition-all"
+          >
+            Open Dashboard
+          </Link>
+          <UserButton afterSignOutUrl="/" />
+        </Authenticated>
+
+        <Unauthenticated>
+          <Link
+            href="/dashboard"
+            className="rounded-lg bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:opacity-90 transition-all"
+          >
+            Try Demo
+          </Link>
+        </Unauthenticated>
       </div>
     </header>
   );
@@ -38,7 +62,7 @@ function LandingHero() {
     <div className="grid gap-6 xl:grid-cols-[1.12fr_0.88fr]">
       <section className="relative overflow-hidden rounded-[36px] bg-[#FFFFFF] p-8 text-[var(--slate-900)] shadow-[var(--shadow-premium)] md:p-10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.45),transparent_38%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_npbottom_right,rgba(245,158,11,0.18),transparent_34%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(245,158,11,0.18),transparent_34%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.02),transparent_52%)]" />
         <div className="relative z-10">
           <p className="text-xs font-semibold uppercase tracking-[0.34em] text-[var(--slate-700)]">
@@ -52,15 +76,16 @@ function LandingHero() {
             yang bersih, premium, dan tetap praktis untuk agensi maupun brand in-house.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link
-              href="/login"
-              className="rounded-xl bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] px-6 py-3 text-sm font-semibold text-[var(--slate-900)]"
-            >
-              Masuk ke workspace
-            </Link>
+            <Unauthenticated>
+              <SignInButton mode="modal">
+                <button className="rounded-xl bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] px-8 py-4 text-lg font-semibold text-white shadow-lg hover:opacity-90 transition-all">
+                  Mulai Sekarang
+                </button>
+              </SignInButton>
+            </Unauthenticated>
             <Link
               href="/dashboard"
-              className="rounded-xl border border-white/25 bg-white/10 px-6 py-3 text-sm font-semibold text-[var(--slate-900)]"
+              className="rounded-xl border border-[var(--slate-200)] bg-white/50 px-8 py-4 text-lg font-semibold text-[var(--slate-700)] hover:bg-white transition-all"
             >
               Jelajahi dashboard
             </Link>
@@ -68,38 +93,45 @@ function LandingHero() {
         </div>
       </section>
 
-      <GlassPanel className="p-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--slate-700)]">
-          Quick Access
-        </p>
-        <h2 className="font-display mt-4 text-3xl leading-[1.08] text-[var(--slate-900)] md:text-4xl">
-          Masuk dan lanjutkan sprint tanpa kehilangan konteks kerja.
-        </h2>
-        <p className="mt-4 text-base leading-7 text-[var(--slate-500)]">
-          Akses role-based untuk Admin, Manager, Creator, dan Client dengan session yang tetap
-          stabil di seluruh modul.
-        </p>
-        <div className="mt-7 space-y-3">
-          <div className="rounded-xl border border-[var(--slate-150)] bg-white/90 px-4 py-4 text-[var(--slate-400)]">
-            admin@kitalaku.in
-          </div>
-          <div className="rounded-xl border border-[var(--slate-150)] bg-white/90 px-4 py-4 text-[var(--slate-400)]">
-            Masukkan password
-          </div>
-          <div className="flex items-center justify-between rounded-xl border border-[var(--slate-150)] bg-white/90 px-4 py-4">
-            <span className="text-sm text-[var(--slate-600)]">Admin workspace terdeteksi</span>
-            <span className="rounded-full bg-[rgba(16,185,129,0.14)] px-3 py-1 text-xs font-semibold text-[var(--emerald-strong)]">
-              Persistent Session
-            </span>
-          </div>
+      <Unauthenticated>
+        <div className="flex items-center justify-center">
+          <SignIn
+            routing="hash"
+            appearance={{
+              elements: {
+                rootBox: 'w-full h-full',
+                card: 'shadow-none border-none bg-transparent w-full',
+                headerTitle: 'hidden',
+                headerSubtitle: 'hidden',
+                footer: 'hidden',
+              },
+            }}
+          />
         </div>
-        <Link
-          href="/login"
-          className="mt-5 block rounded-xl bg-[linear-gradient(135deg,#f59e0b,#d28a19)] px-5 py-4 text-center text-lg font-semibold text-[#1e293b]"
-        >
-          Buka control room
-        </Link>
-      </GlassPanel>
+      </Unauthenticated>
+
+      <Authenticated>
+        <GlassPanel className="p-8 flex flex-col justify-center items-center text-center">
+          <div className="w-16 h-16 rounded-full bg-[var(--purple-soft)] flex items-center justify-center mb-6">
+            <UserButton
+              afterSignOutUrl="/"
+              appearance={{ elements: { userButtonAvatarBox: 'w-16 h-16' } }}
+            />
+          </div>
+          <h2 className="font-display text-3xl leading-[1.08] text-[var(--slate-900)] md:text-4xl">
+            Selamat datang kembali!
+          </h2>
+          <p className="mt-4 text-base leading-7 text-[var(--slate-500)] max-w-sm">
+            Workspace Anda sudah siap. Lanjutkan pekerjaan kreatif Anda hari ini.
+          </p>
+          <Link
+            href="/dashboard"
+            className="mt-8 block w-full rounded-xl bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] px-5 py-4 text-center text-lg font-semibold text-white shadow-md hover:opacity-90 transition-all"
+          >
+            Buka Dashboard
+          </Link>
+        </GlassPanel>
+      </Authenticated>
     </div>
   );
 }
@@ -124,22 +156,23 @@ export function LandingPageDesign() {
           ))}
         </section>
 
-        <GlassPanel className="flex flex-col items-center justify-between gap-4 p-6 text-center md:flex-row md:text-left">
-          <div>
-            <p className="font-display text-3xl leading-[0.98] text-[var(--slate-900)]">
-              Mulai kerja dari satu workspace yang terintegrasi.
-            </p>
-            <p className="mt-1 text-sm text-[var(--slate-500)]">
-              Login untuk membuka planner, scheduler, approval, dan analytics.
-            </p>
-          </div>
-          <Link
-            href="/login"
-            className="rounded-xl bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] px-6 py-3 text-sm font-semibold text-[var(--slate-900)]"
-          >
-            Go to Login
-          </Link>
-        </GlassPanel>
+        <Unauthenticated>
+          <GlassPanel className="flex flex-col items-center justify-between gap-4 p-6 text-center md:flex-row md:text-left">
+            <div>
+              <p className="font-display text-3xl leading-[0.98] text-[var(--slate-900)]">
+                Mulai kerja dari satu workspace yang terintegrasi.
+              </p>
+              <p className="mt-1 text-sm text-[var(--slate-500)]">
+                Login untuk membuka planner, scheduler, approval, dan analytics.
+              </p>
+            </div>
+            <SignInButton mode="modal">
+              <button className="rounded-xl bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] px-6 py-3 text-sm font-semibold text-white shadow-md hover:opacity-90 transition-all">
+                Login ke Kitalaku
+              </button>
+            </SignInButton>
+          </GlassPanel>
+        </Unauthenticated>
       </div>
     </div>
   );

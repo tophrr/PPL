@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useQuery, useAction, useMutation } from 'convex/react';
+import { useRouter } from 'next/navigation';
 import { api } from '@/convex/_generated/api';
-import { IconCopy, IconThumb, IconWand } from './icons';
+import { IconCopy, IconThumb, IconWand, IconCalendar, IconCheck } from './icons';
 import { cn, GlassPanel } from './primitives';
 import { Id } from '@/convex/_generated/dataModel';
 import { RichTextEditor } from './rich-text-editor';
@@ -12,9 +13,16 @@ import { MediaItem } from './media-item';
 import { useWorkspace } from './workspace-context';
 
 export function PlannerSection() {
-  const [brief, setBrief] = useState('');
+  const router = useRouter();
+
+  // Structured Briefing States
+  const [targetAudience, setTargetAudience] = useState('');
+  const [topic, setTopic] = useState('');
+  const [goal, setGoal] = useState('');
+  const [contentType, setContentType] = useState('Social Media Copy');
   const [tone, setTone] = useState('Refined & Warm');
   const [platform, setPlatform] = useState('Instagram');
+
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedText, setGeneratedText] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -31,13 +39,6 @@ export function PlannerSection() {
   const acquireLock = useMutation(api.collaborativeLocks.acquireLock);
   const releaseLock = useMutation(api.collaborativeLocks.releaseLock);
 
-  const brands = useQuery(api.brands.getBrands) || [];
-  const projects =
-    useQuery(
-      api.projects.getProjects,
-      selectedBrandId ? { brandId: selectedBrandId as Id<'brands'> } : 'skip',
-    ) || [];
-
   const agencyQuota = useQuery(api.brands.getAgencyQuota);
   const quotaExhausted = agencyQuota && agencyQuota.tokenQuotaRemaining <= 0;
 
@@ -50,21 +51,26 @@ export function PlannerSection() {
   const [revisionNotes, setRevisionNotes] = useState('');
 
   const handleGenerate = async () => {
-    if (!brief.trim()) {
-      setError('Brief cannot be empty.');
+    if (!targetAudience.trim() || !topic.trim()) {
+      setError('Target Audience and Topic are required.');
       return;
     }
-    if (brief.length > 500) {
-      setError('Brief must be under 500 characters.');
-      return;
-    }
+
+    const combinedBrief = `
+      Content Type: ${contentType}
+      Platform: ${platform}
+      Target Audience: ${targetAudience}
+      Topic: ${topic}
+      Goal: ${goal}
+      Tone: ${tone}
+    `.trim();
 
     setError(null);
     setIsGenerating(true);
 
     try {
       const result = await generateDraftAction({
-        brief,
+        brief: combinedBrief,
         tone,
         platform,
       });
@@ -88,13 +94,15 @@ export function PlannerSection() {
       return;
     }
 
+    const combinedBrief = `Audience: ${targetAudience} | Topic: ${topic}`;
+
     try {
       setSaveStatus('Saving...');
       const newDraftId = await saveDraftMutation({
         brandId: selectedBrandId as Id<'brands'>,
         projectId: selectedProjectId as Id<'projects'>,
         content: generatedText,
-        aiPrompt: brief,
+        aiPrompt: combinedBrief,
         platform,
       });
       setDraftId(newDraftId);
@@ -159,169 +167,229 @@ export function PlannerSection() {
     }
   };
 
+  const resetBrief = () => {
+    setTargetAudience('');
+    setTopic('');
+    setGoal('');
+    setError(null);
+  };
+
   return (
-    <div id="planner" className="space-y-5">
-      <GlassPanel className="relative overflow-hidden border-[rgba(124,58,237,0.14)] bg-[linear-gradient(145deg,rgba(255,255,255,0.96),rgba(245,247,255,0.9))] p-6 text-[var(--slate-900)] shadow-[var(--shadow-premium)] md:p-8">
+    <div id="planner" className="space-y-6">
+      {/* 1. Briefing Section */}
+      <GlassPanel className="relative overflow-hidden border-[rgba(124,58,237,0.14)] bg-[linear-gradient(145deg,rgba(255,255,255,0.96),rgba(245,247,255,0.9))] p-6 shadow-[var(--shadow-premium)] md:p-8">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.14),transparent_40%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.65),transparent_52%)]" />
         <div className="relative z-10">
-          <div className="flex items-start gap-3">
+          <div className="flex items-center gap-3">
             <div className="rounded-xl bg-[var(--purple-soft)] p-2 text-[var(--slate-900)]">
               <IconWand />
             </div>
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.32em] text-[var(--slate-700)]">
-                AI PLANNER
+              <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--slate-500)]">
+                AI Content Ideation
               </p>
-              <h2 className="font-display mt-4 text-5xl leading-[0.98] text-[var(--slate-900)] md:text-6xl">
-                Buat draft konten baru.
+              <h2 className="font-display mt-1 text-4xl text-[var(--slate-900)]">
+                Rancang Konsep Konten.
               </h2>
-              <p className="mt-4 max-w-3xl text-base leading-8 text-[var(--slate-600)]">
-                Isi brief singkat, pilih tone, lalu generate caption yang bisa langsung diedit
-                sebelum dikirim ke review.
-              </p>
             </div>
           </div>
 
-          <div className="mt-8 grid gap-4 lg:grid-cols-[minmax(0,1fr)_280px]">
-            <div>
-              <label
-                htmlFor="planner-brief"
-                className="text-sm font-medium text-[var(--slate-900)]"
+          <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="space-y-2">
+              <label className="text-xs font-bold uppercase tracking-wider text-[var(--slate-500)]">
+                Content Type
+              </label>
+              <select
+                value={contentType}
+                onChange={(e) => setContentType(e.target.value)}
+                className="w-full rounded-xl border border-[var(--slate-200)] bg-white px-4 py-2.5 text-sm outline-none transition-all focus:border-[var(--purple-border)]"
               >
-                Target audience dan topik bisnis
+                <option>Social Media Copy</option>
+                <option>Video Script (Reels/TikTok)</option>
+                <option>Blog Post Outline</option>
+                <option>Storyboard Concept</option>
+                <option>Email Newsletter</option>
+              </select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold uppercase tracking-wider text-[var(--slate-500)]">
+                Platform
+              </label>
+              <select
+                value={platform}
+                onChange={(e) => setPlatform(e.target.value)}
+                className="w-full rounded-xl border border-[var(--slate-200)] bg-white px-4 py-2.5 text-sm outline-none transition-all focus:border-[var(--purple-border)]"
+              >
+                <option>Instagram</option>
+                <option>TikTok</option>
+                <option>LinkedIn</option>
+                <option>Twitter / X</option>
+              </select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold uppercase tracking-wider text-[var(--slate-500)]">
+                Tone of Voice
+              </label>
+              <select
+                value={tone}
+                onChange={(e) => setTone(e.target.value)}
+                className="w-full rounded-xl border border-[var(--slate-200)] bg-white px-4 py-2.5 text-sm outline-none transition-all focus:border-[var(--purple-border)]"
+              >
+                <option>Refined & Warm</option>
+                <option>Professional & Confident</option>
+                <option>Playful & Conversational</option>
+                <option>Minimal & Elegant</option>
+              </select>
+            </div>
+
+            <div className="md:col-span-2 lg:col-span-1 space-y-2">
+              <label className="text-xs font-bold uppercase tracking-wider text-[var(--slate-500)]">
+                Target Audience
               </label>
               <textarea
-                id="planner-brief"
-                rows={4}
-                value={brief}
-                onChange={(e) => setBrief(e.target.value)}
-                placeholder="Founder brand premium, Gen Z urban, launching serum hydration baru..."
-                className="mt-2 w-full resize-none rounded-2xl border border-[var(--slate-200)] bg-white px-4 py-3 text-sm leading-7 text-[var(--slate-700)] shadow-[inset_0_1px_0_rgba(255,255,255,0.92)] outline-none focus:border-[var(--purple-border)] focus:shadow-[0_0_0_4px_rgba(139,92,246,0.1)]"
+                rows={3}
+                value={targetAudience}
+                onChange={(e) => setTargetAudience(e.target.value)}
+                placeholder="Gen Z Urban, Tech Founders, Busy Moms..."
+                className="w-full rounded-xl border border-[var(--slate-200)] bg-white px-4 py-2.5 text-sm outline-none transition-all focus:border-[var(--purple-border)] resize-none"
               />
             </div>
-            <div className="space-y-4">
-              <div>
-                <label
-                  htmlFor="planner-platform"
-                  className="text-sm font-medium text-[var(--slate-900)]"
-                >
-                  Platform
-                </label>
-                <select
-                  id="planner-platform"
-                  value={platform}
-                  onChange={(e) => setPlatform(e.target.value)}
-                  className="mt-2 w-full rounded-2xl border border-[var(--slate-200)] bg-white px-4 py-3 text-sm font-medium text-[var(--slate-700)] shadow-[inset_0_1px_0_rgba(255,255,255,0.92)] outline-none transition-all duration-200 focus:border-[var(--purple-border)] focus:shadow-[0_0_0_4px_rgba(139,92,246,0.1)] hover:border-[var(--slate-300)]"
-                >
-                  <option>Instagram</option>
-                  <option>LinkedIn</option>
-                  <option>Twitter / X</option>
-                  <option>TikTok</option>
-                </select>
-              </div>
-              <div>
-                <label
-                  htmlFor="planner-tone"
-                  className="text-sm font-medium text-[var(--slate-900)]"
-                >
-                  Tone of voice
-                </label>
-                <select
-                  id="planner-tone"
-                  value={tone}
-                  onChange={(e) => setTone(e.target.value)}
-                  className="mt-2 w-full rounded-2xl border border-[var(--slate-200)] bg-white px-4 py-3 text-sm font-medium text-[var(--slate-700)] shadow-[inset_0_1px_0_rgba(255,255,255,0.92)] outline-none transition-all duration-200 focus:border-[var(--purple-border)] focus:shadow-[0_0_0_4px_rgba(139,92,246,0.1)] hover:border-[var(--slate-300)]"
-                >
-                  <option>Refined & Warm</option>
-                  <option>Professional & Confident</option>
-                  <option>Playful & Conversational</option>
-                  <option>Minimal & Elegant</option>
-                </select>
-              </div>
+
+            <div className="md:col-span-2 lg:col-span-1 space-y-2">
+              <label className="text-xs font-bold uppercase tracking-wider text-[var(--slate-500)]">
+                The Topic / Hook
+              </label>
+              <textarea
+                rows={3}
+                value={topic}
+                onChange={(e) => setTopic(e.target.value)}
+                placeholder="Product launch, educational tip, trend response..."
+                className="w-full rounded-xl border border-[var(--slate-200)] bg-white px-4 py-2.5 text-sm outline-none transition-all focus:border-[var(--purple-border)] resize-none"
+              />
+            </div>
+
+            <div className="md:col-span-2 lg:col-span-1 space-y-2">
+              <label className="text-xs font-bold uppercase tracking-wider text-[var(--slate-500)]">
+                Objective / Goal
+              </label>
+              <textarea
+                rows={3}
+                value={goal}
+                onChange={(e) => setGoal(e.target.value)}
+                placeholder="Engagement, brand awareness, direct sale..."
+                className="w-full rounded-xl border border-[var(--slate-200)] bg-white px-4 py-2.5 text-sm outline-none transition-all focus:border-[var(--purple-border)] resize-none"
+              />
             </div>
           </div>
 
           {error && (
-            <div className="mt-4 rounded-xl border border-[rgba(239,68,68,0.2)] bg-[rgba(239,68,68,0.08)] p-3 text-sm text-red-600">
+            <div className="mt-6 rounded-xl border border-red-100 bg-red-50 p-3 text-xs text-red-600 font-medium">
               {error}
             </div>
           )}
 
-          {quotaExhausted && (
-            <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700 font-medium">
-              ⚠️ AI Quota Exhausted. Please contact your administrator to top up tokens.
-            </div>
-          )}
-
-          <div className="mt-5 flex flex-wrap items-center gap-3">
+          <div className="mt-8 flex items-center gap-3">
             <button
               onClick={handleGenerate}
               disabled={isGenerating || !!quotaExhausted}
-              className="inline-flex items-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] px-6 py-3 text-sm font-semibold text-white shadow-[0_16px_40px_rgba(124,58,237,0.28)] transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[0_20px_45px_rgba(124,58,237,0.36)] disabled:opacity-50 disabled:hover:transform-none"
+              className="inline-flex items-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#8b5cf6,#7c3aed)] px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:opacity-90 disabled:opacity-50"
             >
               {isGenerating ? (
-                <span className="animate-pulse">Generating...</span>
+                <span className="animate-pulse">Crafting your content...</span>
               ) : (
                 <>
                   <IconWand />
-                  <span>Generate draft</span>
+                  <span>Generate AI Draft</span>
                 </>
               )}
             </button>
             <button
-              onClick={() => setBrief('')}
-              className="rounded-2xl border border-[var(--slate-200)] bg-white/90 px-6 py-3 text-sm font-semibold text-[var(--slate-700)] transition-all duration-200 hover:bg-white hover:border-[var(--slate-300)]"
+              onClick={resetBrief}
+              className="rounded-2xl border border-[var(--slate-200)] bg-white/50 px-6 py-3 text-sm font-semibold text-[var(--slate-600)] transition-all hover:bg-white"
             >
-              Reset brief
+              Reset
             </button>
           </div>
         </div>
       </GlassPanel>
 
-      <div className="grid gap-6 lg:grid-cols-[340px_minmax(0,1fr)]">
-        {/* Left Side: Parameters & Workflow */}
+      {/* 2. Result & Editor Section */}
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+        {/* Editor (Primary) */}
         <div className="space-y-6">
           <GlassPanel className="p-6">
-            <h3 className="text-lg font-semibold text-[var(--slate-900)]">Workspace Info</h3>
-            <p className="mt-1 text-xs text-[var(--slate-500)]">Inherited from sidebar.</p>
-
-            <div className="mt-6 space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold uppercase tracking-wider text-[var(--slate-400)]">
-                  Active Brand
-                </label>
-                <div className="rounded-xl border border-[var(--slate-100)] bg-[var(--slate-50)] px-3 py-2 text-sm font-semibold text-[var(--slate-600)]">
-                  {brands.find((b) => b._id === selectedBrandId)?.name || 'Select in sidebar'}
-                </div>
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-lg font-semibold text-[var(--slate-900)]">Draft Editor</h3>
+                <p className="text-xs text-[var(--slate-500)] mt-0.5">
+                  Refine your AI generated content here.
+                </p>
               </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold uppercase tracking-wider text-[var(--slate-400)]">
-                  Target Project
-                </label>
-                <div className="rounded-xl border border-[var(--slate-100)] bg-[var(--slate-50)] px-3 py-2 text-sm font-semibold text-[var(--slate-600)]">
-                  {projects.find((p) => p._id === selectedProjectId)?.name || 'Select in sidebar'}
-                </div>
+              <div className="flex items-center gap-2">
+                {draftId ? (
+                  <span className="flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-bold uppercase text-emerald-600 border border-emerald-100">
+                    <IconCheck /> Syncing
+                  </span>
+                ) : (
+                  <button
+                    onClick={handleSaveDraft}
+                    disabled={!generatedText || !selectedProjectId}
+                    className="rounded-xl bg-[var(--slate-900)] px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-[var(--slate-800)] disabled:opacity-50 transition-all"
+                  >
+                    Save to Project
+                  </button>
+                )}
               </div>
-
-              <button
-                onClick={handleSaveDraft}
-                disabled={!generatedText || !selectedProjectId || draftId !== null}
-                className="w-full rounded-xl bg-[var(--slate-900)] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[var(--slate-800)] disabled:opacity-50"
-              >
-                {saveStatus || (draftId ? 'Saved' : 'Save to Drafts')}
-              </button>
             </div>
 
-            {draftId && (
-              <div className="mt-6 space-y-4 border-t border-[var(--slate-100)] pt-6">
+            {isLockedByOther && (
+              <div className="mb-4 rounded-xl border border-red-100 bg-red-50 p-3 text-xs text-red-600 font-medium">
+                🔒 Locked by {contentLock.userName}
+              </div>
+            )}
+
+            <RichTextEditor
+              value={generatedText}
+              onChange={setGeneratedText}
+              onAutoSave={handleAutoSave}
+              disabled={!!isLockedByOther}
+              onFocus={handleEditorFocus}
+              onBlur={handleEditorBlur}
+            />
+
+            <div className="mt-8 border-t border-[var(--slate-100)] pt-6">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--slate-400)] mb-4">
+                Media Assets
+              </h4>
+              <MediaUploader draftId={draftId} />
+
+              {draft?.mediaAssetIds && draft.mediaAssetIds.length > 0 && (
+                <div className="mt-4 grid grid-cols-4 gap-3">
+                  {draft.mediaAssetIds.map((assetId) => (
+                    <MediaItem key={assetId} assetId={assetId} />
+                  ))}
+                </div>
+              )}
+            </div>
+          </GlassPanel>
+        </div>
+
+        {/* Workflow Sidebar */}
+        <div className="space-y-6">
+          {draftId ? (
+            <GlassPanel className="p-6">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-[var(--slate-900)]">
+                Workflow Status
+              </h3>
+
+              <div className="mt-6 space-y-6">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--slate-400)]">
-                    Status
-                  </span>
+                  <span className="text-xs text-[var(--slate-500)]">Current Status</span>
                   <span
                     className={cn(
-                      'rounded-full px-2 py-0.5 text-[10px] font-bold uppercase',
+                      'rounded-full px-2.5 py-1 text-[10px] font-bold uppercase',
                       draft?.status === 'Draft'
                         ? 'bg-amber-100 text-amber-700'
                         : draft?.status === 'Review'
@@ -334,83 +402,69 @@ export function PlannerSection() {
                 </div>
 
                 <div className="space-y-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--slate-400)]">
-                    Actions
-                  </span>
-                  <div className="grid gap-2">
-                    {draft?.status === 'Draft' && (
-                      <button
-                        onClick={() => handleUpdateStatus('Review')}
-                        className="w-full rounded-xl bg-[var(--purple-strong)] px-4 py-2 text-sm font-semibold text-white transition-all hover:opacity-90"
-                      >
-                        Submit for Review
-                      </button>
-                    )}
+                  {draft?.status === 'Draft' && (
+                    <button
+                      onClick={() => handleUpdateStatus('Review')}
+                      className="w-full rounded-xl bg-[var(--purple-strong)] py-2.5 text-sm font-semibold text-white shadow-sm hover:opacity-90 transition-all"
+                    >
+                      Send for Review
+                    </button>
+                  )}
 
-                    {draft?.status === 'Review' && (
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleUpdateStatus('Approved')}
-                          className="flex-1 rounded-xl bg-emerald-600 px-3 py-2 text-sm font-semibold text-white transition-all hover:bg-emerald-700"
-                        >
-                          Approve
-                        </button>
-                        <button
-                          onClick={() => {
-                            const notes = prompt('Enter revision notes:');
-                            if (notes) {
-                              handleUpdateStatus('Draft');
-                              setRevisionNotes(notes);
-                            }
-                          }}
-                          className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-600 transition-all hover:bg-red-100"
-                        >
-                          Revise
-                        </button>
-                      </div>
-                    )}
-                  </div>
+                  {draft?.status === 'Review' && (
+                    <div className="grid gap-2">
+                      <button
+                        onClick={() => handleUpdateStatus('Approved')}
+                        className="w-full rounded-xl bg-emerald-600 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 transition-all"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => {
+                          const notes = prompt('Revision notes:');
+                          if (notes) {
+                            handleUpdateStatus('Draft');
+                            setRevisionNotes(notes);
+                          }
+                        }}
+                        className="w-full rounded-xl border border-red-200 bg-red-50 py-2.5 text-sm font-semibold text-red-600 hover:bg-red-100 transition-all"
+                      >
+                        Request Revision
+                      </button>
+                    </div>
+                  )}
                 </div>
 
-                {draft?.revisionNotes && draft.status === 'Draft' && (
-                  <div className="rounded-xl border border-amber-200 bg-amber-50 p-3">
-                    <p className="text-[10px] font-bold uppercase text-amber-700">Revision Notes</p>
-                    <p className="mt-1 text-xs text-amber-800 italic">{draft.revisionNotes}</p>
-                  </div>
-                )}
+                <div className="pt-6 border-t border-[var(--slate-100)]">
+                  <button
+                    onClick={() => router.push('/dashboard/scheduler')}
+                    className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-[var(--slate-200)] bg-white py-2.5 text-sm font-semibold text-[var(--slate-700)] hover:border-[var(--purple-border)] transition-all"
+                  >
+                    <IconCalendar />
+                    <span>View in Scheduler</span>
+                  </button>
+                </div>
               </div>
-            )}
-          </GlassPanel>
-        </div>
 
-        {/* Right Side: Editor */}
-        <GlassPanel className="p-6">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-[var(--slate-900)]">Content Editor</h3>
-            <span className="text-xs text-[var(--slate-400)]">{generatedText.length} chars</span>
-          </div>
-
-          <div className="mt-6">
-            <RichTextEditor
-              value={generatedText}
-              onChange={setGeneratedText}
-              onAutoSave={handleAutoSave}
-              disabled={!!isLockedByOther}
-              onFocus={handleEditorFocus}
-              onBlur={handleEditorBlur}
-            />
-          </div>
-
-          <div className="mt-6 border-t border-[var(--slate-100)] pt-6">
-            <MediaUploader draftId={draftId} />
-          </div>
-
-          {draftId && (
-            <div className="mt-4 flex items-center justify-end">
-              <span className="text-xs font-semibold text-[var(--slate-500)]">{saveStatus}</span>
-            </div>
+              {draft?.revisionNotes && draft.status === 'Draft' && (
+                <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
+                  <p className="font-bold uppercase text-[9px] mb-1">Feedback</p>
+                  <p className="italic">"{draft.revisionNotes}"</p>
+                </div>
+              )}
+            </GlassPanel>
+          ) : (
+            <GlassPanel className="p-6 text-center opacity-60">
+              <div className="mx-auto w-10 h-10 rounded-full bg-[var(--slate-100)] flex items-center justify-center mb-4">
+                <IconCheck />
+              </div>
+              <h3 className="text-sm font-semibold text-[var(--slate-900)]">Save to get started</h3>
+              <p className="text-xs text-[var(--slate-500)] mt-2">
+                Your draft status and media management will appear here once saved.
+              </p>
+            </GlassPanel>
           )}
-        </GlassPanel>
+        </div>
       </div>
     </div>
   );
