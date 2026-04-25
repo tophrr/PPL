@@ -5,6 +5,7 @@ import {
   ApprovalAnalyticsSection,
   CalendarSection,
   DashboardSection,
+  ProfileSection,
   SubscriptionSection,
 } from './sections';
 import { PlannerSection } from './planner-section';
@@ -180,6 +181,14 @@ export function SubscriptionPageDesign() {
   return (
     <AppShell active="Subscription">
       <SubscriptionSection />
+    </AppShell>
+  );
+}
+
+export function ProfilePageDesign() {
+  return (
+    <AppShell active="Profile">
+      <ProfileSection />
     </AppShell>
   );
 }

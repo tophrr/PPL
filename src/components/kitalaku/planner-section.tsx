@@ -447,9 +447,10 @@ export function PlannerSection() {
               onBlur={handleEditorBlur}
             />
           </div>
-          <div className="mt-4 flex items-center justify-between rounded-xl border border-[rgba(245,158,11,0.2)] bg-[rgba(245,158,11,0.08)] p-3 text-xs text-[var(--amber-strong)]">
-            <span>Human-in-the-loop validation required before approval.</span>
-            {draftId && <span className="font-semibold text-[var(--slate-700)]">{saveStatus}</span>}
+          <div className="mt-4 flex items-center justify-end">
+            {draftId && (
+              <span className="text-xs font-semibold text-[var(--slate-500)]">{saveStatus}</span>
+            )}
           </div>
           <MediaUploader draftId={draftId} />
         </GlassPanel>

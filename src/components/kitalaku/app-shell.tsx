@@ -24,6 +24,11 @@ export function AppShell({ active, children }: { active: string; children: React
   const [notificationsMounted, setNotificationsMounted] = useState(false);
 
   const currentUser = useQuery(api.users.getCurrentUser);
+  const agency = useQuery(
+    api.agencies.getAgency,
+    currentUser?.agencyId ? { agencyId: currentUser.agencyId } : 'skip',
+  );
+
   const notifications = useQuery(api.notifications.getNotifications) || [];
   const markAsReadMutation = useMutation(api.notifications.markAsRead);
   const unreadCount = notifications.filter((n) => !n.isRead).length;
@@ -142,19 +147,26 @@ export function AppShell({ active, children }: { active: string; children: React
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-semibold text-[var(--slate-700)]">AI Quota</p>
-                <p className="mt-1 text-xs text-[var(--slate-500)]">
-                  {currentUser?.agencyId ? 'Balanced' : 'No Agency'}
+                <p className="mt-1 text-2xl font-semibold tracking-tight text-[var(--slate-900)]">
+                  {agency?.tokenQuotaRemaining?.toLocaleString() || '0'}
                 </p>
               </div>
-              <span className="rounded-full bg-[rgba(16,185,129,0.12)] px-2.5 py-1 text-xs font-semibold text-[var(--emerald-strong)]">
-                Healthy
+              <span className="rounded-full bg-[rgba(16,185,129,0.14)] px-3 py-1 text-xs font-semibold text-[var(--emerald-strong)]">
+                {agency ? 'Active' : 'No Agency'}
               </span>
             </div>
             <div className="mt-4 h-2 rounded-full bg-white/85">
-              <div className="h-2 w-[42%] rounded-full bg-[linear-gradient(90deg,#8b5cf6,#7c3aed)]" />
+              <div
+                className="h-2 rounded-full bg-[linear-gradient(90deg,#8b5cf6,#7c3aed)]"
+                style={{
+                  width: `${Math.min(100, ((agency?.tokenQuotaRemaining || 0) / 1000) * 100)}%`,
+                }}
+              />
             </div>
             <p className="mt-3 text-xs leading-5 text-[var(--slate-500)]">
-              Sufficient credit balance to keep draft generation and review workflows running today.
+              {agency
+                ? 'Sufficient credit balance to keep draft generation and review workflows running.'
+                : 'Please set up an agency to use AI features.'}
             </p>
           </GlassPanel>
         </div>

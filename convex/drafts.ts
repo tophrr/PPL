@@ -155,3 +155,51 @@ export const hardDeleteOldDrafts = internalMutation({
     console.log(`Hard deleted ${deletedCount} old records from trash.`);
   },
 });
+
+export const getDashboardStats = query({
+  args: { agencyId: v.id('agencies') },
+  handler: async (ctx, args) => {
+    const brands = await ctx.db
+      .query('brands')
+      .withIndex('by_agency', (q) => q.eq('agencyId', args.agencyId))
+      .collect();
+
+    const brandIds = brands.map((b) => b._id);
+
+    const drafts = await ctx.db
+      .query('contentDrafts')
+      .filter((q) => q.eq(q.field('isDeleted'), false))
+      .collect();
+
+    // Filter by brands belonging to this agency
+    const agencyDrafts = drafts.filter((d) => brandIds.includes(d.brandId));
+
+    const stats = {
+      total: agencyDrafts.length,
+      draft: agencyDrafts.filter((d) => d.status === 'Draft').length,
+      review: agencyDrafts.filter((d) => d.status === 'Review').length,
+      approved: agencyDrafts.filter((d) => d.status === 'Approved').length,
+    };
+
+    return stats;
+  },
+});
+
+export const getDraftsByAgency = query({
+  args: { agencyId: v.id('agencies') },
+  handler: async (ctx, args) => {
+    const brands = await ctx.db
+      .query('brands')
+      .withIndex('by_agency', (q) => q.eq('agencyId', args.agencyId))
+      .collect();
+
+    const brandIds = brands.map((b) => b._id);
+
+    const drafts = await ctx.db
+      .query('contentDrafts')
+      .filter((q) => q.eq(q.field('isDeleted'), false))
+      .collect();
+
+    return drafts.filter((d) => brandIds.includes(d.brandId));
+  },
+});
