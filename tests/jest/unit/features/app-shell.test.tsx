@@ -98,6 +98,24 @@ describe('AppShell', () => {
     });
   });
 
+  test('should show settings access for creative managers', () => {
+    queryState.currentUser = {
+      _id: 'user_3',
+      name: 'Nadia',
+      role: 'Creative Manager',
+      agencyId: 'agency_1',
+    };
+
+    render(
+      <AppShell active="Dasbor">
+        <div>Manager dashboard</div>
+      </AppShell>,
+    );
+
+    expect(screen.getByLabelText('Buka pengaturan')).toBeInTheDocument();
+    expect(screen.getByText('Kuota AI')).toBeInTheDocument();
+  });
+
   test('should restrict navigation and hide admin controls for clients', () => {
     queryState.currentUser = { _id: 'user_2', name: 'Rina', role: 'Client', agencyId: 'agency_1' };
 
@@ -113,6 +131,24 @@ describe('AppShell', () => {
     expect(screen.queryAllByText('Perencana AI')).toHaveLength(0);
     expect(screen.queryAllByText('Kuota AI')).toHaveLength(0);
     expect(screen.queryByLabelText('Buka pengaturan')).not.toBeInTheDocument();
+  });
+
+  test('should reset selected project when brand changes', () => {
+    workspaceState.selectedBrandId = 'brand_1';
+    workspaceState.selectedProjectId = 'project_1';
+
+    render(
+      <AppShell active="Dasbor">
+        <div>Dashboard body</div>
+      </AppShell>,
+    );
+
+    fireEvent.change(screen.getByDisplayValue('Brand One'), {
+      target: { value: 'brand_2' },
+    });
+
+    expect(workspaceState.setSelectedBrandId).toHaveBeenCalledWith('brand_2');
+    expect(workspaceState.setSelectedProjectId).toHaveBeenCalledWith('');
   });
 
   test('should open the notification drawer and mark an item as read', async () => {
