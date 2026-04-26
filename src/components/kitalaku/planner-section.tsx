@@ -29,6 +29,7 @@ export function PlannerSection() {
   const [error, setError] = useState<string | null>(null);
   const [draftId, setDraftId] = useState<Id<'contentDrafts'> | null>(null);
   const [saveStatus, setSaveStatus] = useState<string>('');
+  const [isManualMode, setIsManualMode] = useState(false);
 
   const { selectedBrandId, selectedProjectId } = useWorkspace();
 
@@ -98,6 +99,21 @@ export function PlannerSection() {
       setError(err.message || 'Gagal menghasilkan konten.');
     } finally {
       setIsGenerating(false);
+      setIsManualMode(false);
+    }
+  };
+
+  const handleStartManualDraft = () => {
+    setError(null);
+    setGeneratedText('');
+    setDraftId(null);
+    setSaveStatus('');
+    setIsManualMode(true);
+
+    // Scroll to editor
+    const editorElement = document.getElementById('editor-section');
+    if (editorElement) {
+      editorElement.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -111,7 +127,10 @@ export function PlannerSection() {
       return;
     }
 
-    const combinedBrief = `Audience: ${targetAudience} | Topic: ${topic}`;
+    const combinedBrief =
+      !isManualMode && targetAudience.trim() && topic.trim()
+        ? `Audience: ${targetAudience} | Topic: ${topic}`
+        : undefined;
 
     try {
       setSaveStatus('Menyimpan...');
@@ -124,6 +143,7 @@ export function PlannerSection() {
       });
       setDraftId(newDraftId);
       setSaveStatus('Tersimpan ke Draf');
+      setIsManualMode(false);
     } catch (err: any) {
       setError(err.message || 'Gagal menyimpan draf.');
       setSaveStatus('');
@@ -343,6 +363,12 @@ export function PlannerSection() {
               )}
             </button>
             <button
+              onClick={handleStartManualDraft}
+              className="rounded-2xl border border-[var(--purple-border)] bg-white px-6 py-3 text-sm font-semibold text-[var(--purple-strong)] transition-all hover:bg-[var(--purple-soft)]"
+            >
+              Buat Draf Manual
+            </button>
+            <button
               onClick={resetBrief}
               className="rounded-2xl border border-[var(--slate-200)] bg-white/50 px-6 py-3 text-sm font-semibold text-[var(--slate-600)] transition-all hover:bg-white"
             >
@@ -353,7 +379,7 @@ export function PlannerSection() {
       </GlassPanel>
 
       {/* 2. Result & Editor Section */}
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div id="editor-section" className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
         {/* Editor (Primary) */}
         <div className="space-y-6">
           <GlassPanel className="p-6">
