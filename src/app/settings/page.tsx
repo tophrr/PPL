@@ -12,6 +12,7 @@ import { IconCheck } from '@/src/components/kitalaku/icons';
 export default function SettingsPage() {
   const currentUser = useQuery(api.users.getCurrentUser);
   const brands = useQuery(api.brands.getBrands) || [];
+  const agencyQuota = useQuery(api.brands.getAgencyQuota);
 
   const [newBrandName, setNewBrandName] = useState('');
   const createBrand = useMutation(api.brands.createBrand);
@@ -144,6 +145,48 @@ export default function SettingsPage() {
             Kelola brand, proyek, dan izin tim agensi Anda.
           </p>
         </header>
+
+        {currentUser?.role === 'Admin' && agencyQuota && (
+          <GlassPanel className="p-6 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-lg font-bold text-[var(--slate-900)]">Kuota Token AI</h3>
+                <p className="text-xs text-[var(--slate-500)] mt-0.5">
+                  Pantau penggunaan token AI agensi Anda.
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-bold text-[var(--slate-900)]">
+                  {agencyQuota.tokenQuotaRemaining} / {agencyQuota.totalTokenQuota ?? 1000} Token
+                </p>
+                <p className="text-[10px] uppercase font-bold text-[var(--slate-400)] tracking-wider">
+                  Tersedia
+                </p>
+              </div>
+            </div>
+
+            <div className="w-full bg-[var(--slate-100)] rounded-full h-3 overflow-hidden">
+              <div
+                className={cn(
+                  'h-full rounded-full transition-all duration-500',
+                  agencyQuota.tokenQuotaRemaining / (agencyQuota.totalTokenQuota ?? 1000) > 0.5
+                    ? 'bg-emerald-500'
+                    : agencyQuota.tokenQuotaRemaining / (agencyQuota.totalTokenQuota ?? 1000) > 0.2
+                      ? 'bg-amber-400'
+                      : 'bg-red-500',
+                )}
+                style={{
+                  width: `${Math.max(0, Math.min(100, (agencyQuota.tokenQuotaRemaining / (agencyQuota.totalTokenQuota ?? 1000)) * 100))}%`,
+                }}
+              />
+            </div>
+            {agencyQuota.tokenQuotaRemaining / (agencyQuota.totalTokenQuota ?? 1000) < 0.2 && (
+              <p className="mt-3 text-xs text-red-600 font-medium">
+                ⚠️ Kuota Anda menipis. Silakan hubungi Customer Support untuk menambah kuota token.
+              </p>
+            )}
+          </GlassPanel>
+        )}
 
         <div className="grid gap-6 xl:grid-cols-2">
           {/* 1. Brand & Client Access Management */}

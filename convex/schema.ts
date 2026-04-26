@@ -21,6 +21,7 @@ export default defineSchema({
   agencies: defineTable({
     name: v.string(),
     tokenQuotaRemaining: v.number(),
+    totalTokenQuota: v.optional(v.number()),
   }),
 
   brands: defineTable({
