@@ -34,12 +34,13 @@ export function AppShell({ active, children }: { active: string; children: React
   const { selectedBrandId, setSelectedBrandId, selectedProjectId, setSelectedProjectId } =
     useWorkspace();
 
-  const brands = useQuery(api.brands.getBrands) || [];
-  const projects =
-    useQuery(
-      api.projects.getProjects,
-      selectedBrandId ? { brandId: selectedBrandId as Id<'brands'> } : 'skip',
-    ) || [];
+  const brandsQuery = useQuery(api.brands.getBrands);
+  const brands = brandsQuery || [];
+  const projectsQuery = useQuery(
+    api.projects.getProjects,
+    selectedBrandId ? { brandId: selectedBrandId as Id<'brands'> } : 'skip',
+  );
+  const projects = projectsQuery || [];
 
   useEffect(() => {
     if (!selectedBrandId && brands.length > 0) {
@@ -188,8 +189,9 @@ export function AppShell({ active, children }: { active: string; children: React
                 className="mt-1.5 w-full rounded-xl border border-[var(--slate-200)] bg-white/50 px-3 py-2 text-sm font-semibold text-[var(--slate-700)] outline-none transition-all hover:border-[var(--purple-border)]"
               >
                 <option value="">Pilih Brand</option>
-                {brands.length === 0 && !selectedBrandId && (
-                  <option disabled>Memuat brand...</option>
+                {brandsQuery === undefined && <option disabled>Memuat brand...</option>}
+                {brandsQuery !== undefined && brands.length === 0 && (
+                  <option disabled>Belum ada brand</option>
                 )}
                 {brands.map((b) => (
                   <option key={b._id} value={b._id}>
@@ -210,8 +212,11 @@ export function AppShell({ active, children }: { active: string; children: React
                 className="mt-1.5 w-full rounded-xl border border-[var(--slate-200)] bg-white/50 px-3 py-2 text-sm font-semibold text-[var(--slate-700)] outline-none transition-all hover:border-[var(--purple-border)] disabled:opacity-50"
               >
                 <option value="">Pilih Proyek</option>
-                {selectedBrandId && projects.length === 0 && (
+                {selectedBrandId && projectsQuery === undefined && (
                   <option disabled>Memuat proyek...</option>
+                )}
+                {selectedBrandId && projectsQuery !== undefined && projects.length === 0 && (
+                  <option disabled>Belum ada proyek</option>
                 )}
                 {projects.map((p) => (
                   <option key={p._id} value={p._id}>
