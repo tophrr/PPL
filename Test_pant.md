@@ -19,8 +19,8 @@ dan _Playwright_ untuk pengujian E2E
 **_Test Cases_**
 
 **1. Modul:** **_Authentication & Role Management (_** **TC-AUTH)**
-    **ID Skenario Hasil yang diharapkan**
-       **(CoA)
+**ID Skenario Hasil yang diharapkan**
+**(CoA)
 TC-AUTH-1** Verifikasi Login/Logout Pengguna dapat masuk
 menggunakan email dan
 password yang valid serta
@@ -30,27 +30,28 @@ menghapus sesi.
 Control (_ RBAC) ketat
 Sistem membatasi akses,
 sehingga:
-- **_Admin_** : Memiliki akses
-penuh
-**_- Creator_** **:** Hanya dapat
-membuat/mengedit draf
-& jadwal
-**_- Manager_** : Menyetujui
-draf & melihat analitik
-**_- Client_** : Hanya dapat
-melihat _brand_ sendiri dan
-_Approve/Reject_
-**TC-AUTH-3** _Session Management_ Sesi tetap aktif dalam jangka
 
+- **_Admin_** : Memiliki akses
+  penuh
+  **_- Creator_** **:** Hanya dapat
+  membuat/mengedit draf
+  & jadwal
+  **_- Manager_** : Menyetujui
+  draf & melihat analitik
+  **_- Client_** : Hanya dapat
+  melihat _brand_ sendiri dan
+  _Approve/Reject_
+  **TC-AUTH-3** _Session Management_ Sesi tetap aktif dalam jangka
 
 ```
 waktu tertentu sehingga
 pengguna tidak perlu login
 ulang saat navigasi halaman
 ```
+
 **2. Modul: AI-** **_Powered Content Planning_** **(TC-AI)**
-    **ID Skenario Hasil yang Diharapkan**
-       **(CoA)
+**ID Skenario Hasil yang Diharapkan**
+**(CoA)
 TC-AI-1** Validasi _Input Client_ - _side_ Muncul pesan error jika field
 kosong atau melebihi batas
 karakter, mencegah
@@ -70,8 +71,8 @@ diketik pengguna
 manual melalui komponen
 _Text Editor_ yang disediakan
 **3. Modul:** **_Scheduler & Approval System_** **(TC-SCH)**
-    **ID Skenario Hasil yang Diharapkan**
-       **(CoA)
+**ID Skenario Hasil yang Diharapkan**
+**(CoA)
 TC-SCH-1** Validasi _Drag-and-Drop_ Sistem menolak pemindahan
 jadwal konten ke tanggal di
 masa lalu melalui validasi sisi
@@ -83,16 +84,16 @@ agensi secara instan tanpa
 perlu _refresh halaman_
 **TC-SCH-3** _Optimistic UI Update_ Antarmuka merespons
 
-
 ```
 perubahan secara instan
 sebelum konfirmasi server ,
 memberikan umpan balik
 ( rollback) jika gagal koneksi
 ```
+
 **4. Modul:** **_Centralized Analytics Dashboard_** **(TC-ANL)**
-    **ID Skenario Hasil yang Diharapkan**
-       **(CoA)
+**ID Skenario Hasil yang Diharapkan**
+**(CoA)
 TC-ANL-1** Validasi _Date Picker_ Sistem menolak jika _End
 Date_ diatur lebih awal
 daripada _Start Date_
@@ -105,5 +106,3 @@ koneksi terputus sesaat
 bernilai nol, sistem me- _render_
 desain _Empty State_ yang
 terstruktur
-
-

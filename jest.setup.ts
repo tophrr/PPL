@@ -12,7 +12,7 @@ jest.mock('next/link', () => ({
   default: ({
     href,
     children,
-  ...props
+    ...props
   }: {
     href: string;
     children: ReactNode;
@@ -26,6 +26,7 @@ jest.mock('next/image', () => ({
 }));
 
 if (typeof window !== 'undefined' && !window.requestAnimationFrame) {
-  window.requestAnimationFrame = (callback) => window.setTimeout(() => callback(performance.now()), 0);
+  window.requestAnimationFrame = (callback) =>
+    window.setTimeout(() => callback(performance.now()), 0);
   window.cancelAnimationFrame = (id) => window.clearTimeout(id);
 }
