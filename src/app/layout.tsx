@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, Lora } from 'next/font/google';
+import { Inter } from 'next/font/google';
 import './globals.css';
 import { ConvexClientProvider } from '@/src/components/ConvexClientProvider';
 import { WorkspaceProvider } from '@/src/components/kitalaku/workspace-context';
@@ -23,15 +23,10 @@ const inter = Inter({
   variable: '--font-inter',
 });
 
-const lora = Lora({
-  subsets: ['latin'],
-  variable: '--font-lora',
-});
-
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="id">
-      <body className={`${inter.variable} ${lora.variable} antialiased`}>
+      <body className={`${inter.variable} antialiased`}>
         <ConvexClientProvider>
           <WorkspaceProvider>
             <main>{children}</main>
