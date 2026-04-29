@@ -1,4 +1,4 @@
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/jest-globals';
 import { createElement, type ReactNode } from 'react';
 import { afterEach, jest } from '@jest/globals';
 

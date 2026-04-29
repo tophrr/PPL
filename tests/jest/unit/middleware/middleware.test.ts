@@ -39,7 +39,7 @@ describe('middleware', () => {
 
   test('should protect non-public routes', async () => {
     const middlewareModule = await import('@/src/middleware');
-    const auth = { protect: jest.fn().mockResolvedValue(undefined) };
+    const auth = { protect: jest.fn((..._args: any[]) => Promise.resolve()) };
 
     await middlewareModule.default(
       auth as never,

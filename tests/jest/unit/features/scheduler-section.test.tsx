@@ -33,7 +33,7 @@ const schedulerState = {
   ] as Array<Record<string, any>>,
 };
 
-const updateDraftScheduleMock = jest.fn();
+const updateDraftScheduleMock = jest.fn((..._args: any[]) => Promise.resolve());
 
 jest.mock('@/convex/_generated/api', () => ({
   api: apiMock,

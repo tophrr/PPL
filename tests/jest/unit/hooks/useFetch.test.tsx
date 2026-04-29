@@ -3,7 +3,9 @@ import { afterEach, beforeEach, describe, expect, jest, test } from '@jest/globa
 import { useFetch } from '@/src/hooks/useFetch';
 
 describe('useFetch', () => {
-  const fetchMock = jest.fn();
+  const fetchMock = jest.fn((..._args: any[]) =>
+    Promise.resolve({ json: jest.fn((...jsonArgs: any[]) => Promise.resolve<any>(jsonArgs[0])) }),
+  );
 
   beforeEach(() => {
     Object.defineProperty(global, 'fetch', {
@@ -18,7 +20,7 @@ describe('useFetch', () => {
 
   test('should fetch and return JSON data for a URL', async () => {
     fetchMock.mockResolvedValue({
-      json: jest.fn().mockResolvedValue({ id: 1, title: 'Draft One' }),
+      json: jest.fn((..._args: any[]) => Promise.resolve({ id: 1, title: 'Draft One' })),
     });
 
     const { result } = renderHook(() => useFetch<{ id: number; title: string }>('/api/drafts/1'));
@@ -33,10 +35,10 @@ describe('useFetch', () => {
   test('should refetch when the URL dependency changes', async () => {
     fetchMock
       .mockResolvedValueOnce({
-        json: jest.fn().mockResolvedValue({ url: '/api/brands/1' }),
+        json: jest.fn((..._args: any[]) => Promise.resolve({ url: '/api/brands/1' })),
       })
       .mockResolvedValueOnce({
-        json: jest.fn().mockResolvedValue({ url: '/api/brands/2' }),
+        json: jest.fn((..._args: any[]) => Promise.resolve({ url: '/api/brands/2' })),
       });
 
     const { result, rerender } = renderHook(({ url }) => useFetch<{ url: string }>(url), {

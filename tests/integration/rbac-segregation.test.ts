@@ -34,10 +34,10 @@ describe('Backend RBAC & Data Segregation', () => {
       // Simulate query filtering by agencyId
       const userAgency = agencyId;
       const brands = await mockCtx.db.query('brands');
-      const filteredBrands = brands.filter((b) => b.agencyId === userAgency);
+      const filteredBrands = brands.filter((b: { agencyId: string }) => b.agencyId === userAgency);
 
       expect(filteredBrands).toHaveLength(2);
-      expect(filteredBrands.every((b) => b.agencyId === agencyId)).toBe(true);
+      expect(filteredBrands.every((b: { agencyId: string }) => b.agencyId === agencyId)).toBe(true);
     });
 
     test('should prevent access to brands from different agency', async () => {

@@ -29,12 +29,12 @@ const plannerState = {
   searchDraftId: null as string | null,
 };
 
-const generateDraftAction = jest.fn();
-const saveDraftMutation = jest.fn();
-const updateDraftMutation = jest.fn();
-const updateDraftStatusMutation = jest.fn();
-const acquireLockMutation = jest.fn();
-const releaseLockMutation = jest.fn();
+const generateDraftAction = jest.fn((..._args: any[]) => Promise.resolve(''));
+const saveDraftMutation = jest.fn((..._args: any[]) => Promise.resolve(''));
+const updateDraftMutation = jest.fn((..._args: any[]) => Promise.resolve());
+const updateDraftStatusMutation = jest.fn((..._args: any[]) => Promise.resolve());
+const acquireLockMutation = jest.fn((..._args: any[]) => Promise.resolve());
+const releaseLockMutation = jest.fn((..._args: any[]) => Promise.resolve());
 const routerPushMock = jest.fn();
 
 jest.mock('@/convex/_generated/api', () => ({

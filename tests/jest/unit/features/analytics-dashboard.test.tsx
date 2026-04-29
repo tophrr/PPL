@@ -17,7 +17,7 @@ const state = {
   stats: { total: 0, approved: 0, review: 0, draft: 0 },
 };
 
-const updateDraftStatusMock = jest.fn();
+const updateDraftStatusMock = jest.fn((..._args: any[]) => Promise.resolve());
 
 jest.mock('@/convex/_generated/api', () => ({
   api: apiMock,
