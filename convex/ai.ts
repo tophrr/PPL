@@ -40,7 +40,7 @@ Return ONLY the caption text, without any introductory or conversational text.`;
 
       // Using the Google GenAI SDK v0.1.2 syntax
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3-flash',
         contents: prompt,
       });
 
