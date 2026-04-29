@@ -118,9 +118,6 @@ export function AppShell({ active, children }: { active: string; children: React
             <p className="mt-1 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--slate-700)]">
               Sistem Operasi Kreatif
             </p>
-            <p className="mt-4 text-sm leading-6 text-[var(--slate-600)]">
-              Perencana, penjadwal, persetujuan, dan analitik dalam satu ruang kerja premium.
-            </p>
           </GlassPanel>
 
           <div className="mt-6 px-1">

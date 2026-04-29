@@ -125,10 +125,7 @@ export function DashboardSection() {
             <h1 className="font-display mt-4 max-w-4xl text-4xl leading-[1.04] text-[var(--slate-900)] md:text-5xl">
               Keputusan konten jadi lebih jelas secara instan.
             </h1>
-            <p className="mt-5 max-w-2xl text-sm leading-8 text-[var(--slate-600)] md:text-base">
-              Dari arahan kreatif hingga persetujuan akhir, ruang kerja ini dirancang untuk
-              menghilangkan hambatan tim dan memunculkan prioritas editorial terpenting Anda.
-            </p>
+
 
             <div className="mt-5 flex flex-wrap gap-2">
               {currentUser === undefined ? (
@@ -376,9 +373,6 @@ export function DashboardSection() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h2 className="text-lg font-semibold text-[var(--slate-900)]">Aktivitas Terbaru</h2>
-              <p className="mt-1 text-sm text-[var(--slate-500)]">
-                Pergerakan terbaru pada draf, persetujuan, dan publikasi.
-              </p>
             </div>
             <Link
               href="/dashboard/scheduler"
