@@ -8,6 +8,10 @@ export const metadata: Metadata = {
   title: 'Kitalaku.in',
   description:
     'AI-based content management dashboard for planning, scheduling, approval, and analytics.',
+  icons: {
+    icon: '/kitalakuin-icon.png',
+    apple: '/kitalakuin-icon.png',
+  },
 };
 
 type RootLayoutProps = {
