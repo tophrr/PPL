@@ -15,6 +15,7 @@ const customJestConfig = {
     '<rootDir>/tests/jest/unit/hooks/useAuth.test.tsx',
     '<rootDir>/tests/jest/unit/context/workspace-context.test.tsx',
     '<rootDir>/tests/jest/unit/middleware/middleware.test.ts',
+    '<rootDir>/tests/jest/unit/middleware/session.test.ts',
     '<rootDir>/tests/jest/unit/features/app-shell.test.tsx',
     '<rootDir>/tests/jest/unit/features/planner-section.test.tsx',
     '<rootDir>/tests/jest/unit/features/scheduler-section.test.tsx',

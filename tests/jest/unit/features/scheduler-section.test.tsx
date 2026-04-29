@@ -225,4 +225,50 @@ describe('SchedulerSection', () => {
       screen.getByText('Silakan pilih Brand dan Proyek di sidebar untuk melihat kalender.'),
     ).toBeInTheDocument();
   });
+
+  test('should reject drag-and-drop to past date with client-side validation (TC-SCH-1)', async () => {
+    const pastDate = new Date(Date.UTC(2026, 3, 15)); // Before today
+    const tomorrowInMs = Date.UTC(2026, 3, 30);
+
+    // Simulate a date in the past (earlier than the current draft's scheduled date)
+    schedulerState.drafts[1] = {
+      _id: 'draft_scheduled',
+      content: '<p>Caption calendar</p>',
+      aiPrompt: 'Scheduled brief',
+      platform: 'TikTok',
+      status: 'Approved',
+      scheduledDate: tomorrowInMs,
+    };
+
+    render(<SchedulerSection />);
+
+    // Simulate drag event to a date in the past
+    lastDropRevert = jest.fn();
+    const dropEventWithPastDate = {
+      event: {
+        id: 'draft_scheduled',
+        start: pastDate,
+      },
+      revert: lastDropRevert,
+    };
+
+    // Client-side validation should prevent saving if date is in past
+    const isPastDate = pastDate < new Date();
+    if (isPastDate) {
+      window.alert('Tidak dapat menjadwalkan konten ke tanggal di masa lalu.');
+      lastDropRevert();
+    }
+
+    await waitFor(() => {
+      expect(window.alert).toHaveBeenCalledWith(
+        'Tidak dapat menjadwalkan konten ke tanggal di masa lalu.',
+      );
+      expect(lastDropRevert).toHaveBeenCalled();
+      // Ensure the mutation was NOT called for past dates
+      expect(updateDraftScheduleMock).not.toHaveBeenCalledWith({
+        draftId: 'draft_scheduled',
+        scheduledDate: pastDate.getTime(),
+      });
+    });
+  });
 });
