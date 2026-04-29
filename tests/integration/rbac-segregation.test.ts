@@ -1,4 +1,4 @@
-import { describe, expect, test, beforeEach, jest } from '@jest/globals';
+import { describe, expect, test, beforeEach, vi } from 'vitest';
 
 /**
  * Backend RBAC & Data Segregation Integration Tests
@@ -8,16 +8,16 @@ import { describe, expect, test, beforeEach, jest } from '@jest/globals';
 describe('Backend RBAC & Data Segregation', () => {
   const mockCtx = {
     auth: {
-      getUserIdentity: jest.fn(),
+      getUserIdentity: vi.fn(),
     },
     db: {
-      query: jest.fn(),
-      get: jest.fn(),
+      query: vi.fn(),
+      get: vi.fn(),
     },
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Agency Data Segregation', () => {
@@ -55,9 +55,12 @@ describe('Backend RBAC & Data Segregation', () => {
 
       // Simulate access control: throw error if brand doesn't belong to user's agency
       const hasAccess = brand.agencyId === userAgencyId;
-      if (!hasAccess) {
-        throw new Error('Unauthorized: Brand does not belong to your agency');
-      }
+
+      expect(() => {
+        if (!hasAccess) {
+          throw new Error('Unauthorized: Brand does not belong to your agency');
+        }
+      }).toThrow('Unauthorized: Brand does not belong to your agency');
 
       expect(hasAccess).toBe(false);
     });
