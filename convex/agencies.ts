@@ -10,6 +10,7 @@ export const createAgency = mutation({
     const agencyId = await ctx.db.insert('agencies', {
       name: args.name,
       tokenQuotaRemaining: 1000,
+      totalTokenQuota: 1000,
     });
 
     const user = await ctx.db

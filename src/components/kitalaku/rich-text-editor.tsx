@@ -3,6 +3,7 @@
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
+import { marked } from 'marked';
 import { useEffect, useCallback, useRef } from 'react';
 import debounce from 'lodash.debounce';
 
@@ -65,8 +66,12 @@ export function RichTextEditor({
       // This might reset cursor if updated while typing, so we only do it if the value is vastly different,
       // or we handle it carefully. For now, replacing the whole content is fine for AI generation.
       const currentContent = editor.getHTML();
-      if (currentContent === '<p></p>' || value !== currentContent) {
-        editor.commands.setContent(value);
+      // Detect likely markdown: presence of lines starting with -, *, or numbered lists, or markdown headings
+      const looksLikeMarkdown = /(^|\n)\s*([-*+]\s+|\d+\.\s+|#{1,6}\s+)/.test(value);
+      const parsed = looksLikeMarkdown ? marked.parse(value, { async: false }) : value;
+      const contentToSet = typeof parsed === 'string' ? parsed : value;
+      if (currentContent === '<p></p>' || contentToSet !== currentContent) {
+        editor.commands.setContent(contentToSet);
       }
     }
   }, [value, editor]);
@@ -103,7 +108,10 @@ export function RichTextEditor({
         </button>
       </div>
       <div className="p-5">
-        <EditorContent editor={editor} />
+        <EditorContent
+          editor={editor}
+          className="[&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:my-1"
+        />
       </div>
     </div>
   );

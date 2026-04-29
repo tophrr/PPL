@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useQuery, useMutation } from 'convex/react';
@@ -34,12 +35,13 @@ export function AppShell({ active, children }: { active: string; children: React
   const { selectedBrandId, setSelectedBrandId, selectedProjectId, setSelectedProjectId } =
     useWorkspace();
 
-  const brands = useQuery(api.brands.getBrands) || [];
-  const projects =
-    useQuery(
-      api.projects.getProjects,
-      selectedBrandId ? { brandId: selectedBrandId as Id<'brands'> } : 'skip',
-    ) || [];
+  const brandsQuery = useQuery(api.brands.getBrands);
+  const brands = brandsQuery || [];
+  const projectsQuery = useQuery(
+    api.projects.getProjects,
+    selectedBrandId ? { brandId: selectedBrandId as Id<'brands'> } : 'skip',
+  );
+  const projects = projectsQuery || [];
 
   useEffect(() => {
     if (!selectedBrandId && brands.length > 0) {
@@ -111,18 +113,26 @@ export function AppShell({ active, children }: { active: string; children: React
       <aside className="hidden rounded-[32px] border border-[rgba(219,227,238,0.88)] bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(255,255,255,0.72))] shadow-[0_24px_48px_rgba(30,41,59,0.14)] backdrop-blur-2xl md:fixed md:bottom-4 md:left-4 md:top-4 md:flex md:w-[260px] md:flex-col md:justify-between md:overflow-y-auto">
         <div className="px-5 py-5">
           <GlassPanel className="p-5">
-            <p className="font-display text-3xl leading-[0.95] text-[var(--slate-900)]">
-              Kitalaku.in
-            </p>
-            <p className="mt-1 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--slate-700)]">
-              Sistem Operasi Kreatif
-            </p>
-            <p className="mt-4 text-sm leading-6 text-[var(--slate-600)]">
-              Perencana, penjadwal, persetujuan, dan analitik dalam satu ruang kerja premium.
-            </p>
+            <Link
+              href="/dashboard"
+              className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+            >
+              <Image
+                src="/kitalakuin-icon.png"
+                alt="Kitalaku.in Logo"
+                width={40}
+                height={40}
+                className="w-10 h-10"
+              />
+              <div>
+                <p className="font-bold self-center font-display text-xl leading-[0.95] text-[var(--slate-900)]">
+                  Kitalaku.in
+                </p>
+              </div>
+            </Link>
           </GlassPanel>
 
-          <div className="mt-6 px-1">
+          <div className="mt-3 px-1">
             <p className="px-3 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--slate-400)]">
               Navigasi
             </p>
@@ -188,8 +198,9 @@ export function AppShell({ active, children }: { active: string; children: React
                 className="mt-1.5 w-full rounded-xl border border-[var(--slate-200)] bg-white/50 px-3 py-2 text-sm font-semibold text-[var(--slate-700)] outline-none transition-all hover:border-[var(--purple-border)]"
               >
                 <option value="">Pilih Brand</option>
-                {brands.length === 0 && !selectedBrandId && (
-                  <option disabled>Memuat brand...</option>
+                {brandsQuery === undefined && <option disabled>Memuat brand...</option>}
+                {brandsQuery !== undefined && brands.length === 0 && (
+                  <option disabled>Belum ada brand</option>
                 )}
                 {brands.map((b) => (
                   <option key={b._id} value={b._id}>
@@ -210,8 +221,11 @@ export function AppShell({ active, children }: { active: string; children: React
                 className="mt-1.5 w-full rounded-xl border border-[var(--slate-200)] bg-white/50 px-3 py-2 text-sm font-semibold text-[var(--slate-700)] outline-none transition-all hover:border-[var(--purple-border)] disabled:opacity-50"
               >
                 <option value="">Pilih Proyek</option>
-                {selectedBrandId && projects.length === 0 && (
+                {selectedBrandId && projectsQuery === undefined && (
                   <option disabled>Memuat proyek...</option>
+                )}
+                {selectedBrandId && projectsQuery !== undefined && projects.length === 0 && (
+                  <option disabled>Belum ada proyek</option>
                 )}
                 {projects.map((p) => (
                   <option key={p._id} value={p._id}>
@@ -245,7 +259,7 @@ export function AppShell({ active, children }: { active: string; children: React
               </div>
               <p className="mt-3 text-xs leading-5 text-[var(--slate-500)]">
                 {agency
-                  ? 'Saldo kredit cukup untuk menjalankan workflow pembuatan draf dan peninjauan.'
+                  ? 'Saldo kredit cukup.'
                   : 'Mohon siapkan agency untuk menggunakan fitur AI.'}
               </p>
             </GlassPanel>

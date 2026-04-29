@@ -172,6 +172,7 @@ export const storeUser = mutation({
         const newAgencyId = await ctx.db.insert('agencies', {
           name: `${identity.name ?? 'New User'}'s Agency`,
           tokenQuotaRemaining: 1000,
+          totalTokenQuota: 1000,
         });
         updates.agencyId = newAgencyId;
         updates.role = 'Admin';
@@ -187,6 +188,7 @@ export const storeUser = mutation({
     const agencyId = await ctx.db.insert('agencies', {
       name: `${identity.name ?? 'New User'}'s Agency`,
       tokenQuotaRemaining: 1000,
+      totalTokenQuota: 1000,
     });
 
     const identityName =
