@@ -15,6 +15,11 @@ export const generateDraft = action({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error('Unauthenticated');
 
+    const geminiModel = process.env.GEMINI_MODEL;
+    if (!geminiModel) {
+      throw new Error('Missing GEMINI_MODEL environment variable.');
+    }
+
     // 1. Check AI quota via an internal query
     const hasQuota = await ctx.runQuery(internal.users.checkQuota, {
       tokenIdentifier: identity.tokenIdentifier,
@@ -34,21 +39,54 @@ The tone of voice should be: ${args.tone}.
 Return ONLY the caption text, without any introductory or conversational text.`;
 
     try {
-      // We will implement the 20-second timeout on the frontend, but we can also set an abort controller here if needed.
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 20000);
-
-      // Using the Google GenAI SDK v0.1.2 syntax
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash',
+      // Enforce a 20-second server-side timeout and provide clearer errors.
+      const aiCall = ai.models.generateContent({
+        model: geminiModel,
         contents: prompt,
       });
 
-      clearTimeout(timeoutId);
+      let timeoutId: NodeJS.Timeout | null = null;
+      const timeoutPromise = new Promise((_, reject) => {
+        timeoutId = setTimeout(
+          () => reject(new Error('AI generation timed out after 20 seconds.')),
+          20000,
+        );
+      });
 
-      const generatedText = response.text || '';
+      const response: any = await Promise.race([aiCall, timeoutPromise]);
+      if (timeoutId) clearTimeout(timeoutId);
 
-      // 3. Deduct Quota
+      // Robustly extract text from different possible SDK shapes
+      let generatedText = '';
+      if (response == null) {
+        generatedText = '';
+      } else if (typeof response === 'string') {
+        generatedText = response;
+      } else if (typeof response.text === 'string' && response.text.trim()) {
+        generatedText = response.text;
+      } else if (typeof response.output === 'string' && response.output.trim()) {
+        generatedText = response.output;
+      } else if (Array.isArray(response.candidates) && response.candidates.length) {
+        const first = response.candidates[0];
+        generatedText =
+          (first.display && String(first.display)) ||
+          (first.text && String(first.text)) ||
+          (first.output && JSON.stringify(first.output)) ||
+          '';
+      } else {
+        try {
+          generatedText = JSON.stringify(response);
+        } catch (e) {
+          generatedText = '';
+        }
+      }
+
+      if (!generatedText || !generatedText.trim()) {
+        console.error('Gemini API returned empty response:', response);
+        throw new Error('AI returned an empty response. Please try again.');
+      }
+
+      // 3. Deduct Quota only after a successful generation
       await ctx.runMutation(internal.users.deductQuota, {
         tokenIdentifier: identity.tokenIdentifier,
         amount: 1, // Simplified quota: 1 generation = 1 token
@@ -56,11 +94,12 @@ Return ONLY the caption text, without any introductory or conversational text.`;
 
       return generatedText;
     } catch (error: any) {
-      if (error.name === 'AbortError') {
+      const msg = (error && error.message) || String(error);
+      if (msg.includes('timed out')) {
         throw new Error('AI generation timed out after 20 seconds.');
       }
       console.error('Gemini API Error:', error);
-      throw new Error('Failed to generate content due to API error or rate limits.');
+      throw new Error(`Failed to generate content: ${msg}`);
     }
   },
 });
