@@ -196,14 +196,14 @@ export function PlannerSection() {
   if (currentUser?.role === 'Client') {
     return (
       <GlassPanel className="p-12 text-center">
-        <h2 className="text-2xl font-bold text-[var(--slate-900)]">Akses Terbatas</h2>
-        <p className="mt-4 text-[var(--slate-600)]">
+        <h2 className="text-2xl font-bold text-(--slate-900)">Akses Terbatas</h2>
+        <p className="mt-4 text-(--slate-600)">
           Sebagai Klien, Anda memiliki akses untuk meninjau dan menyetujui konten, namun tidak untuk
           membuat draf baru.
         </p>
         <button
           onClick={() => router.push('/dashboard/approval-analytics')}
-          className="mt-8 rounded-xl bg-[var(--purple-strong)] px-6 py-3 text-sm font-bold text-white shadow-lg transition-all hover:opacity-90"
+          className="mt-8 rounded-xl bg-(--purple-strong) px-6 py-3 text-sm font-bold text-white shadow-lg transition-all hover:opacity-90"
         >
           Buka Persetujuan & Analitik
         </button>
@@ -214,18 +214,18 @@ export function PlannerSection() {
   return (
     <div id="planner" className="space-y-6">
       {/* 1. Briefing Section */}
-      <GlassPanel className="relative overflow-hidden border-[rgba(124,58,237,0.14)] bg-[linear-gradient(145deg,rgba(255,255,255,0.96),rgba(245,247,255,0.9))] p-6 shadow-[var(--shadow-premium)] md:p-8">
+      <GlassPanel className="relative overflow-hidden border-[rgba(124,58,237,0.14)] bg-[linear-gradient(145deg,rgba(255,255,255,0.96),rgba(245,247,255,0.9))] p-6 shadow-(--shadow-premium) md:p-8">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.14),transparent_40%)]" />
         <div className="relative z-10">
           <div className="flex items-center gap-3">
-            <div className="rounded-xl bg-[var(--purple-soft)] p-2 text-[var(--slate-900)]">
+            <div className="rounded-xl bg-(--purple-soft) p-2 text-(--slate-900)">
               <IconWand />
             </div>
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--slate-500)]">
+              <p className="text-xs font-bold uppercase tracking-[0.24em] text-(--slate-500)">
                 Ideasi Konten AI
               </p>
-              <h2 className="font-display mt-1 text-4xl text-[var(--slate-900)]">
+              <h2 className="font-display mt-1 text-4xl text-(--slate-900)">
                 Rancang Konsep Konten.
               </h2>
             </div>
@@ -233,13 +233,13 @@ export function PlannerSection() {
 
           <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-[var(--slate-500)]">
+              <label className="text-xs font-bold uppercase tracking-wider text-(--slate-500)">
                 Jenis Konten
               </label>
               <select
                 value={contentType}
                 onChange={(e) => setContentType(e.target.value)}
-                className="w-full rounded-xl border border-[var(--slate-200)] bg-white px-4 py-2.5 text-sm outline-none transition-all focus:border-[var(--purple-border)]"
+                className="w-full rounded-xl border border-(--slate-200) bg-white px-4 py-2.5 text-sm outline-none transition-all focus:border-(--purple-border)"
               >
                 <option>Konten Media Sosial</option>
                 <option>Skrip Video (Reels/TikTok)</option>
@@ -250,13 +250,13 @@ export function PlannerSection() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-[var(--slate-500)]">
+              <label className="text-xs font-bold uppercase tracking-wider text-(--slate-500)">
                 Platform
               </label>
               <select
                 value={platform}
                 onChange={(e) => setPlatform(e.target.value)}
-                className="w-full rounded-xl border border-[var(--slate-200)] bg-white px-4 py-2.5 text-sm outline-none transition-all focus:border-[var(--purple-border)]"
+                className="w-full rounded-xl border border-(--slate-200) bg-white px-4 py-2.5 text-sm outline-none transition-all focus:border-(--purple-border)"
               >
                 <option>Instagram</option>
                 <option>TikTok</option>
@@ -266,13 +266,13 @@ export function PlannerSection() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-[var(--slate-500)]">
+              <label className="text-xs font-bold uppercase tracking-wider text-(--slate-500)">
                 Gaya Bahasa (Tone)
               </label>
               <select
                 value={tone}
                 onChange={(e) => setTone(e.target.value)}
-                className="w-full rounded-xl border border-[var(--slate-200)] bg-white px-4 py-2.5 text-sm outline-none transition-all focus:border-[var(--purple-border)]"
+                className="w-full rounded-xl border border-(--slate-200) bg-white px-4 py-2.5 text-sm outline-none transition-all focus:border-(--purple-border)"
               >
                 <option>Refined & Warm</option>
                 <option>Professional & Confident</option>
@@ -282,7 +282,7 @@ export function PlannerSection() {
             </div>
 
             <div className="md:col-span-2 lg:col-span-1 space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-[var(--slate-500)]">
+              <label className="text-xs font-bold uppercase tracking-wider text-(--slate-500)">
                 Target Audiens
               </label>
               <textarea
@@ -290,12 +290,12 @@ export function PlannerSection() {
                 value={targetAudience}
                 onChange={(e) => setTargetAudience(e.target.value)}
                 placeholder="Gen Z Perkotaan, Founder Startup, Ibu Rumah Tangga..."
-                className="w-full rounded-xl border border-[var(--slate-200)] bg-white px-4 py-2.5 text-sm outline-none transition-all focus:border-[var(--purple-border)] resize-none"
+                className="w-full rounded-xl border border-(--slate-200) bg-white px-4 py-2.5 text-sm outline-none transition-all focus:border-(--purple-border) resize-none"
               />
             </div>
 
             <div className="md:col-span-2 lg:col-span-1 space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-[var(--slate-500)]">
+              <label className="text-xs font-bold uppercase tracking-wider text-(--slate-500)">
                 Topik / Hook
               </label>
               <textarea
@@ -303,12 +303,12 @@ export function PlannerSection() {
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
                 placeholder="Peluncuran produk, tips edukasi, respon tren..."
-                className="w-full rounded-xl border border-[var(--slate-200)] bg-white px-4 py-2.5 text-sm outline-none transition-all focus:border-[var(--purple-border)] resize-none"
+                className="w-full rounded-xl border border-(--slate-200) bg-white px-4 py-2.5 text-sm outline-none transition-all focus:border-(--purple-border) resize-none"
               />
             </div>
 
             <div className="md:col-span-2 lg:col-span-1 space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-[var(--slate-500)]">
+              <label className="text-xs font-bold uppercase tracking-wider text-(--slate-500)">
                 Objektif / Goal
               </label>
               <textarea
@@ -316,7 +316,7 @@ export function PlannerSection() {
                 value={goal}
                 onChange={(e) => setGoal(e.target.value)}
                 placeholder="Engagement, kesadaran brand, penjualan langsung..."
-                className="w-full rounded-xl border border-[var(--slate-200)] bg-white px-4 py-2.5 text-sm outline-none transition-all focus:border-[var(--purple-border)] resize-none"
+                className="w-full rounded-xl border border-(--slate-200) bg-white px-4 py-2.5 text-sm outline-none transition-all focus:border-(--purple-border) resize-none"
               />
             </div>
           </div>
@@ -344,7 +344,7 @@ export function PlannerSection() {
             </button>
             <button
               onClick={resetBrief}
-              className="rounded-2xl border border-[var(--slate-200)] bg-white/50 px-6 py-3 text-sm font-semibold text-[var(--slate-600)] transition-all hover:bg-white"
+              className="rounded-2xl border border-(--slate-200) bg-white/50 px-6 py-3 text-sm font-semibold text-(--slate-600) transition-all hover:bg-white"
             >
               Reset
             </button>
@@ -359,8 +359,8 @@ export function PlannerSection() {
           <GlassPanel className="p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-lg font-semibold text-[var(--slate-900)]">Editor Draf</h3>
-                <p className="text-xs text-[var(--slate-500)] mt-0.5">
+                <h3 className="text-lg font-semibold text-(--slate-900)">Editor Draf</h3>
+                <p className="mt-0.5 text-xs text-(--slate-500)">
                   Poles konten hasil AI Anda di sini.
                 </p>
               </div>
@@ -377,7 +377,7 @@ export function PlannerSection() {
                   <button
                     onClick={handleSaveDraft}
                     disabled={!generatedText}
-                    className="rounded-xl bg-[var(--slate-900)] px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-[var(--slate-800)] disabled:opacity-50 transition-all"
+                    className="rounded-xl bg-(--slate-900) px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-(--slate-800) disabled:opacity-50 transition-all"
                   >
                     Simpan ke Proyek
                   </button>
@@ -401,7 +401,7 @@ export function PlannerSection() {
             />
 
             <div className="mt-8 border-t border-[var(--slate-100)] pt-6">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--slate-400)] mb-4">
+              <h4 className="mb-4 text-xs font-bold uppercase tracking-wider text-(--slate-400)">
                 Aset Media
               </h4>
               {!draftId && (
@@ -432,7 +432,7 @@ export function PlannerSection() {
 
               <div className="mt-6 space-y-6">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-[var(--slate-500)]">Status Saat Ini</span>
+                  <span className="text-xs text-(--slate-500)">Status Saat Ini</span>
                   <span
                     className={cn(
                       'rounded-full px-2.5 py-1 text-[10px] font-bold uppercase',
@@ -455,7 +455,7 @@ export function PlannerSection() {
                   {draft?.status === 'Draft' && (
                     <button
                       onClick={() => handleUpdateStatus('Review')}
-                      className="w-full rounded-xl bg-[var(--purple-strong)] py-2.5 text-sm font-semibold text-white shadow-sm hover:opacity-90 transition-all"
+                      className="w-full rounded-xl bg-(--purple-strong) py-2.5 text-sm font-semibold text-white shadow-sm hover:opacity-90 transition-all"
                     >
                       Kirim untuk Ditinjau
                     </button>
@@ -488,7 +488,7 @@ export function PlannerSection() {
                 <div className="pt-6 border-t border-[var(--slate-100)]">
                   <button
                     onClick={() => router.push('/dashboard/scheduler')}
-                    className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-[var(--slate-200)] bg-white py-2.5 text-sm font-semibold text-[var(--slate-700)] hover:border-[var(--purple-border)] transition-all"
+                    className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-(--slate-200) bg-white py-2.5 text-sm font-semibold text-(--slate-700) hover:border-(--purple-border) transition-all"
                   >
                     <IconCalendar />
                     <span>Lihat di Penjadwal</span>
@@ -498,20 +498,18 @@ export function PlannerSection() {
 
               {draft?.revisionNotes && draft.status === 'Draft' && (
                 <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
-                  <p className="font-bold uppercase text-[9px] mb-1">Umpan Balik</p>
+                  <p className="mb-1 text-[9px] font-bold uppercase">Umpan Balik</p>
                   <p className="italic">"{draft.revisionNotes}"</p>
                 </div>
               )}
             </GlassPanel>
           ) : (
             <GlassPanel className="p-6 text-center opacity-60">
-              <div className="mx-auto w-10 h-10 rounded-full bg-[var(--slate-100)] flex items-center justify-center mb-4">
+              <div className="mx-auto mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-(--slate-100)">
                 <IconCheck />
               </div>
-              <h3 className="text-sm font-semibold text-[var(--slate-900)]">
-                Simpan untuk memulai
-              </h3>
-              <p className="text-xs text-[var(--slate-500)] mt-2">
+              <h3 className="text-sm font-semibold text-(--slate-900)">Simpan untuk memulai</h3>
+              <p className="mt-2 text-xs text-(--slate-500)">
                 Status draf dan manajemen media akan muncul di sini setelah draf disimpan.
               </p>
             </GlassPanel>
