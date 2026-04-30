@@ -50,8 +50,12 @@ export function SchedulerSection() {
     }
   }, [selectedProjectId]);
 
-  const scheduledDrafts = drafts.filter((d) => d.scheduledDate !== undefined);
-  const unscheduledDrafts = drafts.filter((d) => d.scheduledDate === undefined);
+  const scheduledDrafts = drafts.filter(
+    (d) => d.scheduledDate !== undefined && d.scheduledDate > 0,
+  );
+  const unscheduledDrafts = drafts.filter(
+    (d) => !d.scheduledDate || d.scheduledDate === 0 || d.scheduledDate === undefined,
+  );
 
   const calendarEvents = scheduledDrafts.map((d) => ({
     id: d._id,
@@ -66,12 +70,25 @@ export function SchedulerSection() {
     },
   }));
 
+  const isPastDate = (date: Date): boolean => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    date.setHours(0, 0, 0, 0);
+    return date < today;
+  };
+
   const handleEventDrop = async (info: any) => {
     const draftId = info.event.id as Id<'contentDrafts'>;
-    const newDate = info.event.start.getTime();
+    const newDate = new Date(info.event.start);
+
+    if (isPastDate(newDate)) {
+      info.revert();
+      alert('Tidak dapat menjadwalkan konten di tanggal yang sudah lewat.');
+      return;
+    }
 
     try {
-      await updateDraftSchedule({ draftId, scheduledDate: newDate });
+      await updateDraftSchedule({ draftId, scheduledDate: newDate.getTime() });
     } catch (error) {
       console.error('Failed to reschedule draft:', error);
       info.revert();
@@ -81,14 +98,42 @@ export function SchedulerSection() {
 
   const handleEventReceive = async (info: any) => {
     const draftId = info.event.id as Id<'contentDrafts'>;
-    const newDate = info.event.start.getTime();
+    const newDate = new Date(info.event.start);
+
+    if (isPastDate(newDate)) {
+      info.revert();
+      alert('Tidak dapat menjadwalkan konten di tanggal yang sudah lewat.');
+      return;
+    }
 
     try {
-      await updateDraftSchedule({ draftId, scheduledDate: newDate });
+      await updateDraftSchedule({ draftId, scheduledDate: newDate.getTime() });
       info.event.remove();
     } catch (error) {
       console.error('Failed to schedule draft:', error);
       info.revert();
+    }
+  };
+
+  const handleEventDragStop = async (info: any) => {
+    // Check if event was dragged outside the calendar (to the backlog)
+    const calendarRect = document.querySelector('.fc')?.getBoundingClientRect();
+    const eventRect = info.jsEvent.target.getBoundingClientRect();
+
+    if (calendarRect && (eventRect.x < calendarRect.x || eventRect.x > calendarRect.right)) {
+      const draftId = info.event.id as Id<'contentDrafts'>;
+      try {
+        // Remove scheduled date to move back to unscheduled
+        await updateDraftSchedule({ draftId, scheduledDate: 0 });
+        // remove from calendar immediately to avoid flicker/duplicates until data syncs
+        try {
+          info.event.remove();
+        } catch (e) {
+          // ignore
+        }
+      } catch (error) {
+        console.error('Failed to unschedule draft:', error);
+      }
     }
   };
 
@@ -221,6 +266,7 @@ export function SchedulerSection() {
               events={calendarEvents}
               eventDrop={handleEventDrop}
               eventReceive={handleEventReceive}
+              eventDragStop={handleEventDragStop}
               height="auto"
               locale="id"
               headerToolbar={{
