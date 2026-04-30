@@ -1,6 +1,7 @@
 'use client';
 
 import { Suspense, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { SignInButton, SignOutButton, useAuth, UserButton, SignIn } from '@clerk/nextjs';
 import { Authenticated, Unauthenticated } from 'convex/react';
@@ -19,7 +20,19 @@ function LandingNav() {
   const { isSignedIn } = useAuth();
   return (
     <header className="mx-auto flex w-full max-w-300 items-center justify-between rounded-2xl border border-[rgba(255,255,255,0.7)] bg-[rgba(255,255,255,0.72)] px-5 py-4 backdrop-blur-xl">
-      <p className="font-display text-2xl leading-[0.95] text-(--slate-900)">Kitalaku.in</p>
+      <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+        <Image
+          src="/kitalakuin-icon.png"
+          alt="Kitalaku.in Logo"
+          width={40}
+          height={40}
+          className="w-10 h-10"
+          priority
+        />
+        <span className="self-center font-bold font-display text-xl leading-[0.95] text-(--slate-900)">
+          Kitalaku.in
+        </span>
+      </Link>
       <div className="flex items-center gap-3">
         <Unauthenticated>
           <SignInButton mode="modal">

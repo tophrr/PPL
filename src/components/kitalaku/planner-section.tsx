@@ -68,6 +68,28 @@ export function PlannerSection() {
     }
   }, [draft, draftId]);
 
+  // Map backend/SDK errors to friendly, localized messages for the UI
+  const formatAiError = (err: any) => {
+    if (!err) return 'Gagal menghasilkan konten.';
+    const msg = (err.message && String(err.message)) || String(err);
+
+    if (/timed out/i.test(msg) || /time.?out/i.test(msg)) {
+      return 'Pembuatan konten memakan waktu terlalu lama (20 detik). Coba lagi.';
+    }
+    if (/quota/i.test(msg)) {
+      return 'Kuota AI untuk agency ini telah habis.';
+    }
+    if (/empty response/i.test(msg) || /empty/i.test(msg)) {
+      return 'AI mengembalikan respons kosong. Coba lagi.';
+    }
+    if (/rate limit|rate limited|rate-limit/i.test(msg)) {
+      return 'Layanan AI sedang dibatasi (rate limit). Tunggu sebentar dan coba lagi.';
+    }
+
+    // Fallback: return the server message but keep it concise
+    return msg.length > 200 ? `${msg.slice(0, 197)}...` : msg;
+  };
+
   const handleGenerate = async () => {
     if (!targetAudience.trim() || !topic.trim()) {
       setError('Target Audiens dan Topik wajib diisi.');
@@ -96,7 +118,8 @@ export function PlannerSection() {
       setDraftId(null);
       setSaveStatus('');
     } catch (err: any) {
-      setError(err.message || 'Gagal menghasilkan konten.');
+      console.error('AI generate error:', err);
+      setError(formatAiError(err));
     } finally {
       setIsGenerating(false);
       setIsManualMode(false);
